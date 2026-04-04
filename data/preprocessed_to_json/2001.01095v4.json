@@ -1,0 +1,659 @@
+{
+  "id": "2001.01095v4",
+  "title": "High-Dimensional Independence Testing via Maximum and Average Distance Correlations",
+  "metadata": {
+    "source_path": "data/pdf_files/2001.01095v4.pdf",
+    "page_count": 16,
+    "hash": "5bf5cddd7f595b1e8bc183dd80edc5049f45b2368407ff6cb6e41d98fa4c297e"
+  },
+  "sections": [
+    {
+      "id": "front-matter",
+      "title": "Front Matter",
+      "paras": [
+        {
+          "id": "front-matter-p001",
+          "text": "High-Dimensional Independence Testing via Maximum and Average Distance Correlations Cencheng Shen1 and Yuexiao Dong2 1Department of Applied Economics and Statistics, University of Delaware. 2Department of Statistics, Operations, and Data Science, Temple University. arXiv:2001.01095v4 [stat.ML] 10 Jun 2025",
+          "page_span": [
+            1,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "id": "abstract",
+      "title": "Abstract",
+      "paras": [
+        {
+          "id": "abstract-p001",
+          "text": "This paper investigates the utilization of maximum and average distance correlations for multivariate independence testing. We characterize their consistency properties in high-dimensional settings with respect to the number of marginally dependent dimensions, compare the advantages of each test statistic, examine their respective null distributions, and present a fast chi-square-based testing procedure. The resulting tests are non-parametric and applicable to both Euclidean distance and the Gaussian kernel as the underlying metric. To better understand the practical use cases of the proposed tests, we evaluate the empirical performance of the maximum distance correlation, average distance correlation, and the original distance correlation across various multivariate dependence scenarios, as well as conduct a real data experiment to test the presence of various cancer types and peptide levels in human plasma. Keywords: unbiased distance correlation, chi-square test, testing independence 1 Introduction Given pairs of observations (xi, yi) ∈Rp × Rq for i = 1, . . . , n, assume they are independently identically distributed as FXY of finite moments. The statistical hypothesis for",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "abstract-p002",
+          "text": "testing independence is formulated",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "abstract-p003",
+          "text": "as: H0 : FXY = FXFY , HA : FXY ̸= FXFY . Traditional correlation measures like Pearson’s correlation [1] are commonly used but unable to detect nonlinear and high-dimensional dependencies. Recent measures, such as the distance correlation [2, 3] and the Hilbert-Schmidt independence criterion [4, 5], can uncover any type of dependency given sufficient sample size, are asymptotically zero if and only if independence, and can consistently test independence for any joint distribution of fixed dimensionality. Due to such consistency properties, dependence measures have become widely used in various applications, such as feature screening [6–9], time-series [10–12], conditional independence [13–15], K-sample test [16, 17], clustering [18, 19], graph testing [20, 21], and deep learning [22, 23]. Detecting multivariate dependencies, and especially in high-dimensional scenarios, remains a challenging task with limited understanding. As the number of dimensions increases relative to the sample size, the testing power of existing dependence measures may diminish [24]. In situations where the dimensions (p or q) approach infinity and the sample size grows more slowly than the dimension,",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "abstract-p004",
+          "text": "distance",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "abstract-p005",
+          "text": "correlation may fail to detect certain multivariate dependencies [25]. To address this issue, a common solution involves projecting the high-dimensional data into a low-dimensional space and then considering the marginal dependence, such as the average marginal covariance [25], projection correlation [26], and average covariance of random rotations [27]. In this paper, we examine the utilization of maximum distance correlation and average distance correlation as sample test statistics for multivariate dependence testing. We formulate the maximum distance correlation and the average distance correlation based on pairwise, unbiased, and marginal distance 1 correlations. To understand their respective advantages, we establish their consistency properties for highdimensional independence testing, using the concept of marginally dependent dimensions. Subsequently, we analyze their limiting null distribution, and propose a valid chi-square-based test for computing pvalues, which is significantly faster than the standard permutation test. Our numerical study compares the performance of maximum, average, and original distance correlation using both Euclidean distance and the Gaussian",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "abstract-p006",
+          "text": "kernel across various simulation settings. Finally, we provide a real data experiment on",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "abstract-p007",
+          "text": "cancer types and peptide levels in human plasma to illustrate their practical applications. All theorem proofs and additional simulations are in the appendix. 2 Background In this section, we provide a review of existing results, including the unbiased distance correlation, its relationship with the Hilbert-Schmidt independence criterion (HSIC), its validity and consistency in testing independence, the standard permutation test, the limiting null distribution, and the chi-square test. We denote the paired sample data as follows: (X, Y) = {(xi, yi) ∈Rp+q, i = 1, . . . , n}. Namely, (X, Y) represents sample realizations of the random variable (X, Y ), where each sample pair (xi, yi) is assumed to be independently and identically distributed as FXY . Throughout this paper, we assume finite moments for FXY . Distance Correlation Given a distance metric d(·, ·) such as the Euclidean metric, we denote DX as the n×n pairwise distance matrix of X with DX ij = d(xi, xj). Similarly, we denote DY as the pairwise distance matrix of Y. Next, we compute a modified matrix CX as follows: nP nP       DX ij − 1 n−2 t=1 DX it − 1 n−2 s=1 DX sj nP CX ij = + 1 (n−1)(n−2) s,t=1 DX st, i ̸= j   ",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "abstract-p008",
+          "text": "  0, otherwise, and similarly compute CY from DY. The unbiased sample distance covariance and correlation are then given by: Dcovn(X, Y) = 1 n(n −3)trace \u0000 CXCY\u0001 , Dcorn(X, Y) = Dcovn(X, Y) Dcovn(X, X)Dcovn(Y, Y) ∈[−1, 1]. If n < 4 or the denominator term is not a positive real number, the unbiased sample distance correlation is set to 0. Theoretical Property The above unbiased statistic was introduced in [14]. Comparing to the biased statistic introduced in [2], the unbiased statistic satisfies E(Dcorn(X, Y)) = 0 if and only if X and Y are independent. By default, distance correlation utilizes the Euclidean distance as its metric. Nevertheless, it may accommodate any distance metric or kernel choice by setting DX and DY as the corresponding distance or kernel matrices. It is worth noting that when the Gaussian kernel is used, distance correlation effectively becomes equivalent to HSIC. In fact, one can interchange between distance and kernel metrics through an appropriate kernel-to-distance transformation [28, 29]. When the metric used is of strong negative type [30, 31], such as the Euclidean distance, or when a characteristic kernel is used [4, 13], like the Gaussian kernel,",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "abstract-p009",
+          "text": "the resulting distance correlation exhibits",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "abstract-p010",
+          "text": "the following property: Dcorn(X, Y) n→∞ → 0 2 if and only if X and Y are independent. This fundamental property makes distance correlation a valid and universally consistent statistic for testing independence. Hypothesis Test To conduct testing on sample data, one needs to approximate the null distribution of the test statistic, typically achieved through a standard permutation test [32]. Given X and Y, the process involves randomly permuting the indices of Y for R iterations. The p-value is then computed as: pval = 1 r=1 1{Dcorn(X, πr(Y)) > Dcorn(X, Y)} where each πr represents a random permutation of size n. Specifically, when X and Y are dependent, performing a permutation test on distance correlation yields an asymptotic p-value of 0, leading to testing power that converges to 1 as the sample size n increases. Conversely, when X and Y are independent, the p-value follows a Uniform distribution in the range [0, 1], and the testing power equals the type I error level α. The primary drawback of the permutation test is its computational complexity, which requires repeated computation of the statistic for R iterations, often set to 100 or more, rendering it time-consuming for large",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "abstract-p011",
+          "text": "sample sizes.",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "abstract-p012",
+          "text": "Recent works have significantly reduced the computational cost of distance correlation [33, 34] and the resulting permutation test [9, 35]. Specifically, the null distribution of distance correlation satisfies the following [36]: ∞ n · Dcorn(X, Y) → i,j=1 wij(N 2 ij −1), where the weights satisfy wij ∈[0, 1] and P∞ i,j=1 w2 ij = 1, and Nij are independent standard normal distributions. The null distribution can be further bounded by a chi-square-based distribution, enabling the use of the following chi-square test: pval = 1 −Fχ2 1−1(n · Dcorn(X, Y)). This approximation is approximately valid for any α < 0.0875 [35], and has a time complexity of O(1) and is straightforward to implement in any programming language. Difference from Mutual Independence A related but fundamentally distinct concept is that of testing mutual independence within a random vector X. For instance, a recent paper [25] introduced a similar idea of using the maximum of marginal statistics to construct a more powerful test for mutual independence. However, testing independence between X ∈Rp and Y ∈Rq is conceptually and technically different from testing mutual independence among the marginals of X. While there",
+          "page_span": [
+            3,
+            3
+          ]
+        },
+        {
+          "id": "abstract-p013",
+          "text": "are similarities in the construction of test statistics (e.g., via",
+          "page_span": [
+            3,
+            3
+          ]
+        },
+        {
+          "id": "abstract-p014",
+          "text": "marginal aggregations), methods developed for one problem are generally not applicable to the other. To be precise, testing mutual independence within X corresponds to the null hypothesis: H0 : FX = j=1 FXj, i.e., all coordinates of X are mutually independent. This is a much stronger requirement than pairwise independence, and implies that there is no interaction or shared randomness among any subset of the components of X. By contrast, testing independence between X and Y involves the hypothesis: H0 : FXY = FX · FY , which concerns the relationship between two random vectors, regardless of any dependence structure within X or within Y individually. To illustrate the distinction, consider the combined vector Z = [X, Y ]. If X ⊥Y , this does not imply that the components of X are mutually independent — hence, Z may or may not be mutually independent. Conversely, if X and Y are dependent, then Z must be mutually dependent. As a result, applying a mutual independence test to Z is not a valid or consistent method for testing whether X ⊥Y , because mutual dependence of Z does not uniquely determine the presence or absence of dependence 3 between X and Y . The reverse also holds: tests",
+          "page_span": [
+            3,
+            3
+          ]
+        },
+        {
+          "id": "abstract-p015",
+          "text": "for independence between X and Y are not valid nor",
+          "page_span": [
+            3,
+            3
+          ]
+        },
+        {
+          "id": "abstract-p016",
+          "text": "consistent for assessing mutual independence within X. The only special case in which the two problems coincide is when both X and Y are univariate. In that setting, testing independence between X and Y is equivalent to testing mutual independence within Z = [X, Y ], which forms the basis for using marginal dependence measures for mutual independence testing in the bivariate case, as in [25]. Outside of this setting, however, the two problems remain fundamentally different. Therefore, while both settings involve notions of statistical dependence, they target distinct structural properties of the data, and the associated testing methodologies are not interchangeable in general. 3 Main Results 3.1 Maximum and Average Distance Correlations Given X = {xi ∈Rp for i = 1, . . . , n]} as the sample data, let Xs = {xs i ∈R for i = 1, . . . , n} denote the sth-dimension of the sample data. Similarly for Y and Yt for each t ∈[q]. For every s ∈[p] and t ∈[q], we refer to the distance correlation between (Xs, Yt) as the marginal distance correlation, denoted by Dcorn(Xs, Yt). To distinguish, we will refer to Dcorn(X, Y), which incorporates all dimensions of the sample data, as the original",
+          "page_span": [
+            4,
+            4
+          ]
+        },
+        {
+          "id": "abstract-p017",
+          "text": "distance correlation.",
+          "page_span": [
+            4,
+            4
+          ]
+        },
+        {
+          "id": "abstract-p018",
+          "text": "We introduce the maximum and average distance correlations as follows: MDcorn(X, Y) = max s∈[p],t∈[q] Dcorn(Xs, Yt), ADcorn(X, Y) = s∈[p],t∈[q] Dcorn(Xs, Yt)/pq. In essence, MDcorn(X, Y) is the maximum of all marginal distance correlations per dimension, while ADcorn(X, Y) is the average of all marginal distance correlations. Note that in this paper, all the sample statistics utilize the unbiased distance correlation. 3.2 Consistency for Testing Marginal Dependence In this section, our objective is to determine when and how the proposed statistics are suitable for testing independence in high-dimensional scenarios, particularly when pq is large and increases concurrently with n. To achieve this, we introduce the concept of marginal dependence: Definition 1. For X ∈Rp and Y ∈Rq, we define ∆(X, Y ) as the set of pairwise marginally dependent dimensions. In other words, the element (s, t) ∈∆(X, Y ) if and only if FXsY t ̸= FXsFY t. We use δ(X, Y ) = |∆(X, Y )| to denote the cardinality of this set, which means it represents the number of marginally dependent dimensions. Clearly, δ(X, Y ) ∈[0, pq]. If δ(X, Y ) > 0, it implies that X and Y must be dependent. However, the reverse is not",
+          "page_span": [
+            4,
+            4
+          ]
+        },
+        {
+          "id": "abstract-p019",
+          "text": "always true; that is, X and Y may be dependent, while δ(X, Y ) could be 0. One such",
+          "page_span": [
+            4,
+            4
+          ]
+        },
+        {
+          "id": "abstract-p020",
+          "text": "example is provided in appendix A4. In practice, creating such examples requires special construction, and the concept of marginal dependence captures a significant portion of dependence. The following two theorems establish the high-dimensional behavior of the maximum and average statistics under the null and alternative hypotheses, respectively. Theorem 1. Given δ(X, Y ) = 0, the average distance correlation satisfies: ADcorn(X, Y) n→∞ → 0 regardless of pq. On the other hand, the maximum distance correlation satisfies: MDcorn(X, Y) n→∞ → 0 when pq = o(√nen). Theorem 2. When δ(X, Y ) > 0, the maximum distance correlation satisfies: MDcorn(X, Y) n→∞ → c > 0 4 regardless of pq. On the other hand, the average distance correlation satisfies: ADcorn(X, Y) n→∞ → c ≥0, with equality holds when δ(X, Y ) = o(pq) and pq n→∞ → ∞. Therefore, both the maximum and average distance correlations are asymptotically consistent for testing the presence of marginal dependence when pq is fixed because either statistic tends to zero asymptotically if and only if δ(X, Y ) = 0. However, in high-dimensional testing scenarios where pq increases concurrently with n, the maximum statistic may not be",
+          "page_span": [
+            4,
+            4
+          ]
+        },
+        {
+          "id": "abstract-p021",
+          "text": "consistent if pq increases too rapidly",
+          "page_span": [
+            4,
+            4
+          ]
+        },
+        {
+          "id": "abstract-p022",
+          "text": "relative to n, while the average statistic is not consistent when δ(X, Y ) is too small relative to n. This can be summarized in the following corollary, which directly follows from Theorem 1 and Theorem 2. Corollary 1. As n increases to infinity, the average distance correlation is asymptotically consistent in testing the existence of marginal dependence when pq is fixed or δ(X, Y ) = O(pq) for increasing pq. The maximum distance correlation is asymptotically consistent in testing the existence of marginal dependence when pq is fixed or pq = o(√nen) for increasing pq. Therefore, the maximum correlation is advantageous when the dependence signal is sparse, i.e., concentrated in a few marginal pairs. In contrast, the average statistic is more powerful when there are many weak associations spread across many dimensions. 3.3 Limiting Null Distribution While one could employ the permutation test on either the maximum or average statistic (detailed procedure in appendix), it tends to be very slow for large n. To expedite the testing process, we consider the null distributions of the maximum and average statistics: Theorem 3. Assume that X and Y are independent, and that the coordinates",
+          "page_span": [
+            5,
+            5
+          ]
+        },
+        {
+          "id": "abstract-p023",
+          "text": "of X and Y are",
+          "page_span": [
+            5,
+            5
+          ]
+        },
+        {
+          "id": "abstract-p024",
+          "text": "independent within each variable. For sufficiently large n and sufficiently small α, it holds that n · MDcorn(X, Y) ⪯α U −1, where U ∼F pq χ2 1 (x). While the null distribution of maximum statistic relies on upper-tail dominance, the null distribution of the average statistic is simpler, which converges to a normal distribution as the dimensions increase: Theorem 4. Assume that X and Y are independent, and that the coordinates of X and Y are independent within each variable. As both n and pq increase to infinity, it holds that n√pq · ADcorn(X, Y) →N(0, 2). Note that this coincides with the limiting null distribution of the original distance correlation in high-dimensions [37]. Moreover, while Theorem 3 holds for any pq, Theorem 4 requires pq to increase. In practice, we have found that pq > 30 suffices for a good approximation. Alternatively, if we assume each marginal distance correlation actually follows χ2 1, then the null distribution of npq · ADcorn(X, Y) equals χ2 pq −pq. This provides a better empirical approximation for small pq, and as pq increases, it also converges to N(0, 2) after dividing by √pq. Regarding the assumptions, we require that the coordinates of X and Y are",
+          "page_span": [
+            5,
+            5
+          ]
+        },
+        {
+          "id": "abstract-p025",
+          "text": "independent. While this",
+          "page_span": [
+            5,
+            5
+          ]
+        },
+        {
+          "id": "abstract-p026",
+          "text": "may appear restrictive at first glance, it can be further relaxed. Specifically, if we additionally assume that both p and q tend to infinity, the independence assumption can be relaxed to exchangeability, similar to Theorem 1 and Corollary 2 in [37]. This can be justified by de Finetti’s theorem, which states that an infinite exchangeable sequence is conditionally i.i.d. Our proofs remain valid under this setting, as the maximum or average distance correlation retains the same asymptotic distribution when conditioning on the latent variable. 3.4 Chi-square-based Tests Utilizing the null distributions, we can construct chi-square-based tests for both the maximum and average distance correlations. Specifically, we calculate p-values as follows: 5 • For the maximum distance correlation, we let z = n · MDcorn(X, Y) + 1, and compute the p-value as pval = 1 −Prob{χ2 1 < z}pq. If pval < α, where α is the type 1 error, we reject the independence hypothesis. • For the average distance correlation, we let z = n · ADcorn(X, Y) + 1, and compute the p-value as pval = 1 −Prob{χ2 pq < pqz}. If pval < α, where α is the type 1 error, we reject the independence hypothesis. Note that for the average",
+          "page_span": [
+            5,
+            5
+          ]
+        },
+        {
+          "id": "abstract-p027",
+          "text": "distance correlation, we employ the χ2",
+          "page_span": [
+            5,
+            5
+          ]
+        },
+        {
+          "id": "abstract-p028",
+          "text": "pq distribution instead of the normal distribution. This choice provides a better approximation for small values of pq while being equivalent to the normal distribution for large pq. Both of these chi-square-based tests are considered valid according to the following theorem: Theorem 5. Under the same condition in Theorem 3, the chi-square test for the maximum correlation is a valid test of independence for sufficiently large n and sufficiently small type 1 error level α. Moreover, the chi-square test for the average correlation is a valid test of independence for sufficiently large n and pq, at any type 1 error level α. It is important to note that our results do not rely on any particular choice of distance metric. For instance, one can employ the Gaussian kernel and compute the maximum and average HSIC, and the chi-square-based tests remain approximately valid and consistent. 3.5 Computational Complexity Taken together, the maximum and average distance correlation statistics have a computational complexity of O(pq n log n). This is because each marginal distance correlation can be computed in O(n log n) time under the Euclidean distance metric, thanks to [33, 34]. The",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "abstract-p029",
+          "text": "chi-square-based tests incur no addi-",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "abstract-p030",
+          "text": "tional cost, so the overall complexity for testing remains O(pq n log n). However, if a permutation test with R permutations is used, the total complexity increases to O(R pq n log n), and in practice, R is typically 100 or more. If one instead uses a non-Euclidean metric such as the Gaussian kernel, fast univariate algorithms are no longer available. In this case, the computation of the test statistic has a complexity of O(pq n2), and using a permutation test raises the total complexity to O(R pq n2). For comparison, the original (non-marginal) distance correlation or kernel-based methods require O((p + q) n2) time. However, since the pairwise distance or kernel matrix is computed only twice, the cost is typically treated as O(n2) in practice. Therefore, marginal-based methods can be slower in terms of raw computation. Namely, in high-dimensional testing scenarios, potential gain in statistical power shall come at the cost of increased computational burden. As an additional note, our average distance correlation performs similarly to the average distance covariance proposed in [25], since distance correlation is simply a normalized version of distance covariance, and their testing",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "abstract-p031",
+          "text": "power has been shown to coincide [2]. However, our method offers a computational",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "abstract-p032",
+          "text": "advantage: the average distance covariance typically requires a permutation test (costing O(R pq n log n)), or alternatively, a transformation into a t-distribution for avoiding permutations. The latter approach requires computing marginal distance variances, resulting in a complexity of O((pq + p2 + q2) n log n), which can exceed the cost of a permutation test when p >> q or vice versa. In contrast, our average distance correlation, paired with the efficient chi-square test, achieves similar testing power and significantly lower computational cost, making it more suitable for large sample sizes and high-dimensional settings. 4 Simulation Study In our simulation study, we first demonstrate that the chi-square-based distribution provides an accurate approximation of the true null distribution. Then we evaluate the testing power of the maximum and average tests on a variety of multivariate dependence. 4.1 Chi-Square vs True Null Figure 1 displays the comparison between the chi-square-based distribution and the true null distribution for original, maximum, and average statistics, using Euclidean distance and Gaussian kernel respectively. The cumulative distribution function is plotted",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "abstract-p033",
+          "text": "based on Theorem 3 and Theorem 4 for a sample size",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "abstract-p034",
+          "text": "6 of n = 300 and pq = 100. The true null distribution is obtained through repeated generation of independent (X, Y). For the original and maximum distance correlations, the chi-square-based distribution dominates the true null for small α, regardless of whether Euclidean distance or Gaussian kernel is used. For the average distance correlation, the chi-square-based distribution aligns closely with the true null distribution. Cumulative Distribution Function Cumulative Distribution Function Ori DCor Max DCor Ave DCor 1 1 1 0.9 0.9 0.9 0.8 0.8 0.8 0.7 0.7 0.7 Chi-Square Actual Null 0.6 0.6 0.6 0 0.05 0.1 0.5 0.5 0 0.02 0.04 0.5 0 1 2 10-3 Ori HSIC Max HSIC Ave HSIC 1 1 1 0.9 0.9 0.9 0.8 0.8 0.8 0.7 0.7 0.7 0.6 0.6 0.6 0 0.05 0.1 0.5 0.5 0 0.02 0.04 0.5 0 1 2 10-3 Fig. 1 Compare the chi-square distribution and true null distribution for distance correlation. The top row considers the Euclidean distance (DCor), while the bottom row employs the Gaussian kernel (HSIC). In the first column, we compare the null approximation for the original statistic. In the second and third columns, we compare the null approximation for the maximum and average statistics, respectively, based on Theorems",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "abstract-p035",
+          "text": "3 and 4.",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "abstract-p036",
+          "text": "4.2 Fixed δ(X, Y ) with Increasing pq We evaluate the testing power of original statistic, maximum statistic, and average statistic, in detecting multivariate dependence structures. The data is generated by sampling Xs ∼Uniform(−1, 1) for s = 1, . . . , p, using the p × 1 vector w = [1, 1 2, 1 3, 1 4, 1 5, 0, · · · , 0], and considering • Linear (X, Y ): Y = X · w. • Quadratic (X, Y ): Y = X2 · w using dimension-wise square. • Fourth Root (X, Y ): Y = |X| 1 4 · w. • Independence (X, Y ): Xs ∼Uniform(−1, 1) for s = 1, . . . , p and Y ∼Uniform(−1, 1). Here, each sample in X is independently and identically distributed (i.i.d.) from the distribution of X, and Y is constructed as a function of each corresponding sample in X, except in the case of independence, where each sample in Y is also independently generated. We perform the simulation study with n = 100 by gradually increasing p from 5 to 100 (except in the linear case, where it is increased to 1000). At each p, we generate sample data 1000 times, run each method and record the number of times the p-value is below α = 0.05. The results are plotted in Figure 2, showing the testing power for each method. In these scenarios",
+          "page_span": [
+            7,
+            7
+          ]
+        },
+        {
+          "id": "abstract-p037",
+          "text": "(excluding independence), the number of marginally dependent dimensions are",
+          "page_span": [
+            7,
+            7
+          ]
+        },
+        {
+          "id": "abstract-p038",
+          "text": "limited, i.e., δ(X, Y ) = 5, while pq increases. The maximum test delivers near perfect power, followed 7 by the average test, and the original test has the lowest power. As pq increases, the power of all tests declines, but the maximum test appears to be the least affected by increasing dimensions. This pattern remains consistent regardless of whether the Euclidean distance or Gaussian kernel is employed. Furthermore, in the case of independence, the chi-square-based test effectively controls the type 1 error, and the test power closely aligns with α, affirming the validity of the tests. 1 Quadratic 1 Independence Linear 1 Fourth Root 1 0.8 0.8 0.8 0.8 Testing Power 0.6 0.6 0.6 0.6 0.4 0.4 0.4 0.4 Max DCor Ave Dcor Ori DCor 0.2 0.2 0.2 0.2 0 20 40 60 80 100 0 20 40 60 80 100 0 20 40 60 80 100 0 200 400 600 Number of Ambient Dimension 1 1 1 1 0.8 0.8 0.8 0.8 Testing Power 0.6 0.6 0.6 0.6 0.4 0.4 0.4 0.4 Max HSIC Ave HSIC Ori HSIC 0.2 0.2 0.2 0.2 0 20 40 60 80 100 0 20 40 60 80 100 0 20 40 60 80 100 0 200 400 600 Number of Ambient Dimension Fig. 2 Compare the testing power of maximum statistic, average statistic, and original statistic in linear, quadratic, fourth root, and",
+          "page_span": [
+            7,
+            7
+          ]
+        },
+        {
+          "id": "abstract-p039",
+          "text": "independent settings as the number of dimensions increases while the number of marginally dependent dimensions",
+          "page_span": [
+            7,
+            7
+          ]
+        },
+        {
+          "id": "abstract-p040",
+          "text": "is fixed. The top row utilizes Euclidean distance (DCor), while the bottom row employs the Gaussian kernel (HSIC). 4.3 Increasing δ(X, Y ) with Fixed pq In this scenario, we examine different multivariate dependence structures where the number of marginally dependent dimension δ(X, Y ) increases, while pq remains fixed. Let Xs ∼Uniform(−1, 1) for s = 1, . . . , p, and consider • Linear (X, Y ): Y s = Xs for each s ≤d, and Y s ∼Uniform(−1, 1) otherwise. • Trigonometry (X, Y ): Y s = sin(2πXs) for each s ≤d, and Y s ∼Uniform(−1, 1) otherwise. We set p = 50 and n = 20 in linear, and p = 30 and n = 100 in trigonometry. For each d = 1, . . . , 10, we repeat the experiment 1000 times, run the test with all methods, and plot the testing power at a type 1 error level of α = 0.05 in Figure 3. In these settings, as the number of marginally dependent dimensions δ(X, Y ) increases, all testing methods eventually achieve a testing power of 1. Among these, the maximum test consistently outperforms the average test, and the original test has the lowest power. 5 Real Data This experiment aimed to investigate the presence of any dependency between the abundance levels of peptides in human plasma",
+          "page_span": [
+            8,
+            8
+          ]
+        },
+        {
+          "id": "abstract-p041",
+          "text": "and the occurrence of cancers. Selected Reaction Monitoring (SRM) was",
+          "page_span": [
+            8,
+            8
+          ]
+        },
+        {
+          "id": "abstract-p042",
+          "text": "employed as a targeted quantitative proteomics technique for measuring protein and peptide abundance in complex biological samples [38]. A prior study utilized SRM to identify a total of 318 peptides from a total of 98 individuals, among whom 33 were normal subjects, 10 had pancreatic cancer, 24 had colorectal cancer, and 28 had ovarian cancer [39]. Consequently, X represents the sample peptide levels with p = 318. The data is publicly available on a GitHub repository in MATLAB format1. We performed independence tests based on various combinations, including utilizing the entire sample dataset, where Y represents a label vector indicating the cancer type each subject has. Other test scenarios included: distinguishing normal individuals from others, where Y is a label vector with normal subjects as 0 and all others as 1; distinguishing pancreatic from colorectal cancer, with Y as a label vector where pancreatic subjects are labeled as 0, colorectal subjects as 1, and others as unused; and so forth. Note that categorical response variables can be directly incorporated in dependence testing. Binary 1https://github.com/neurodata/MGC-paper/blob/master/Data/Preprocessed/proteomics.mat 8",
+          "page_span": [
+            8,
+            8
+          ]
+        },
+        {
+          "id": "abstract-p043",
+          "text": "Linear",
+          "page_span": [
+            8,
+            8
+          ]
+        },
+        {
+          "id": "abstract-p044",
+          "text": "1 Trigonometry 1 Max DCor Ave Dcor Ori DCor 0.8 0.8 Testing Power 0.6 0.6 0.4 0.4 0.2 0.2 0 2 4 6 8 10 0 2 4 6 8 10 Number of Signal Dimension 1 1 Max HSIC Ave HSIC Ori HSIC 0.8 0.8 Testing Power 0.6 0.6 0.4 0.4 0.2 0.2 0 2 4 6 8 10 0 2 4 6 8 10 Number of Signal Dimension Fig. 3 Compare the testing power of maximum statistic, average statistic, and original statistic in linear and trigonometric relationships as the number of marginally dependent dimensions increases from 1 to 10. The top row considers the Euclidean distance (DCor), while the bottom row employs the Gaussian kernel (HSIC). variables, for instance, can be numerically encoded (e.g., as 0 and 1), while multi-category variables can be handled via one-hot encoding [9, 17]. A previous study [40] indicated that all such testing combinations should yield significant p-value. Table 1 presents the test statistics and p-values for the maximum distance correlation, average distance correlation, and original distance correlation. While the original distance correlation performed well, there were three combinations where it failed to detect dependence: pancreatic vs others, colorectal vs others, and pancreatic vs colorectal. This",
+          "page_span": [
+            9,
+            9
+          ]
+        },
+        {
+          "id": "abstract-p045",
+          "text": "may not be surprising, given that there were only 10 subjects",
+          "page_span": [
+            9,
+            9
+          ]
+        },
+        {
+          "id": "abstract-p046",
+          "text": "with pancreatic cancer, which is the smallest group in the dataset, and colorectal cancer is the second smallest group. The maximum correlation yielded significant results overall, except in three testing combinations involving pancreatic cancer. As the chi-square test for the maximum correlation may be overly conservation for small sample sizes, in these three cases, we further conducted permutation tests using 100 random permutations (results reported in brackets), and the results improved significantly. The average correlation yielded significant p-values in almost all combinations, as its chi-square test is robust against small sample sizes. The only exception was the test for pancreatic vs. colorectal cancer, where it did not yield a significant result, while the maximum method is very close to significance. Its underperformance in this case suggests that δ(X, Y ), the number of marginally dependent dimensions, could be very small, leading to its lack of sensitivity. 6 Conclusion In this paper, we propose the maximum and average distance correlations using pairwise, unbiased, and marginal distance correlations. This formulation facilitates the understanding of their",
+          "page_span": [
+            9,
+            9
+          ]
+        },
+        {
+          "id": "abstract-p047",
+          "text": "consistency",
+          "page_span": [
+            9,
+            9
+          ]
+        },
+        {
+          "id": "abstract-p048",
+          "text": "properties, relative advantages, limiting distributions, and enables the use of chi-square-based tests. The numerical experiments further confirm our findings and shed light on their practical usages. Beyond their theoretical appeal, these methods are highly applicable to real-world problems, particularly in biomedical and biological sciences. In such fields, researchers are often interested in detecting complex, nonlinear, and high-dimensional dependencies, such as between gene expression profiles and disease subtypes, or between multi-omics data and clinical outcomes. Our methods are well suited to these tasks, as they operate in a fully nonparametric, model-free framework, require minimal assumptions, and are robust to data heterogeneity. 9 Table 1 Results for cancer peptide testing. We consider 11 different combinations of the sample data to test significant relationship, and use the original distance correlation, maximum distance correlation, and average distance correlation for testing. The statistic and the p-value are reported. Combination Dcorn p-val MDcorn p-val ADcorn p-val All data 98 0.26 < 0.001 0.30 < 0.001 0.10 < 0.001 Norm vs Others 98 0.13 < 0.001 0.23 < 0.001",
+          "page_span": [
+            9,
+            9
+          ]
+        },
+        {
+          "id": "abstract-p049",
+          "text": "0.055 < 0.001 PANC vs Others 98 0.007 0.19 0.11 0.18(0.07) 0.003 0.01 COLO vs Others 98 0.022 0.07 0.15 0.02 0.013 < 0.001 OVAR vs Others 98 0.35 < 0.001 0.47 < 0.001 0.15 < 0.001 Norm vs. PANC 43 0.080 0.035 0.50 < 0.001 0.024 < 0.001 Norm vs. COLO 57 0.077 0.021 0.36 < 0.001 0.029 < 0.001 Norm vs. OVAR 61 0.41 < 0.001 0.49 < 0.001 0.18 < 0.001 PANC vs. COLO 34 −0.030 1 0.31 0.19(0.06) −0.01 0.99 PANC vs. OVAR 38 0.17 0.005 0.25 0.31(0.02) 0.06 < 0.001 COLO vs. OVAR 52 0.25 < 0.001 0.35 < 0.001 0.12 < 0.001 Moreover, the ability to decompose dependence through marginal statistics (and aggregate them meaningfully) offers practical interpretability and flexibility for applied scientists. Compared to classical approaches rooted in covariance-based inference (e.g., the Wishart distribution under multivariate normality), our approach targets a broader class of multivariate dependence structures. Taken together, we believe the proposed distance correlation framework offers a valuable statistical tool for both theoretical development and applied data analysis. Declarations • Availability of data and materials: The datasets generated and/or analysed during the current study are available",
+          "page_span": [
+            10,
+            10
+          ]
+        },
+        {
+          "id": "abstract-p050",
+          "text": "in the Github repository, [https://github.com/neurodata/mgc-matlab].",
+          "page_span": [
+            10,
+            10
+          ]
+        },
+        {
+          "id": "abstract-p051",
+          "text": "• Author Contributions: C.S.: conceptualization, method, theory, experiments, writing; Y.D.: conceptualization, theory, discussion. All authors have read and agreed to the published version of the manuscript. • Funding: This work was supported in part by the National Science Foundation DMS-1921310 and DMS-2113099, the University of Delaware Data Science Institute Seed Funding Grant, and the Defense Advanced Research Projects Agency’s L2M program FA8650-18-2-7834. • Acknowledgments: We sincerely thank the editor and anonymous reviewers for providing valuable and timely feedback that significantly improved the paper.",
+          "page_span": [
+            10,
+            10
+          ]
+        }
+      ]
+    },
+    {
+      "id": "references",
+      "title": "References",
+      "paras": [
+        {
+          "id": "references-p001",
+          "text": "[1] K. Pearson, “Notes on regression and inheritance in the case of two parents,” Proceedings of the Royal Society of London, vol. 58, pp. 240–242, 1895. [2] G. Szekely, M. Rizzo, and N. Bakirov, “Measuring and testing independence by correlation of distances,” Annals of Statistics, vol. 35, no. 6, pp. 2769–2794, 2007. [3] G. Szekely and M. Rizzo, “Brownian distance covariance,” Annals of Applied Statistics, vol. 3, no. 4, pp. 1233–1303, 2009. [4] A. Gretton, R. Herbrich, A. Smola, O. Bousquet, and B. Scholkopf, “Kernel methods for measuring independence,” Journal of Machine Learning Research, vol. 6, pp. 2075–2129, 2005. [5] A. Gretton and L. Gyorfi, “Consistent nonparametric tests of independence,” Journal of Machine Learning Research, vol. 11, pp. 1391–1423, 2010. [6] R. Li, W. Zhong, and L. Zhu, “Feature screening via distance correlation learning,” Journal of American Statistical Association, vol. 107, pp. 1129–1139, 2012. [7] W. Zhong and L. Zhu, “An iterative approach to distance correlation-based sure independence screening,” Journal of Statistical Computation and Simulation, vol. 85, no. 11, pp. 2331–2345, 2015. [8] C. Shen, S. Wang, A. Badea, C. E. Priebe, and J. T.",
+          "page_span": [
+            10,
+            10
+          ]
+        },
+        {
+          "id": "references-p002",
+          "text": "Vogelstein, “Discovering the signal subgraph:",
+          "page_span": [
+            10,
+            10
+          ]
+        },
+        {
+          "id": "references-p003",
+          "text": "An iterative screening approach on graphs,” Pattern Recognition Letters, vol. 184, pp. 97–102, 2024. [9] Q. Zhang, “On the properties of distance covariance for categorical data: Robustness, sure screening, and approximate null distributions,” Scandinavian Journal of Statistics, vol. 52, no. 2, pp. 777–804, 2025. [10] Z. Zhou, “Measuring nonlinear dependence in time-series, a distance correlation approach,” Journal of Time Series Analysis, vol. 33, no. 3, pp. 438–457, 2012. [11] K. Fokianos and M. Pitsillou, “Testing independence for multivariate time series via the autodistance correlation matrix,” Biometrika, vol. 105, no. 2, pp. 337–352, 2018. [12] C. Shen, J. Chung, R. Mehta, T. Xu, and J. T. Vogelstein, “Independence testing for temporal data,” Transactions on Machine Learning Research, 2024. 10 [13] K. Fukumizu, A. Gretton, X. Sun, and B. Sch ̈olkopf, “Kernel measures of conditional dependence,” in Advances in neural information processing systems, 2007. [14] G. Szekely and M. Rizzo, “Partial distance correlation with methods for dissimilarities,” Annals of Statistics, vol. 42, no. 6, pp. 2382–2412, 2014. [15] X. Wang, W. Pan, W. Hu, Y. Tian, and H. Zhang, “Conditional",
+          "page_span": [
+            10,
+            10
+          ]
+        },
+        {
+          "id": "references-p004",
+          "text": "Distance Correlation,” Journal of",
+          "page_span": [
+            10,
+            10
+          ]
+        },
+        {
+          "id": "references-p005",
+          "text": "the American Statistical Association, vol. 110, no. 512, pp. 1726–1734, 2015. [16] D. Edelmann and J. Goeman, “A regression perspective on generalized distance covariance and the hilbert–schmidt independence criterion,” Statistical Science, vol. 37, no. 4, pp. 562–579, 2022. [17] S. Panda, C. Shen, R. Perry, J. Zorn, A. Lutz, C. E. Priebe, and J. T. Vogelstein, “Universally consistent k-sample tests via dependence measures,” Statistics and Probability Letters, vol. 216, p. 110278, 2025. [18] G. Szekely and M. Rizzo, “Hierarchical clustering via joint between-within distances: Extending ward’s minimum variance method,” Journal of Classification, vol. 22, pp. 151–183, 2005. [19] M. Rizzo and G. Szekely, “DISCO analysis: A nonparametric extension of analysis of variance,” Annals of Applied Statistics, vol. 4, no. 2, pp. 1034–1055, 2010. [20] Y. Lee, C. Shen, C. E. Priebe, and J. T. Vogelstein, “Network dependence testing via diffusion maps and distance-based correlations,” Biometrika, vol. 106, no. 4, pp. 857–873, 2019. [21] C. Shen, J. Arroyo, J. Xiong, and J. T. Vogelstein, “Community correlations and testing independence between binary graphs,” arXiv preprint arXiv:1906.03661,",
+          "page_span": [
+            11,
+            11
+          ]
+        },
+        {
+          "id": "references-p006",
+          "text": "2024.",
+          "page_span": [
+            11,
+            11
+          ]
+        },
+        {
+          "id": "references-p007",
+          "text": "[22] D. Guo, C. Wang, B. Wang, and H. Zha, “Learning fair representations via distance correlation minimization,” IEEE Transactions on Neural Networks and Learning Systems, vol. 35, no. 2, pp. 2139 – 2152, 2024. [23] X. Zhen, Z. Meng, R. Chakraborty, and V. Singh, “On the versatile uses of partial distance correlation in deep learning,” in European Conference on Computer Vision, pp. 327–346, 2022. [24] A. Ramdas, S. J. Reddi, B. P ́oczos, A. Singh, and L. Wasserman, “On the decreasing power of kernel and distance based nonparametric hypothesis tests in high dimensions,” in 29th AAAI Conference on Artificial Intelligence, 2015. [25] C. Zhu, S. Yao, X. Zhang, and X. Shao, “Distance-based and rkhs-based dependence metrics in high dimension,” The Annals of Statistics, vol. 48, no. 6, pp. 3366–3394, 2020. [26] L. Zhu, K. Xu, R. Li, and W. Zhong, “Projection correlation between two random vectors,” Biometrika, vol. 104, no. 4, pp. 829–843, 2017. [27] C. Huang and X. Huo, “A statistically and numerically efficient independence test based on random projections and distance covariance,” Frontiers in Applied Mathematics and Statistics, vol. 7, p. 779841, 2022. [28] D. Sejdinovic, B.",
+          "page_span": [
+            11,
+            11
+          ]
+        },
+        {
+          "id": "references-p008",
+          "text": "Sriperumbudur, A. Gretton, and K. Fukumizu, “Equivalence of distance-based and",
+          "page_span": [
+            11,
+            11
+          ]
+        },
+        {
+          "id": "references-p009",
+          "text": "rkhs-based statistics in hypothesis testing,” Annals of Statistics, vol. 41, no. 5, pp. 2263–2291, 2013. [29] C. Shen and J. T. Vogelstein, “The exact equivalence of distance and kernel methods in hypothesis testing,” AStA Advances in Statistical Analysis, vol. 105, no. 3, pp. 385–403, 2021. [30] R. Lyons, “Distance covariance in metric spaces,” Annals of Probability, vol. 41, no. 5, pp. 3284–3305, 2013. [31] R. Lyons, “Errata to “distance covariance in metric spaces”,” Annals of Probability, vol. 46, no. 4, pp. 2400–2405, 2018. [32] P. Good, Permutation, Parametric, and Bootstrap Tests of Hypotheses. Springer, 2005. [33] X. Huo and G. Szekely, “Fast computing for distance covariance,” Technometrics, vol. 58, no. 4, pp. 435–447, 2016. [34] A. Chaudhuri and W. Hu, “A fast algorithm for computing distance correlation,” Computational Statistics & Data Analysis, vol. 135, pp. 15–24, 2019. [35] C. Shen, S. Panda, and J. T. Vogelstein, “The chi-square test of distance correlation,” Journal of Computational and Graphical Statistics, vol. 31, no. 1, pp. 254–262, 2022. [36] Q. Zhang, S. Filippi, A. Gretton, and D. Sejdinovic, “Large-scale kernel methods for independence testing,” Statistics",
+          "page_span": [
+            11,
+            11
+          ]
+        },
+        {
+          "id": "references-p010",
+          "text": "and Computing, vol. 28, no. 1, pp. 113–130, 2018.",
+          "page_span": [
+            11,
+            11
+          ]
+        },
+        {
+          "id": "references-p011",
+          "text": "[37] G. Szekely and M. Rizzo, “The distance correlation t-test of independence in high dimension,” Journal of Multivariate Analysis, vol. 117, pp. 193–213, 2013. [38] Q. Wang, R. Chaerkady, J. Wu, H. J. Hwang, N. Papadopoulos, L. Kopelovich, A. Maitra, H. Matthaei, J. R. Eshleman, R. H. Hruban, K. W. Kinzler, A. Pandey, and B. Vogelstein, “Mutant proteins as cancer-specific biomarkers,” Proceedings of the National Academy of Sciences of the United States of America, vol. 108, no. 6, pp. 2444–2449, 2011. [39] Q. Wang, M. Zhang, T. Tomita, J. T. Vogelstein, S. Zhou, N. Papadopoulos, K. W. Kinzler, and B. Vogelstein, “Selected reaction monitoring approach for validating peptide biomarkers,” Proceedings of The National Academy of Sciences, vol. 114, no. 51, pp. 13519–13524, 2017. [40] J. T. Vogelstein, E. W. Bridgeford, Q. Wang, C. E. Priebe, M. Maggioni, and C. Shen, “Discovering and deciphering relationships across disparate data modalities,” eLife, vol. 8, p. e41690, 2019. 11",
+          "page_span": [
+            11,
+            11
+          ]
+        }
+      ]
+    },
+    {
+      "id": "appendix",
+      "title": "Appendix",
+      "paras": [
+        {
+          "id": "appendix-p001",
+          "text": "A1 Technical Prerequisite We first cite the main theorem of [35], which is necessary for subsequent proofs. It holds under the assumption of independence between X and Y , finite-moments of FXY , an increasing sample size n, and regardless of p, q nor the specific distribution of FXY . Theorem A1. For sufficiently large n, there exists α > 0 such that N(0, 2) ⪯α n · Dcorn(X, Y) ⪯α χ2 1 −1 regardless of the metric choice or marginal distributions. Here, the notation ⪯α means upper tail dominance in distribution, defined as follows: Definition B2. Given two random variables U and V , we say U dominates V in upper tail at probability level α, or equivalently V ⪯α U, if and only if FV (z) ≥FU(z) for all z ≥F −1 U (1 −α), where FV and FU are cumulative distribution functions of random variables V and U respectively. A2 Theorem Proofs Theorem 1. Given δ(X, Y ) = 0, the average distance correlation satisfies: ADcorn(X, Y) n→∞ → 0 regardless of pq. On the other hand, the maximum distance correlation satisfies: MDcorn(X, Y) n→∞ → 0 when pq = o(√nen). Proof. When δ(X, Y ) = 0, FXsY t = FXsFY t for any pair of (s, t), leading to: Dcorn(Xs, Yt) n→∞ → 0. Consequently, when p and q are fixed,",
+          "page_span": [
+            12,
+            12
+          ]
+        },
+        {
+          "id": "appendix-p002",
+          "text": "both the maximum distance correlation and average distance",
+          "page_span": [
+            12,
+            12
+          ]
+        },
+        {
+          "id": "appendix-p003",
+          "text": "correlation are asymptotically 0. If pq increases together with n, there can be an infinite number of marginal correlations. The average distance correlation still converges to 0 by law of large numbers, as it represents the mean of pq marginal correlations, all of which converge to 0. However, the maximum distance correlation may be influenced, and a careful analysis is required to determine whether the convergence still holds in probability. For any ε > 0, it suffices to prove Prob(MDcorn(X, Y) < ε) ≥Prob(n · Dcorn(Xs, Yt) < nε)pq ≥F pq χ2 1−1(nε) →1. Here, the second line follows from basic order statistics, and the third line follows from the existing dominance results by Theorem A1. Next, consider the asymptotic expansion of the standard normal tail probability: 2πxe−x2/2 \u0012 1 −1 x4 −· · · \u0013 , as x →∞, 1 −Φ(x) = 1 √ x2 + 3 1 where Φ(x) is the standard normal CDF. Applying this to our setting, where F pq χ2 1−1(nε) = [2Φ(x) −1]pq , we immediately have !!pq e−x2/2 1 − 2 √ 2πxe−x2/2 + o F pq χ2 1−1(nε) = = (1 −δn)pq, x3 where x = √nε + 1 = O(√n), which increases to infinity at any fixed ε. We aim to show (1 −δn)pq →1. It suffices for pqδn →0. This is because: (1 −δn)pq = exp (pq ·",
+          "page_span": [
+            12,
+            12
+          ]
+        },
+        {
+          "id": "appendix-p004",
+          "text": "log(1 −δn)) .",
+          "page_span": [
+            12,
+            12
+          ]
+        },
+        {
+          "id": "appendix-p005",
+          "text": "As δn →0, we use the Taylor expansion log(1 −δn) = −δn + o(δn), so (1 −δn)pq = exp (−pq · δn + o(pq · δn)) . If pq · δn →0, then the exponent tends to zero, and hence (1 −δn)pq →1. To ensure pqδn →0, a sufficient condition would be pq · e−x2/2 →0. To see why, if the above holds, then e−x2/2 ! pq · 2 √ 2πxe−x2/2 →0 and pq · o →0, x3 and hence, 2 √ e−x2/2 !! 2πxe−x2/2 + o pq · →0. x3 Finally, to satisfy pq · e−x2/2 →0 with x = √nε + 1 = O(√n), we observe that e−x2/2 = O \u0012e−n/2 \u0013 . √n Therefore, a sufficient condition is pq = o \u0000√n · en\u0001 . Theorem 2. When δ(X, Y ) > 0, the maximum distance correlation satisfies: MDcorn(X, Y) n→∞ → c > 0 regardless of pq. On the other hand, the average distance correlation satisfies: ADcorn(X, Y) n→∞ → c ≥0, with equality holds when δ(X, Y ) = o(pq) and pq n→∞ → ∞. 2 Proof. When δ(X, Y ) > 0, there exists at least one pair of (s, t) such that Dcorn(Xs, Yt) n→∞ → c > 0. Therefore, the maximum distance correlation shall converge to a positive constant. This also holds true for the average distance correlation when pq is fixed. However, when pq also increases to infinity (at any rate relative to n), and δ(X, Y ) = o(pq), then: |ADcorn(X, Y)| = |",
+          "page_span": [
+            13,
+            13
+          ]
+        },
+        {
+          "id": "appendix-p006",
+          "text": "s∈[p],t∈[q]",
+          "page_span": [
+            13,
+            13
+          ]
+        },
+        {
+          "id": "appendix-p007",
+          "text": "Dcorn(Xs, Yt)|/pq ≤δ(X, Y )/pq →0, where the second line follows because each marginal correlation is bounded in [−1, 1]. Theorem 3. Assume that X and Y are independent, and that the coordinates of X and Y are independent within each variable. For sufficiently large n and sufficiently small α, it holds that n · MDcorn(X, Y) ⪯α U −1, where U ∼F pq χ2 1 (x). Proof. For each s ∈[p], t ∈[q], we apply the upper-tail dominance property from Theorem A1 to each marginal distance correlation, i.e., n · Dcorn(Xs, Yt) ⪯α χ2 1 −1 for sufficiently large n and sufficiently small α. By order statistics of independent random variables, we can establish the distribution of the maximum distance correlation as follows: Fn·MDcorn(X,Y)+1(z) = s∈[p],t∈[q] Prob(n · Dcorn(Xs, Yt) + 1 ≤z) ≥F pq χ2 1 (z) Consequently, we have n · MDcorn(X, Y) + 1 ⪯α U. Theorem 4. Assume that X and Y are independent, and that the coordinates of X and Y are independent within each variable. As both n and pq increase to infinity, it holds that n√pq · ADcorn(X, Y) →N(0, 2). Proof. First, n√pq · ADcorn(X, Y) = 1 √pq t=1 n · Dcorn(Xs, Yt). s=1 As mentioned in the background section, the limiting null distribution of each marginal",
+          "page_span": [
+            14,
+            14
+          ]
+        },
+        {
+          "id": "appendix-p008",
+          "text": "distance",
+          "page_span": [
+            14,
+            14
+          ]
+        },
+        {
+          "id": "appendix-p009",
+          "text": "correlation satisfies ∞ n · Dcorn(Xs, Yt) → i,j=1 wij(N 2 ij −1), where the weights satisfy wij ∈[0, 1] and ∞ i,j=1 w2 ij = 1, and Nij are independent standard normal distribution. Therefore, as n →∞, each n · Dcorn(Xs, Yt) has an expected value of 0 and a variance of ! i,j (wij)2 = 2. = 2 i,j wij(N 2 ij −1) Var 3 Furthermore, since this limit is a (centered) quadratic form in independent sub-Gaussian random variables, it satisfies uniform exponential tail bounds. Specifically, there exists a constant C > 0 such that sup s,t,n E \u0002 exp \u0000 C · n · Dcorn(Xs, Yt) \u0001\u0003 < ∞. Under the given assumptions, the marginal statistics n·Dcorn(Xs, Yt) are independent across s ∈[p], t ∈[q]. Then we may view the full sum as a triangular array: Zn := 1 √pq \u0000 n · Dcorn(Xs, Yt) \u0001 . s=1 t=1 Each summand has mean zero and variance 2, so the total variance of Zn is Var(Zn) = 1 pq · pq · 2 = 2. To apply the triangular array Central Limit Theorem (e.g., Lindeberg-Feller CLT), it suffices to verify the Lindeberg condition: s,t h\u0000 n · Dcorn(Xs, Yt) \u00012 · 1 \b n · Dcorn(Xs, Yt) > ε√pq = 0. ∀ε > 0, lim n→∞ 1 pq This condition is satisfied due to the exponential tail bounds established above, which ensure that large",
+          "page_span": [
+            14,
+            14
+          ]
+        },
+        {
+          "id": "appendix-p010",
+          "text": "deviations decay faster than any polynomial in pq. Therefore, the contribution of rare large terms",
+          "page_span": [
+            14,
+            14
+          ]
+        },
+        {
+          "id": "appendix-p011",
+          "text": "becomes negligible as pq →∞. Hence, the Lindeberg CLT applies, and we conclude: n√pq · ADcorn(X, Y) −→N(0, 2). Theorem 5. Under the same condition in Theorem 3, the chi-square test for the maximum correlation is a valid test of independence for sufficiently large n and sufficiently small type 1 error level α. Moreover, the chi-square test for the average correlation is a valid test of independence for sufficiently large n and pq, at any type 1 error level α. Proof. The validity of these tests can be directly deduced from Theorem 3 and Theorem 4. For the maximum statistic, owing to upper-tail dominance, the p-value obtained through the chi-square-based test is always greater than or equal to the p-value derived from the true null. Consequently, the test is valid and tends to be more conservative than the permutation test. In the case of the average statistic, the p-value produced by the chi-square-based test converges to the p-value generated by the true null. Hence, the test is valid and matches the p-value of the permutation test for sufficiently large n, p, and q. A3 Standard Permutation Test While the main paper uses the chi-square test, it can be slightly conservative when the",
+          "page_span": [
+            15,
+            15
+          ]
+        },
+        {
+          "id": "appendix-p012",
+          "text": "sample size is",
+          "page_span": [
+            15,
+            15
+          ]
+        },
+        {
+          "id": "appendix-p013",
+          "text": "small. An alternative is the standard permutation test, although more computationally expensive, tends to be more accurate and is applicable to both the average and maximum distance correlation statistics. Taking MDcorn(X, Y) as an example: Given paired data X and Y, we generate R independent permutations of Y by randomly shuffling the sample indices. Denote the r-th permuted data as πr(Y), and compute the test statistic MDcorn(X, πr(Y)) for each r = 1, . . . , R. The permutation-based p-value is then given by: pval = 1 r=1 1{MDcorn(X, πr(Y)) > MDcorn(X, Y)}. 4 A4 Additional Simulation Here, we present a special example where the random vectors X and Y are dependent, yet each individual dimension of X is independent of Y . As a result, neither the average nor the maximum marginal distance correlation exhibits meaningful testing power. In contrast, the original distance correlation remains consistent and achieves perfect power as the sample size increases. We use an XOR-like construction with categorical variables: let X1 ∼Bernoulli(0.5) and Y ∼ Bernoulli(0.5) be independent, and define X2 = X1 ⊕Y , where ⊕denotes the exclusive OR operation. Specifically, X2 = 1 if X1 ̸= Y , and 0",
+          "page_span": [
+            15,
+            15
+          ]
+        },
+        {
+          "id": "appendix-p014",
+          "text": "otherwise. By construction, X1 is independent of Y , and one can",
+          "page_span": [
+            15,
+            15
+          ]
+        },
+        {
+          "id": "appendix-p015",
+          "text": "verify that X2 is also independent of Y by enumerating all possible combinations. However, the pair X = [X1, X2] determines Y uniquely (since Y = X1 ⊕X2), implying that X and Y are dependent, despite each marginal of X being independent of Y . In this experiment, we fix the sample size n = 100 and compute the original distance correlation, maximum distance correlation, and average distance correlation, each using their respective chi-squared test. Over 1000 Monte Carlo replicates, the empirical power at a type I error level of 0.05 is: 1.000, 0.046, and 0.048, respectively. These results remain unchanged even when increasing the sample size n, or when replacing distance correlation with HSIC. Therefore, this example demonstrates that there exists dependence structures where any marginal-based dependence measure fails, while the original distance correlation or HSIC remains consistent and achieves perfect testing power. 5",
+          "page_span": [
+            16,
+            16
+          ]
+        }
+      ]
+    }
+  ]
+}

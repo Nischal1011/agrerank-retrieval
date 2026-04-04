@@ -1,0 +1,713 @@
+{
+  "id": "1-s2.0-S0020025524008260-am",
+  "title": "Synergistic graph fusion via encoder embedding",
+  "metadata": {
+    "source_path": "data/pdf_files/1-s2.0-S0020025524008260-am.pdf",
+    "page_count": 24,
+    "hash": "0f9c440bb277568873c74bcde0452ea419c14f9c92d5471093c6ed11efdacdcc"
+  },
+  "sections": [
+    {
+      "id": "front-matter",
+      "title": "Front Matter",
+      "paras": [
+        {
+          "id": "front-matter-p001",
+          "text": "Version of Record: https://www.sciencedirect.com/science/article/pii/S0020025524008260 Manuscript_91c706e2fa6656fdae917911377056ab Synergistic Graph Fusion via Encoder Embedding⋆ Cencheng Shena,∗, Carey Priebeb, Jonathan Larsonc, Ha Trinhc aUniversity of Delaware, 19716, Newark, United States bJohns Hopkins University, 21218, Baltimore, United States cMicrosoft Research, 98052, Redmond, United States",
+          "page_span": [
+            1,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "id": "abstract",
+      "title": "Abstract",
+      "paras": [
+        {
+          "id": "abstract-p001",
+          "text": "In this paper, we introduce a method called graph fusion embedding, designed for multi-graph embedding with shared vertex sets. Under the framework of supervised learning, our method exhibits a remarkable and highly desirable synergistic effect: for sufficiently large vertex size, the accuracy of vertex classification consistently benefits from the incorporation of additional graphs. We establish the mathematical foundation for the method, including the asymptotic convergence of the embedding, a sufficient condition for asymptotic optimal classification, and the proof of the synergistic effect for vertex classification. Our comprehensive simulations and real data experiments provide compelling evidence supporting the effectiveness of our proposed method, showcasing the pronounced synergistic effect for multiple graphs from disparate sources. Keywords: Graph Fusion, Encoder Embedding, Supervised Learning",
+          "page_span": [
+            1,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "id": "1-introduction",
+      "title": "1. Introduction",
+      "paras": [
+        {
+          "id": "1-introduction-p001",
+          "text": "Graphs have become increasingly prevalent in various real-world scenarios, including social networks, communication networks, webpage hyperlinks, and biological systems [9, 18, 3, 5, 38, 37]. In graph data, we have a set of vertices denoted as {vi, i = 1, . . . , n}, and edges represented as {ej, j = 1, . . . , s} connecting these vertices. This information can be captured by an n × n ⋆This work was supported in part by the National Science Foundation HDR TRIPODS 1934979, the National Science Foundation DMS-2113099, and by funding from Microsoft Research. ∗Corresponding author (Jonathan Larson), trinhha@microsoft.com (Ha Trinh) Preprint submitted to Elsevier February 22, 2024 © 2024 published by Elsevier. This manuscript is made available under the Elsevier user license https://www.elsevier.com/open-access/userlicense/1.0/ adjacency matrix A, where A(i, j) = 1 indicates the existence of an edge between vertices i and j, and A(i, j) = 0 indicates the absence of an edge. Traditionally, the adjacency matrix is binary and primarily used for representing unweighted graphs. Its capacity extends to handling weighted graphs, where the elements of A are assigned the corresponding edge",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "1-introduction-p002",
+          "text": "weights. Moreover, graph representation can be used for any data via",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "1-introduction-p003",
+          "text": "proper transformations. For instance, when vertex attributes are available, they can be transformed into a pairwise distance or kernel matrix, thus creating a general graph structure. This adaptability enables the incorporation of additional information from vertex attributes, making graph representation a powerful tool for data analysis that goes beyond traditional binary or weighted graphs. Graph embedding is a fundamental and versatile approach for analyzing and exploring graph data, encompassing a wide range of techniques such as spectral embedding [25, 35], graph convolutional neural networks [13, 39], node2vec [11, 14], among others. By projecting the vertices into a low-dimensional space while preserving the structural information of the graph, graph embedding yields vertex representations in Euclidean space that facilitate various downstream inference tasks, such as community detection [12, 42], vertex classification [21, 13], outlier detection [24, 1], etc. This manuscript addresses a crucial and increasingly prevalent scenario in data analysis where we encounter multiple graphs {A1, A2, . . . , AM} sharing a common vertex set [19, 15, 30, 2]. This situation is becoming",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "1-introduction-p004",
+          "text": "more frequent as data collection accelerates, and it arises in diverse",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "1-introduction-p005",
+          "text": "fields such as social network analysis, neuroscience, and linguistics. For instance, one may want to analyze different social network connections for the same group of individuals, different measurements on the same brain regions, hyperlinks in articles written in different languages, or citation networks enriched with additional attributes. In such settings, it is essential to develop a method that can effectively integrate data from multiple sources. The ideal method should not only exhibit improved performance as more signals from different graphs are incorporated but also be robust against noisy or irrelevant data sources. By leveraging information from multiple graphs, we aim to achieve a richer and more comprehensive representation of the underlying structure and relationships within the data. This can lead to better insights and enhanced 2 accuracy in various downstream tasks, such as vertex classification and link prediction. Existing works on multiple-graph settings are relatively limited. Most of these investigations, particularly those with theoretical foundations, are based on spectral embedding. For instance, the Omnibus method [22, 16] constructs an Mn×Mn matrix by",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "1-introduction-p006",
+          "text": "placing the input adjacency on",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "1-introduction-p007",
+          "text": "the diagonals and computing the average of two adjacency matrices on each off-diagonal n × n sub-matrix. This matrix is then projected into an n × d matrix using spectral embedding. The more recent multiple adjacency spectral embedding (MASE) [2] method conducts individual spectral embedding for each adjacency matrix, concatenating the resulting embeddings followed by single value decomposition to obtain an n×d embedding. Another method, unfolded spectral embedding (USE) [27], concatenates the adjacency matrices into an n×Mn matrix, then applies spectral embedding to obtain an n × Md embedding. The main difference among these methods lies in how they concatenate the multiple graphs in a proper manner. As they all utilize spectral embedding, specifically singular value decomposition, they require the selection of the dimension d. While they have demonstrated certain theoretical properties, the theoretical investigations do not focus on the subsequent downstream task and how well it benefits from collecting more graphs. To that end, in this paper we present a supervised multi-graph embedding approach called ”graph fusion embedding,” which builds upon the recently proposed graph",
+          "page_span": [
+            3,
+            3
+          ]
+        },
+        {
+          "id": "1-introduction-p008",
+          "text": "encoder embedding",
+          "page_span": [
+            3,
+            3
+          ]
+        },
+        {
+          "id": "1-introduction-p009",
+          "text": "[33]. The method is designed to handle multiple graphs, accommodating binary, weighted, distance or similarity matrix representations derived from vertex attributes. A notable and distinctive feature of graph fusion embedding is the ”synergistic effect” in supervised learning. This effect guarantees that, for sufficiently large vertex sizes, the accuracy of vertex classification consistently benefits from the inclusion of additional graphs and never degrades. We prove this synergistic effect under both the stochastic block model for binary graphs and a more general graph model. Additionally, we explore the asymptotic behavior of graph fusion embedding and establish a sufficient condition for it to achieve asymptotically perfect vertex classification. To validate the superiority of our proposed method, we conduct extensive simulations and evaluations on real graph data. By applying the graph fusion embedding to various types of graphs, we showcase its effectiveness and versatility in different settings. Our method consistently 3 outperforms existing techniques and demonstrates the synergistic effect, making it a robust and powerful tool for multi-graph analysis. The MATLAB code for",
+          "page_span": [
+            3,
+            3
+          ]
+        },
+        {
+          "id": "1-introduction-p010",
+          "text": "the method and simulations",
+          "page_span": [
+            3,
+            3
+          ]
+        },
+        {
+          "id": "1-introduction-p011",
+          "text": "are made available on Github1. The appendix includes additional simulations validating the proposed methods, all benchmark results using competitor methods, as well as all theorem proofs.",
+          "page_span": [
+            4,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2-1-main-algorithm",
+      "title": "2.1. Main Algorithm",
+      "paras": [
+        {
+          "id": "2-1-main-algorithm-p001",
+          "text": "The graph fusion embedding takes as input M graphs with a common set of n vertices and a label vector representing K communities. For vertices with unknown labels, the corresponding entry in the label vector is set to 0, and such labels are not used in the embedding process. • Input: The graphs {Am ∈Rn×n, m = 1, . . . , M} and a label vector Y ∈{0, 1, . . . , K}n. • Step 1: For each k = 1, . . . , K, compute the number of observations per-class nk = i=1 I(Yi = k). • Step 2: Compute the one-hot encoding matrix W ∈Rn×K based on Y, then normalize by the number of observations per-class. Specifically, for each vertex i = 1, . . . , n, we set W(i, k) = 1/nk if and only if Yi = k, and 0 otherwise. Note that vertices with unknown labels are unused and effectively zero, i.e., W(i, :) is a zero vector if Yi = 0. • Step 3: For each graph m = 1, . . . , M, calculate the graph encoder embedding: Zm = Am × W. 1https://github.com/cshen6/GraphEmd 4 • Step 4: Let Zm(i, ·) denote each row of Zm, and ∥· ∥be the Euclidean norm. For each i and each m where ∥Zm(i, ·)∥> 0, normalize the non-zero row by the norm ̃Zm(i, ·) = Zm(i, ·) ∥Zm(i, ·)∥, then construct the row-concatenated embedding ̃Z by setting",
+          "page_span": [
+            4,
+            4
+          ]
+        },
+        {
+          "id": "2-1-main-algorithm-p002",
+          "text": "̃Z(i, ·) = [ ̃Z1(i, ·), ̃Z2(i, ·), . . . , ̃ZM(i, ·)] ∈RMK",
+          "page_span": [
+            4,
+            4
+          ]
+        },
+        {
+          "id": "2-1-main-algorithm-p003",
+          "text": "for each vertex i. • Output: The graph fusion embedding ̃Z ∈Rn×MK.",
+          "page_span": [
+            5,
+            5
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2-2-subsequent-classification",
+      "title": "2.2. Subsequent Classification",
+      "paras": [
+        {
+          "id": "2-2-subsequent-classification-p001",
+          "text": "In the supervised setting, the label vector is always available. During steps 1 to 3 of the graph fusion embedding process, the labels of training vertices are used to construct the W matrix, while the labels of testing vertices are set to zero and remain unused throughout the embedding process. It is important to note that both the training and testing vertices are present in the graph, and as a result, the resulting embedding ̃Z provides representations for all vertices in the graph. Let Yi be a random variable taking values in 1, . . . , K that represents the true label for any testing vertex i, and let g(·) denotes a classifier function. The true classification error can be denoted as L = Prob(g( ̃Z(i, :)) ̸= Yi). Throughout the main paper, we employed the 5-nearest-neighbor classifier as our classifier of choice. The synergistic effect is also observed when using other standard classifiers, such as discriminant analysis or a simple two-layer neural network. These alternatives classifiers can be readily applied, yielding similar numerical outcomes, and are presented in the appendix. Furthermore, the main algorithm can be adapted to an unsupervised version in an iterative",
+          "page_span": [
+            5,
+            5
+          ]
+        },
+        {
+          "id": "2-2-subsequent-classification-p002",
+          "text": "manner, similar to the single graph version in [32], which is also briefly discussed in the appendix.",
+          "page_span": [
+            5,
+            5
+          ]
+        },
+        {
+          "id": "2-2-subsequent-classification-p003",
+          "text": "5",
+          "page_span": [
+            5,
+            5
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2-3-computational-complexity",
+      "title": "2.3. Computational Complexity",
+      "paras": [
+        {
+          "id": "2-3-computational-complexity-p001",
+          "text": "The computation complexity of the graph fusion embedding is O(nMk + PM m=1 sm), where sm is the number of entries in each graph. Step 1 and 2 are shared across all graphs, and step 3 is carried out separately for each graph, allowing for parallelization and further reducing the running time to O(nk + maxm=1,...,T {sm}). Note that if M = 1, the fusion embedding is equivalent to the normalized graph encoder embedding for a single graph. Additionally, for sparse graphs, step 3 can be implemented in linear time using two simple edgelist operations. Figure 1 provides a comparison of the running time between the graph fusion embedding and the unfolded spectral embedding. The algorithm demonstrates linear scalability with respect to the number of graphs, with the three-graph fusion embedding taking approximately three times longer than the single-graph embedding. Additionally, the graph fusion embedding is significantly more efficient than the spectral embedding, requiring only 0.2 seconds at n = 30000, whereas the spectral embedding takes over 4 minutes. In general, the encoder embedding outperforms any existing graph embedding approach and can process millions of edges in just a few",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "2-3-computational-complexity-p002",
+          "text": "seconds [34].",
+          "page_span": [
+            6,
+            6
+          ]
+        }
+      ]
+    },
+    {
+      "id": "3-1-the-stochastic-block-model",
+      "title": "3.1. The Stochastic Block Model",
+      "paras": [
+        {
+          "id": "3-1-the-stochastic-block-model-p001",
+          "text": "The binary graph serves as the foundation of most graph methods and is commonly used in various applications. To demonstrate the functionality of graph fusion embedding on binary graphs, we focus on the stochastic block model (SBM) for both theoretical analysis and simulations. Under SBM, each vertex i in a graph Am is assigned a label Yi ∈{1, . . . , K}. The probability of an edge between a vertex from class k and a vertex from class l is determined by a block probability matrix Bm = [Bm(k, l)] ∈[0, 1]K×K, and for any i ̸= j it holds that Am(i, j) ∼Bernoulli(Bm(Yi, Yj)). It is worth mentioning that this formulation generates a directed graph, but it can be easily adapted for an undirected graph by setting Am(j, i) = Am(i, j) for all i < j. The choice of 6 0.25 Encoder Embedding 200 Spectral Embedding One Graph Three Graphs One Graph Three Graphs 0.2 150 Running Time (s) 0.15 100 0.1 50 0.05 3000 15000 30000 0 3000 15000 30000 0 Number of Vertices Figure 1: This figure illustrates the runtime performance of the graph fusion embedding (left panel) and the unfolded spectral embedding (right panel). The graphs are generated by simulation model 2 in Section 5, and we carry out 20",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "3-1-the-stochastic-block-model-p002",
+          "text": "Monte-Carlo replicates at each sample size n. Each line represents the average running time, with",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "3-1-the-stochastic-block-model-p003",
+          "text": "error bars indicating the standard deviation. 7 directed or undirected graph does not affect the method or theory, and in this case, we opt for the directed case. Additionally, the graph may or may not have self-loops, i.e., Am(i, i) could be 0 or 1, and the method and the theorems still hold. The degree-corrected stochastic block model (DC-SBM) is an extension of the SBM that accounts for the sparsity observed in real graphs [42]. In addition to the parameters defined in the SBM, each vertex i is associated with a degree θi i.i.d. ∼Fθ. When conditioned on the degrees, each edge from vertex i to another vertex j is independently generated as follows: Am(i, j) ∼Bernoulli(θiθjB(Yi, Yj)). As standard SBM is a special case where all degrees are 1, it suffices to consider the DC-SBM graphs for theory purpose. Finally, the class labels Yi are assumed to follow a categorical distribution with prior probability {πk ∈(0, 1) with PK k=1 πk = 1}. Under this assumption, as the number of vertices n increases to infinity, the number of vertices within each class nk also converges to infinity. If not, πk asymptotically approaches 0, rendering class k trivial in the model. This assumption implies",
+          "page_span": [
+            7,
+            7
+          ]
+        },
+        {
+          "id": "3-1-the-stochastic-block-model-p004",
+          "text": "that nk = O(n) for all k. Note that we do not assume any specific dependence structure between graphs. For instance, A1(i, j) and A2(i, j) could be independently distributed, identical, similar up to some noise or transformation, or correlated in any other way, and all theorems would still hold true.",
+          "page_span": [
+            8,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "id": "3-2-convergence-of-the-fusion-embedding",
+      "title": "3.2. Convergence of the Fusion Embedding",
+      "paras": [
+        {
+          "id": "3-2-convergence-of-the-fusion-embedding-p001",
+          "text": "Given M graphs from DC-SBM with a common vertex set, we define ̃Bm as the rownormalized block probability matrix of Bm, such that for each row k, ̃Bm(k, :) = Bm(k, :) ∥Bm(k, :)∥. Then we form the row concatenation of all ̃Bm as: ̃B = [ ̃B1, ̃B2, . . . , ̃BM] ∈RK×MK. The first theorem demonstrates that given DC-SBM graphs, the graph fusion embedding converges to the normalized and concatenated block probability matrix. 8 Theorem 1. Suppose that {Am, m = 1, . . . , M} follows the DC-SBM model in Section 3.1. Let n be the number of vertices with known labels. Then, for any vertex i belonging to class Yi, its graph fusion embedding satisfies: ∥ ̃Z(i, ·) − ̃B(Yi, :)∥= O( 1 √n) n→∞ → 0.",
+          "page_span": [
+            8,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "id": "3-3-asymptotic-perfect-separation",
+      "title": "3.3. Asymptotic Perfect Separation",
+      "paras": [
+        {
+          "id": "3-3-asymptotic-perfect-separation-p001",
+          "text": "Under DC-SBM, the normalized and concatenated block probability matrix ̃B fully determines the embedding. As a result, there exists a simple condition to ensure the embedding is asymptotically perfect for vertex classification. In the context of vertex classification, both the training and testing vertices follow the same asymptotic convergence in Theorem 1, with the only difference being that the training labels are known while the testing labels are not observed. We denote the finite-sample nearest-neighbor classification error using M graphs and n training vertices as Ln(A1, . . . , AM). Theorem 2. Suppose that {Am, m = 1, . . . , M} follows the DC-SBM model in Section 3.1. As the number of training vertices increases to infinity, the graph fusion embedding achieves asymptotically perfect vertex classification, i.e., lim n→∞Ln(A1, . . . , AM) = 0, if and only if there are no repeating rows in ̃B. In essence, the graph fusion embedding can achieve perfect classification when there is no overlap between the rows of ̃B, meaning that each row represents a unique class. Conversely, if any two rows of ̃B coincide, then the embedding vectors for vertices in those two classes will also",
+          "page_span": [
+            9,
+            9
+          ]
+        },
+        {
+          "id": "3-3-asymptotic-perfect-separation-p002",
+          "text": "coincide, making them indistinguishable.",
+          "page_span": [
+            9,
+            9
+          ]
+        },
+        {
+          "id": "3-3-asymptotic-perfect-separation-p003",
+          "text": "While the condition may appear restrictive, it is equivalent to stating that every class of vertices must be perfectly separable from any other class, a scenario that rarely occurs in practice. Indeed, perfect classification serves as a preliminary step for the subsequent theorem on the synergistic effect, which always holds for our fusion embedding and does not require additional conditions. 9",
+          "page_span": [
+            9,
+            9
+          ]
+        }
+      ]
+    },
+    {
+      "id": "3-4-the-synergistic-effect",
+      "title": "3.4. The Synergistic Effect",
+      "paras": [
+        {
+          "id": "3-4-the-synergistic-effect-p001",
+          "text": "Theorem 3. Suppose that {Am, m = 1, . . . , M} follows the DC-SBM model in Section 3.1. For any subset of graphs M1 ≤M, the classification error using the fusion embedding satisfies: lim n→∞Ln(A1, . . . , AM) −Ln(A1, . . . , AM1) ≤0 for sufficiently large sample size n. Therefore, as more graphs are collected and included, vertex classification via the graph fusion embedding always achieves equal or better performance. If an included graph contains pure noise, the classification error does not deteriorate; however, any graph that contains additional signal to better separate classes can lead to a reduction in classification error. It is important to note that the theorems are based on asymptotic analysis, and the finite-sample error may still exhibit minimal deterioration, especially for small vertex size.",
+          "page_span": [
+            10,
+            10
+          ]
+        }
+      ]
+    },
+    {
+      "id": "4-1-a-general-graph-model",
+      "title": "4.1. A General Graph Model",
+      "paras": [
+        {
+          "id": "4-1-a-general-graph-model-p001",
+          "text": "To understand how the graph fusion embedding can be applied to weighted graphs or distance transformation of vertex attributes, we consider the following general graph model. For any fixed vertex i, we assume that Am(i, 1), Am(i, 2), · · · i.i.d. ∼Fm(i), and the densities {Fm(i), m = 1, . . . , M and i = 1, . . . , n} have finite moments. Namely, each row of the adjacency matrix is independently and identically distributed when conditioning on vertex i. Note that when we condition on the vertex i, it means that all relevant information associated with that vertex are known, including its degree, class label, or Euclidean position, depending on the underlying distribution of the entries in the adjacency matrix. This model includes a wide range of graph representations, including the aforementioned degree-corrected stochastic block model (DC-SBM), the random dot product graph model [41], as well as a pairwise distance or kernel matrix from Euclidean space. To illustrate, consider the 10 scenario where we have vertex attributes Xi for each vertex i = 1, . . . , n, and we construct a Euclidean distance matrix A where A(i, j) = ∥Xi −Xj∥. Under this transformation, when we condition on",
+          "page_span": [
+            10,
+            10
+          ]
+        },
+        {
+          "id": "4-1-a-general-graph-model-p002",
+          "text": "the attributes Xi, the entries A(i, j) and A(i, s) are independently and identically",
+          "page_span": [
+            10,
+            10
+          ]
+        },
+        {
+          "id": "4-1-a-general-graph-model-p003",
+          "text": "distributed for any j ̸= s. We reiterate that the general model does not assume any dependence structure between graphs. For instance, A1(i, j) and A2(i, j) could be correlated in any manner. The model assumption is solely on the edge generation within each individual graph.",
+          "page_span": [
+            11,
+            11
+          ]
+        }
+      ]
+    },
+    {
+      "id": "4-2-convergence-under-general-graph",
+      "title": "4.2. Convergence under General Graph",
+      "paras": [
+        {
+          "id": "4-2-convergence-under-general-graph-p001",
+          "text": "Given the above model, we define the following conditional expectation for the mth graph: E(Am(i, j)|i) = [E(Am(i, j)|i, Yj = 1), · · · , E(Am(i, j)|i, Yj = K)], which is a K-dimensional vector. We then define the normalized vector as follows: μm(i) = E(Am(i, j)|i) ∥E(Am(i, j)|i)∥∈RK. Finally, we form the concatenated mean matrix as follows: μ(i) = [μ1(i), μ2(i), . . . , μM(i)] ∈RMK, which represents the concatenation of all the normalized conditional expectation vectors for vertex i across all M graphs. Theorem 4. Suppose that {Am, m = 1, . . . , M} follows the general graph model in Section 4.1. Let n be the number of vertices with known labels. Then, for any vertex i belonging to class Yi, its graph fusion embedding satisfies: ∥ ̃Z(i, :) −μ(i)∥= O( 1 √n) n→∞ → 0. Thus, in the context of a general graph model, the fusion embedding provides n point masses represented by the concatenated conditional means. The location of each point mass is determined by the specific vertex i under consideration, reflecting the characteristics of the underlying graph model. For example, under the DC-SBM graph, μ(i) = ̃B(Yi, :), implying that all vertices belonging to the same class share a common",
+          "page_span": [
+            11,
+            11
+          ]
+        },
+        {
+          "id": "4-2-convergence-under-general-graph-p002",
+          "text": "point. This effectively reduces n embedding position",
+          "page_span": [
+            11,
+            11
+          ]
+        },
+        {
+          "id": "4-2-convergence-under-general-graph-p003",
+          "text": "to K points, where each point corresponds to a distinct class. 11",
+          "page_span": [
+            11,
+            11
+          ]
+        }
+      ]
+    },
+    {
+      "id": "4-3-vertex-classification-under-general-graph",
+      "title": "4.3. Vertex Classification under General Graph",
+      "paras": [
+        {
+          "id": "4-3-vertex-classification-under-general-graph-p001",
+          "text": "Let {hk(x), k = 1, . . . , K} denotes the density family where each hk(x) represents all possible μ(i) from class k. Generally, hk(x) is continuous, but in specific cases, such as discrete graph models, the density can be discrete, e.g., under DC-SBM, hk( ̃B(k, :)) = 1 and 0 otherwise. Using the density characterization, the next theorem expands the results of Theorem 2 and Theorem 3 to the general graph model. It establishes a general condition for achieving asymptotically optimal classification through the fusion embedding and demonstrates the presence of a synergistic effect in general scenarios. Theorem 5. Suppose that {Am, m = 1, . . . , M} follows the general graph model in Section 4.1. As the number of training vertices increases to infinity, the graph fusion embedding achieves asymptotically perfect vertex classification, i.e., lim n→∞Ln(A1, . . . , AM) = 0 if and only if 1≤k<l≤K hk(x)hl(x) = 0 for any x ∈RMK. Additionally, for any subset of graphs M1 ≤M, the classification error using the fusion embedding satisfies: lim n→∞Ln(A1, . . . , AM1, . . . , AM) −Ln(A1, . . . , AM) ≤0 for sufficiently large sample size n. Once more, the condition for asymptotically perfect",
+          "page_span": [
+            12,
+            12
+          ]
+        },
+        {
+          "id": "4-3-vertex-classification-under-general-graph-p002",
+          "text": "classification implies that each class must",
+          "page_span": [
+            12,
+            12
+          ]
+        },
+        {
+          "id": "4-3-vertex-classification-under-general-graph-p003",
+          "text": "be perfectly separable, as indicated by the class-wise density of the expectations. Although such perfect separability is not commonly observed, it serves as an important special case in understanding the synergistic effect. Note that based on the convergence rate for the embedding (O( 1 √n) as shown in Theorem 4), it is possible to estimate the required sample size to observe the classification improvement. 12 However, the precise value of n is contingent not only on the convergence rate but also on factors like the magnitude of separation between classes and the standard deviation of the underlying graph distribution. As an illustration, let us make some simplifying assumptions. Suppose each class-conditional mean (i.e., μ(i)) is at least c1 apart from others, and the standard deviation for the graph variable (i.e., Fm(i)) is c2. In this case, we can employ a normal approximation with three standard deviations, and deduce that the required sample size for classification error convergence must satisfy 6 c2 √n ≥c1. For example, considering c1 = 0.1 and c2 = 0.5, solving the inequality yields n ≥900, which is similar to the setting for the rightmost figure in Figure 3 with one",
+          "page_span": [
+            12,
+            12
+          ]
+        },
+        {
+          "id": "4-3-vertex-classification-under-general-graph-p004",
+          "text": "graph. As another example,",
+          "page_span": [
+            12,
+            12
+          ]
+        },
+        {
+          "id": "4-3-vertex-classification-under-general-graph-p005",
+          "text": "if we assume c1 = 0.02 (indicating very small differences in class-conditional expectations) and c2 = 0.4, then n would need to be approximately 15000 to achieve perfect classification.",
+          "page_span": [
+            13,
+            13
+          ]
+        }
+      ]
+    },
+    {
+      "id": "5-simulations",
+      "title": "5. Simulations",
+      "paras": [
+        {
+          "id": "5-simulations-p001",
+          "text": "In this section, we present three simulations to illustrate the synergistic effect of the graph fusion embedding. We consistently use the 5-nearest-neighbor classifier in all simulations and real data experiments. While the main paper primarily focuses on the graph fusion embedding and the synergistic effect in classification, additional simulation results are provided in the appendix. These include experiments with heterogeneous graphs, alternative classifiers, the unsupervised case, and comparisons with benchmark methods (Omnibus, MASE, and USE). Simulation 1 We consider a scenario with K = 4 classes, where the prior probabilities for each vertex to belong to class [1, 2, 3, 4] are set to [0, 0.3, 0.2, 0.2, 0.3]. Three SBM graphs are generated with block probability matrices Bm ∈RK×K. For each m, the probabilities are Bm(k, l) = 0.1 for all k, l, except Bm(m, m) = 0.2 for m = 1, 2, 3. This means that the mth class has a stronger connection in graph m. A visualization of this setup is provided in Figure 2. While no single 13 graph is asymptotically perfect for classification, the concatenated block probability matrix   0.2 · · · 0.1 0.1 · · · 0.1 0.1 0.1 · · · 0.1 · · · 0.1 0.2",
+          "page_span": [
+            13,
+            13
+          ]
+        },
+        {
+          "id": "5-simulations-p002",
+          "text": "· · ·",
+          "page_span": [
+            13,
+            13
+          ]
+        },
+        {
+          "id": "5-simulations-p003",
+          "text": "0.1 0.1 0.1 · · · B = 0.1 · · · 0.1 0.1 · · · 0.1 0.1 0.2 · · · 0.1 · · · 0.1 0.1 · · · 0.1 0.1 0.1 · · · satisfies the condition in Theorem 2. Therefore, each graph provides additional information to aid in separating the communities, and using all three graphs leads to asymptotic perfect classification. Figure 2: Visualize three SBM graphs at n = 1000. Simulation 2 Simulations 2 uses the same settings as simulation 1, except that the three graphs are generated using DC-SBM. The parameters are the same as above, and the degrees are drawn independently from a uniform distribution in the interval [0.1, 0.5]. Simulation 3 This simulation involves starting with one signal graph and progressively adding independent graphs. The number of classes remains at four with the same prior probability. We first generate A1 using SBM with the block probability matrix B1, which has 0.1 in off-diagonal entries and 0.2 in diagonal entries. Next, we generate five independent SBM graphs Am for m = 2, . . . , 6 with the block probability matrix Bm being 0.1 in all entries. The concatenated block probability 14 matrix B always satisfies Theorem 2, even in the presence of independent graphs, i.e.,  ",
+          "page_span": [
+            14,
+            14
+          ]
+        },
+        {
+          "id": "5-simulations-p004",
+          "text": "0.2 0.1 0.1 0.1 · · · 0.1 0.2 0.1 0.1 · · · B = 0.1 0.1 0.2 0.1 · · · 0.1 0.1 0.1 0.2 · · · Theorems 2 and 3 predict that the classification error should stay almost the same with the addition of noisy graphs.",
+          "page_span": [
+            15,
+            15
+          ]
+        }
+      ]
+    },
+    {
+      "id": "results",
+      "title": "Results",
+      "paras": [
+        {
+          "id": "results-p001",
+          "text": "In both simulation 1 and simulation 2, the classification error improves with the inclusion of more graphs, as illustrated in the left and center panels of Figure 3. Using two graphs yields a lower error than using only one graph, and using all three graphs yields the lowest error. This is because each new graph contains new signal about the labels, so including a new graph shall always yields better performance. In simulation 3, only the first graph is related to the label, while all additional graphs are essentially noise. The addition of noise graphs has a minimal effect on the classification error of fusion embedding as the number of vertices increases, as shown in the right panels of Figure 3. Compared to the benchmark methods’ performance in the appendix, the graph fusion embedding stands out as the only method that demonstrates the synergistic effect, remains robust against noise graphs, and consistently performs well across all simulations.",
+          "page_span": [
+            15,
+            15
+          ]
+        }
+      ]
+    },
+    {
+      "id": "6-real-data",
+      "title": "6. Real Data",
+      "paras": [
+        {
+          "id": "6-real-data-p001",
+          "text": "In this section, we showcase the performance and synergistic effect of the graph fusion embedding using a wide range of real-world graphs. The dataset consists of various types of graphs, including binary graphs, weighted graphs, directed and undirected graphs, as well as general graphs such as distance matrices of vertex attributes. The majority of the data were sourced from the network repository [26], while a few were collected directly by the authors. All the public data has been properly formatted in MATLAB and is made available on GitHub2. The 2https://github.com/cshen6/GraphEmd 15 1 Signal + Noise SBM 0.8 Three SBMs 0.8 Three DC-SBMs Nearest-Neighbor Classifier Signal Graph Noise Graph Signal + 1 Noise Signal + 5 Noise G1 G2 G3 G1+G2 G2+G3 G1+G2 G1+G2+G3 G1 G2 G3 G1+G2 G2+G3 G1+G2 G1+G2+G3 0.4 0.4 0.5 100 500 1000 0 100 500 1000 0 100 500 1000 0 Number of Vertices Figure 3: The figure shows the 5-fold classification error of graph fusion embedding, averaged over 20 Monte-Carlo replicates, for the three simulation settings. results for Omnibus, MASE, and USE methods are provided in the appendix for comparison.",
+          "page_span": [
+            15,
+            15
+          ]
+        }
+      ]
+    },
+    {
+      "id": "6-1-two-graph-data",
+      "title": "6.1. Two-Graph Data",
+      "paras": [
+        {
+          "id": "6-1-two-graph-data-p001",
+          "text": "Table 1 presents the 5-fold classification error for five graph datasets, each having two graphs. The results are reported as the mean and standard deviation over 20 Monte-Carlo replicates. A brief description of each data and pre-processing steps is as follows: • The C-elegans neuron data [20] consists of two binary graphs with 253 vertices, over 1000 edges, and a label vector with three classes. • The cora dataset [17] is a citation network with 2708 vertices and 5429 edges and 7 classes, and each vertex has a 1433-dimensional 0/1 vertex attribute, indicating the absence or presence of corresponding words from the dictionary. A1 is a binary matrix indicating the existence of edges, while A2 = 1 −D where D is the pairwise cosine distance matrix of the vertex attributes and 1 is the matrix of ones. • The citeseer data [8] is another citation network with 3312 vertices and 4715 edges and 6 classes, with a vertex attribute of 3703 dimensions. We apply the same processing as in the cora dataset to yield a binary graph A1 and a general graph A2 = 1 −D from the cosine distance of the attributes. 16 • The IMDB [40] data consists of two slighly un-matched graphs, one with binary labels",
+          "page_span": [
+            16,
+            16
+          ]
+        },
+        {
+          "id": "6-1-two-graph-data-p002",
+          "text": "and",
+          "page_span": [
+            16,
+            16
+          ]
+        },
+        {
+          "id": "6-1-two-graph-data-p003",
+          "text": "19773 vertices, and another with three-class labels and 19502 vertices. We remove the 271 unmatched vertices to ensure a common vertex set, and use the 3-class label as the label vector. • COIL-RAG has 11757 vertices with 23588 edges, 100 classes, and a vertex attribute of 64 dimensions. A1 is a binary matrix indicating the existence of edges, while A2 = max{D} −D where D is the pairwise Euclidean distance matrix of the vertex attributes. In the cora and citeseer datasets, we employed the cosine distance as it is a widely-used and effective distance measure in word-frequency analysis [4]. Additionally, we transformed the distance matrix by subtracting the distance entries from the maximum value in the distance matrix, denoted as max{D} (which equals 1 for cosine distance). This transformation ensures that the resulting matrix is a valid kernel or similarity matrix [28]. The results presented in Table 1 (and compared with appendix Table B.2) clearly demonstrates that the graph fusion embedding outperforms all other methods by a significant margin across all real datasets, regardless of whether it involves single graph classification, multiple binary graph classification, or multiple",
+          "page_span": [
+            17,
+            17
+          ]
+        },
+        {
+          "id": "6-1-two-graph-data-p004",
+          "text": "general graphs.",
+          "page_span": [
+            17,
+            17
+          ]
+        },
+        {
+          "id": "6-1-two-graph-data-p005",
+          "text": "The only exception is the C-elegans data, where the fusion embedding exhibits slightly lower performance, likely due to the small size of the vertex set. Furthermore, the graph fusion embedding consistently exhibits improved classification performance as more graphs are included.",
+          "page_span": [
+            17,
+            17
+          ]
+        }
+      ]
+    },
+    {
+      "id": "6-2-three-graph-and-three-label-data",
+      "title": "6.2. Three-Graph and Three-Label Data",
+      "paras": [
+        {
+          "id": "6-2-three-graph-and-three-label-data-p001",
+          "text": "The letter dataset consists of three binary graphs, named letter-high, letter-med, and letterlow, each of which has its own label vector with a total of 15 classes. The graphs contain over 10500 vertices and 20250, 14092 and 14426 edges, respectively. After removing several unmatched vertices, we use all three graphs to predict the class labels, and the results are shown in Table 2. The results show that the fusion embedding consistently exhibits the synergistic effect. Specifically, the classification error for each graph and its corresponding label is better than that of a mismatched pair, for example using Letter-High to predict Label-High results in 17 Graph 1 Graph 2 Graph 1+2 C-elegans 42.1% ± 2.3% 44.5% ± 3.0% 38.3% ± 2.4% Cora 19.2% ± 0.5% 29.7% ± 0.5% 15.8% ± 0.5% Citeseer 32.3% ± 1.6% 31.1% ± 0.3% 26.1% ± 0.5% COIL-RAG 7.44% ± 0.4% 48.4% ± 0.03% 3.72% ± 0.2% IMDB 0.9% ± 2% 0.02% ± 0.02% 0% ± 0% Table 1: Evaluate the classification errors using graph fusion embedding. We report the average 5-fold errors and the standard deviation over 20 Monte-Carlo replicates. better error than using Letter-Mid for the same task. Additionally, using all three graphs yields the best",
+          "page_span": [
+            17,
+            17
+          ]
+        },
+        {
+          "id": "6-2-three-graph-and-three-label-data-p002",
+          "text": "classification error in all cases.",
+          "page_span": [
+            17,
+            17
+          ]
+        },
+        {
+          "id": "6-2-three-graph-and-three-label-data-p003",
+          "text": "The dataset comprises graph representations of 15 letters: a, e, f, h, i, k, l, m, n, t, v, w, x, y, z. The labels ”high,” ”med,” and ”low” denote the letter’s shape, with ”high” indicating capitalized letters. The drawings are distorted, making letter recognition a non-trivial task. In the graph, vertices denote the endpoints of the letter drawing, while edges represent the lines in the drawing. Our results indicate that capitalized letters are the easiest to recognize, likely due to their distinct shapes compared to smaller letters. Moreover, employing the fusion embedding using all three graphs yields the best performance in identifying the letter (or, more precisely, the endpoint of a letter) each vertex belongs to. Letter-High Letter-Med Letter-Low All Graphs Label-High 7.86% ± 0.3% 44.2% ± 0.8% 43.0% ± 0.9% 6.09% ± 0.2% Label-Med 44.6% ± 0.9% 14.4% ± 0.4% 44.1% ± 0.6% 9.75% ± 0.3% Label-Low 44.3% ± 0.6% 43.2% ± 0.5% 13.9% ± 0.4% 9.50% ± 0.2% Table 2: Evaluate the classification errors using fusion embedding for a three-graph three-label data. 18",
+          "page_span": [
+            18,
+            18
+          ]
+        }
+      ]
+    },
+    {
+      "id": "6-3-four-graph-wikipedia-data",
+      "title": "6.3. Four-Graph Wikipedia Data",
+      "paras": [
+        {
+          "id": "6-3-four-graph-wikipedia-data-p001",
+          "text": "The Wikipedia dataset consists of four disparate graph representations we collected from Wikipedia articles [29, 30]. The dataset has a total of n = 1382 Wikipedia articles based on a 2-neighborhood of the English article “Algebraic Geometry” and the corresponding French articles. Latent Dirichlet Allocation is applied to the word-frequency of each article to calculate the English text feature and French text feature, from which we generate two graphs A1 and A2 via the cosine distance transformation. The hyperlink information in the English articles and the corresponding French articles yields A3 and A4. All articles are manually labeled into K = 5 disjoint classes: category, people, locations, date, math. Table 3 displays the classification errors using 5-nearest-neighbor on graph fusion embedding for the Wikipedia dataset. For each individual graph, it is evident that the text graphs provide more information for predicting the class of the article, as expected. On the other hand, the hyperlink graph exhibits significantly higher classification errors, indicating less signals. Moreover, combining the text and hyperlink graphs results in slightly improved performance compared to",
+          "page_span": [
+            19,
+            19
+          ]
+        },
+        {
+          "id": "6-3-four-graph-wikipedia-data-p002",
+          "text": "using individual graph. The most favorable outcome is achieved when all four graphs are utilized,",
+          "page_span": [
+            19,
+            19
+          ]
+        },
+        {
+          "id": "6-3-four-graph-wikipedia-data-p003",
+          "text": "showcasing the synergistic effect. English Text French Text English Hyperlinks French Hyperlinks One Graph 19.3% ± 0.5% 18.5% ± 0.5% 48.6% ± 0.9% 52.9% ± 1.2% Two Graphs 16.2% ± 0.5% (1+2) 18.4% ± 0.6% (2+4) 19.0% ± 0.5% (1+3) 44.7% ± 1.0% (3+4) Three Graphs 16.2% ± 0.5% (-4) 16.1% ± 0.5% (-3) 18.8% ± 0.5% (-2) 18.4% ± 0.5% (-1) All 16.0% ± 0.5% Table 3: Evaluate the classification errors using graph fusion embedding for the Wikipedia data. The first row evaluates the embedding of each individual graph; the second row evaluates the embedding of using two graphs, e.g., 1+2 means English text + French text; the third row evaluates the embedding of using three graphs, e.g., -4 means all graphs excluding French hyperlinks; the last row uses all four graphs. 19",
+          "page_span": [
+            19,
+            19
+          ]
+        }
+      ]
+    },
+    {
+      "id": "7-discussion",
+      "title": "7. Discussion",
+      "paras": [
+        {
+          "id": "7-discussion-p001",
+          "text": "This paper presented the graph fusion embedding, and provided compelling evidence on its theoretical soundness and numerical advantages. The most important feature of this method is the synergistic effect, which results in improved numerical performance as more graphs are included. To some extent, the method can be viewed as a supervised and deterministic version of spectral embedding, but without requiring any additional transformation, and works well for general graphs. In contrast, many competitor methods require extra alignment or additional singular value decomposition. This paper suggests several promising directions for future research. Firstly, as the dimension of the fusion embedding always equals MK, for an extremely large number of graphs with high M, or an extremely large number of classes M, exploring dimension reduction techniques and strategies for selecting graphs would be intriguing. Secondly, since the graph encoder embedding can be employed for distance and kernel matrices, exploring connections with other areas such as multi-dimensional scaling [6, 7], distance and kernel correlation [36, 10, 31], etc., could provide valuable insights. Lastly, the application of",
+          "page_span": [
+            20,
+            20
+          ]
+        },
+        {
+          "id": "7-discussion-p002",
+          "text": "this method to general graphs suggests its potential",
+          "page_span": [
+            20,
+            20
+          ]
+        },
+        {
+          "id": "7-discussion-p003",
+          "text": "to enhance existing data fusion tasks, provided an appropriate metric can be identified. Hence, exploring more applications using this method and possible variants on different data regimes would be an exciting avenue for future research.",
+          "page_span": [
+            20,
+            20
+          ]
+        }
+      ]
+    },
+    {
+      "id": "references",
+      "title": "References",
+      "paras": [
+        {
+          "id": "references-p001",
+          "text": "[1] L. Akoglu, H. Tong, and D. Koutra. Graph based anomaly detection and description: A survey. Data Mining and Knowledge Discovery, 29(3):626–688, 2015. [2] J. Arroyo, A. Athreya, J. Cape, G. Chen, C. E. Priebe, and J. T. Vogelstein. Inference for multiple heterogeneous networks with a common invariant subspace. Journal of Machine Learning Research, 22(142):1–49, 2021. [3] A.-L. Barab ́asi and Z. N. Oltvai. Network biology: Understanding the cell’s functional organization. Nature Reviews Genetics, 5(2):101–113, 2004. 20 [4] D. Blei, A. Ng, and M. Jordan. Latent dirichlet allocation. Journal of Machine Learning Research, 3:993–1022, 2003. [5] S. Boccaletti, V. Latora, Y. Moreno, M. Chavez, and D.-U. Hwang. Complex networks: Structure and dynamics. Physics Reports, 424(4-5):175–308, 2006. [6] I. Borg and P. Groenen. Modern Multidimensional Scaling: theory and applications. Springer-Verlag, 2005. [7] T. Cox and M. Cox. Multidimensional Scaling. Chapman and Hall, 2001. [8] C. L. Giles, K. D. Bollacker, and S. Lawrence. Citeseer: An automatic citation indexing system. In Proceedings of the Third ACM Conference on Digital Libraries, pages 89–98, 1998. [9] M. Girvan and M. E. J. Newman.",
+          "page_span": [
+            20,
+            20
+          ]
+        },
+        {
+          "id": "references-p002",
+          "text": "Community structure in social and biological networks.",
+          "page_span": [
+            20,
+            20
+          ]
+        },
+        {
+          "id": "references-p003",
+          "text": "Proceedings of National Academy of Science, 99(12):7821–7826, 2002. [10] A. Gretton, R. Herbrich, A. Smola, O. Bousquet, and B. Scholkopf. Kernel methods for measuring independence. Journal of Machine Learning Research, 6:2075–2129, 2005. [11] A. Grover and J. Leskovec. node2vec: Scalable feature learning for networks. In Proceedings of the 22nd ACM SIGKDD international conference on Knowledge discovery and data mining, pages 855–864, 2016. [12] B. Karrer and M. E. J. Newman. Stochastic blockmodels and community structure in networks. Physical Review E, 83:016107, 2011. [13] T. N. Kipf and M. Welling. Semi-supervised classification with graph convolutional networks. In International Conference on Learning Representations, 2017. [14] R. Liu and A. Krishnan. Pecanpy: a fast, efficient and parallelized python implementation of node2vec. Bioinformatics, 37(19):3377–3379, 2021. [15] V. Lyzinski, D. Fishkind, and C. E. Priebe. Seeded graph matching for correlated Erdos- Renyi graphs. Journal of Machine Learning Research, 15:3513–3540, 2014. 21 [16] V. Lyzinski, Y. Park, C. E. Priebe, and M. W. Trosset. Fast embedding for jofc using the raw stress criterion. Journal of Computational and",
+          "page_span": [
+            21,
+            21
+          ]
+        },
+        {
+          "id": "references-p004",
+          "text": "Graphical Statistics, 26(4):786–802,",
+          "page_span": [
+            21,
+            21
+          ]
+        },
+        {
+          "id": "references-p005",
+          "text": "2017. [17] A. K. McCallum, K. Nigam, J. Rennie, and K. Seymore. Automating the construction of internet portals with machine learning. Information Retrieval, 3:127–163, 2000. [18] M. E. J. Newman. The structure and function of complex networks. SIAM Review, 45(2): 167–256, 2003. [19] Y. Park, C. E. Priebe, and A. Youssef. Anomaly detection in time series of graphs using fusion of graph invariants. IEEE J. Sel. Top. Signal Process., 7:67–75, 2013. [20] D. Pavlovic, P. Vertes, E. Bullmore, W. Schafer, and T. Nicholas. Stochastic blockmodeling of the modules and core of the caenorhabditis elegans connectome. PLoS ONE, 9(9):e97584, 2014. [21] B. Perozzi, R. Al-Rfou, and S. Skiena. Deepwalk: Online learning of social representations. In Proceedings of the 20th ACM SIGKDD international conference on Knowledge discovery and data mining, pages 701–710. ACM, 2014. [22] C. E. Priebe, D. J. Marchette, Z. Ma, and S. Adali. Manifold matching: Joint optimization of fidelity and commensurability. Brazilian Journal of Probability and Statistics, 27(3): 377–400, 2013. [23] W. M. Rand. Objective criteria for the evaluation of clustering methods. Journal of the American Statistical Association,",
+          "page_span": [
+            22,
+            22
+          ]
+        },
+        {
+          "id": "references-p006",
+          "text": "66(336):846–850, 1971.",
+          "page_span": [
+            22,
+            22
+          ]
+        },
+        {
+          "id": "references-p007",
+          "text": "[24] S. Ranshous, S. Shen, D. Koutra, S. Harenberg, C. Faloutsos, and N. F. Samatova. Anomaly detection in dynamic networks: a survey. Wiley Interdisciplinary Reviews: Computational Statistics, 7(3):223–247, 2015. [25] K. Rohe, S. Chatterjee, and B. Yu. Spectral clustering and the high-dimensional stochastic blockmodel. Annals of Statistics, 39(4):1878–1915, 2011. 22 [26] R. A. Rossi and N. K. Ahmed. The network data repository with interactive graph analytics and visualization. In AAAI, 2015. URL https://networkrepository.com. [27] P. Rubin-Delanchy, J. Cape, M. Tang, and C. E. Priebe. A statistical interpretation of spectral embedding: The generalised random dot product graph. Journal of the Royal Statistical Society Series B: Statistical Methodology, 84(4):1446–1473, 2022. [28] C. Shen and J. T. Vogelstein. The exact equivalence of distance and kernel methods in hypothesis testing. AStA Advances in Statistical Analysis, 105(3):385–403, 2021. [29] C. Shen, M. Sun, M. Tang, and C. E. Priebe. Generalized canonical correlation analysis for classification. Journal of Multivariate Analysis, 130:310–322, 2014. [30] C. Shen, J. T. Vogelstein, and C. Priebe. Manifold matching using",
+          "page_span": [
+            22,
+            22
+          ]
+        },
+        {
+          "id": "references-p008",
+          "text": "shortest-path distance",
+          "page_span": [
+            22,
+            22
+          ]
+        },
+        {
+          "id": "references-p009",
+          "text": "and joint neighborhood selection. Pattern Recognition Letters, 92:41–48, 2017. [31] C. Shen, S. Panda, and J. T. Vogelstein. The chi-square test of distance correlation. Journal of Computational and Graphical Statistics, 31(1):254–262, 2022. [32] C. Shen, Y. Park, and C. E. Priebe. Graph encoder ensemble for simultaneous vertex embedding and community detection. In 2023 2nd International Conference on Algorithms, Data Mining, and Information Technology, pages 13–18. ACM, 2023. [33] C. Shen, Q. Wang, and C. E. Priebe. One-hot graph encoder embedding. IEEE Transactions on Pattern Analysis and Machine Intelligence, 45(6):7933–7938, 2023. [34] C. Shen, J. Larson, H. Trinh, X. Qin, Y. Park, and C. E. Priebe. Discovering communication pattern shifts in large-scale labeled networks using encoder embedding and vertex dynamics. IEEE Transactions on Network Science and Engineering, 2024. [35] D. Sussman, M. Tang, D. Fishkind, and C. Priebe. A consistent adjacency spectral embedding for stochastic blockmodel graphs. Journal of the American Statistical Association, 107 [36] G. Szekely and M. Rizzo. Brownian distance covariance. Annals of Applied Statistics, 3(4): 1233–1303, 2009. 23 [37] J.",
+          "page_span": [
+            23,
+            23
+          ]
+        },
+        {
+          "id": "references-p010",
+          "text": "Ugander, B. Karrer, L. Backstrom, and C. Marlow. The anatomy of the facebook social",
+          "page_span": [
+            23,
+            23
+          ]
+        },
+        {
+          "id": "references-p011",
+          "text": "graph. arXiv preprint arXiv:1111.4503, 2011. [38] L. Varshney, B. Chen, E. Paniagua, D. Hall, and D. Chklovskii. Structural properties of the caenorhabditis elegans neuronal network. PLoS Computational Biology, 7(2):e1001066, 2011. [39] Z. Wu, S. Pan, F. Chen, G. Long, C. Zhang, and P. S. Yu. A comprehensive survey on graph neural networks. IEEE Transactions on Neural Networks and Learning Systems, 32: 4–24, 2019. [40] P. Yanardag and S. Vishwanathan. Deep graph kernels. In KDD 15: Proceedings of the 21th ACM SIGKDD International Conference on Knowledge Discovery and Data Mining, pages 1365–1374, 2015. [41] S. Young and E. Scheinerman. Random dot product graph models for social networks. In Algorithms and Models for the Web-Graph, pages 138–149. Springer Berlin Heidelberg, 2007. [42] Y. Zhao, E. Levina, and J. Zhu. Consistency of community detection in networks under degree-corrected stochastic block models. Annals of Statistics, 40(4):2266–2292, 2012. 24",
+          "page_span": [
+            24,
+            24
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,697 @@
+{
+  "id": "1806.05514v5",
+  "title": "The Exact Equivalence",
+  "metadata": {
+    "source_path": "data/pdf_files/1806.05514v5.pdf",
+    "page_count": 33,
+    "hash": "faea19b52d828efddbfff950e7ea9eff4676eb02af434c3ce02748ee7533821a"
+  },
+  "sections": [
+    {
+      "id": "front-matter",
+      "title": "Front Matter",
+      "paras": [
+        {
+          "id": "front-matter-p001",
+          "text": "The Exact Equivalence of Distance and Kernel Methods in Hypothesis Testing Cencheng Shen∗1 and Joshua T. Vogelstein†2,3 1Department of Applied Economics and Statistics, University of Delaware 2Institute for Computational Medicine, Johns Hopkins University 3Department of Biomedical Engineering and Institute of Computational Medicine, Johns Hopkins University arXiv:1806.05514v5 [stat.ML] 15 Sep 2020 September 16, 2020",
+          "page_span": [
+            1,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "id": "abstract",
+      "title": "Abstract",
+      "paras": [
+        {
+          "id": "abstract-p001",
+          "text": "Distance correlation and Hilbert-Schmidt independence criterion are widely used for independence testing, two-sample testing, and many inference tasks in statistics and machine learning. These two methods are tightly related, yet are treated as two different entities in the majority of existing literature. In this paper, we propose a simple and elegant bijection between metric and kernel. The bijective transformation better preserves the similarity structure, allows distance correlation and Hilbert-Schmidt independence criterion to be always the same for hypothesis testing, streamlines the code base for implementation, and enables a rich literature of distance-based and kernel-based methodologies to directly communicate with each other. Keywords: distance covariance, Hilbert-Schmidt independence criterion, strong negative type metric, characteristic kernel ∗shenc@udel.edu †jovo@jhu.edu 1 1",
+          "page_span": [
+            1,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "id": "introduction",
+      "title": "Introduction",
+      "paras": [
+        {
+          "id": "introduction-p001",
+          "text": "Distance correlation is a distance-based method initially proposed for testing independence [28, 30]. It can be used in two-sample test [18, 20], conditional independence [29, 34], feature screening [12, 33, 37], clustering [19, 27], time-series testing [3, 14, 38], graph dependence [11, 35]. The Hilbert-Schmidt independence criterion is a kernelbased method for testing independence and equally popular in related inference tasks [1, 2, 4, 6, 7, 26, 36]. These two foundational methods are universally consistent for testing independence, which motivated many other consistent methods with improved finite-sample power [8–10, 17, 22, 23, 31, 39]. The distance-based and kernel-based methods share similar formulations and many common properties. The independence hypothesis is formulated as follows: given paired sample data {(xi, yi) ∈Rp+q, i = 1, . . . , n} where p denotes the dimension of xi and q denotes the dimension of yi, we aim to test H0 : FXY = FXFY , HA : FXY ̸= FXFY by assuming {(xi, yi) iid∼FXY }. The sample distance correlation is computed via the two pairwise Euclidean distance matrices, is proved asymptotically 0 if and only if X and Y are independent, and thus is",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "introduction-p002",
+          "text": "universally consistent for testing independence. On the",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "introduction-p003",
+          "text": "other hand, the Hilbert-Schmidt independence criterion is computed via the Gaussian kernel, is also proved asymptotically 0 if and only if X and Y are independent, and thus is universally consistent for testing independence. Distance correlation is applicable to any metric choice, while the Hilbert-Schmidt 2 independence criterion may use any kernel choice, and the consistency property still holds under proper conditions [7, 13]. It was shown in [21] that there exists a fixed-point transformation between metrics and kernels such that distance correlation is equivalent to the Hilbert-Schmidt independence criterion for the population statistic. However, this transformation requires an arbitrary fixed point to start with. Moreover, it is still an open question whether the equivalence holds between the sample statistics and between testing p-values, in particular the unbiased statistics [26, 29]. In this paper, we propose a new bijective transformation between metrics and kernels. The bijection is shown as a special case of the fixed-point transformation proposed in [21] but more advantageous for sample data. The bijection is intuitive to use and simpler to implement, does not rely on",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "introduction-p004",
+          "text": "a pre-determined fixed point, enables testing equiv-",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "introduction-p005",
+          "text": "alence between distance correlation and Hilbert-Schmidt independence criterion using either the biased or the unbiased statistics, and is equipped with additional desirable properties that better preserve the data structure, which facilitate theoretical proofs and practical usages. In the experiments section, we provide a spectral clustering application and a testing independence application. All theorem proofs are in the appendix. 2",
+          "page_span": [
+            3,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "id": "background",
+      "title": "Background",
+      "paras": [
+        {
+          "id": "background-p001",
+          "text": "Distance Correlation and Hilbert-Schmidt Independence Criterion Assume (X, Y) = {(xi, yi) ∈Rp+q, i = 1, . . . , n} is the paired sample data where each pair (xi, yi) is independently and identically distributed as (X, Y ) ∼FXY . Given a distance metric d(·, ·), let DX denote the n × n distance matrix of X such that DX ij = d(xi, xj), DY denote the corresponding distance matrix of Y, H = I −1 nJ denote the 3 n × n centering matrix where I is the identity matrix and J is the matrix of ones. The biased sample distance covariance [28] equals DCOVb n(X, Y) = 1 n2trace(HDXHHDYH), where the superscript b stands for a biased statistic. Note that it was called squared distance covariance in [28], and we drop the squared naming for ease of presentation in this paper. Despite the elegant matrix formulation, the above statistic is biased, e.g., when X is independent of Y , E[DCOVb n(X, Y)] > 0 at any finite n. One strategy to cure the bias is to use a modified matrix CX [29]:     nP nP nP t=1 DX it − 1 n−2 s=1 DX sj + 1 (n−1)(n−2) DX ij − 1 n−2 s,t=1 DX st, i ̸= j CX ij =    0, otherwise. Similarly compute CY from DY. Then the unbiased sample distance covariance equals: DCOVn(X, Y) = 1",
+          "page_span": [
+            3,
+            3
+          ]
+        },
+        {
+          "id": "background-p002",
+          "text": "n(n −3)trace(CXCY)",
+          "page_span": [
+            3,
+            3
+          ]
+        },
+        {
+          "id": "background-p003",
+          "text": "Distance correlation is the normalized distance covariance, computed as follows: DCORn(X, Y) = DCOVn(X, Y) DCOVn(X, X)DCOVn(Y, Y) ∈[−1, 1]. (1) Distance correlation is equivalent to distance covariance for testing purpose, but more advantageous for interpreting the test statistic, i.e., the correlation equals 1 for linear relationship while the covariance is unbounded. 4 Suppose (X ′, Y ′), (X ′′, Y ′′) are two independent and identical copy of the random variable pair (X, Y ), the population distance covariance is defined as [29] DCOV(X, Y ) = E[d(X, X′)d(Y, Y ′)] + E[d(X, X′)]E[d(Y, Y ′)] −2E[d(X, X′)d(Y, Y ′′)]. (2) The sample statistic converges to the population version as sample size n increases to infinity, and is also unbiased: DCOVn(X, Y) n→∞ →DCOV(X, Y ), E[DCOVn(X, Y)] = DCOV(X, Y ). When d(·, ·) is the Euclidean metric, it was proved via characteristic functions [28] that the population distance covariance equals 0 if and only if X and Y are independent. Therefore, sample distance covariance converges to 0 if and only if X and Y are independent, thus is universally consistent for testing independence. Note that d(·, ·) can be any metric not just the Euclidean, and the",
+          "page_span": [
+            4,
+            4
+          ]
+        },
+        {
+          "id": "background-p004",
+          "text": "consistency property still holds for any strong",
+          "page_span": [
+            4,
+            4
+          ]
+        },
+        {
+          "id": "background-p005",
+          "text": "negative type metric [13]. The convergence, unbiasedness, and consistent properties also hold for distance correlation by replacing DCOV by DCOR. By replacing the distance metric d(·, ·) by a kernel function k(·, ·), and replacing the distance matrices DX and DY by the respective kernel matrices KX and KY, the distance-based statistic become the respective kernel statistic. For example, when using the Gaussian kernel in the right hand side of Equation 2, the left hand side becomes the population Hilbert-Schmidt covariance [7, 21]. Similarly one can define the biased sample Hilbert-Schmidt covariance, unbiased sample Hilbert-Schmidt covariance, unbiased correlation, and the population covariance. They are denoted by HSICb n(X, Y), 5 HSICn(X, Y), HSICORn(X, Y), and HSIC(X, Y ) respectively. When the kernel function k(·, ·) is characteristic [7], HSICn(X, Y) converges to 0 if and only if X and Y are independent, thus is universally consistent. Hypothesis testing requires a test statistic and a p-value. Distance correlation is the test statistic, and a p-value is needed to decide whether one shall reject the independence hypothesis or not. Permutation test [5] is the standard procedure",
+          "page_span": [
+            5,
+            5
+          ]
+        },
+        {
+          "id": "background-p006",
+          "text": "for testing",
+          "page_span": [
+            5,
+            5
+          ]
+        },
+        {
+          "id": "background-p007",
+          "text": "independence: compute r permuted statistics by randomly permuting the samples of Y each time (i.e., when Y is a matrix of size n × p, it corresponds to permute the rows), calculate the p-value as how often the sample statistic is larger than the permuted ones, and reject independence for small p-value. The permutation test is commonly used in almost every other method for testing independence [8, 23, 39], but can be slow since r is at least 100. Recently, fast chi-square test are made available for the unbiased distance or kernel correlation with validity and power guarantee [24], making the unbiased statistics more attractive for large data. Metric and Kernel and Fixed-Point Transformation Here we introduce some required backgrounds of metric and kernel. Definition 1. Let Z be a non-empty set. A metric d(·, ·) : Z × Z →[0, ∞) is of negative type when it has the following property: for any n ≥2, x1, . . . , xn ∈Z and a1, . . . , an ∈R with Pn i=1 ai = 0, a negative type metric satisfies i,j=1 aiajd(xi, xj) ≤0. A strong negative type metric is a negative type metric with the following additional 6 property: for any distribution FX and FY , d(x, x′)d(FX(x) −FY (x))d(FX(x′) −FY (x′))",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "background-p008",
+          "text": "= 0 if and only if FX = FY ,",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "background-p009",
+          "text": "(3) x′ where d stands for the differential sign. A kernel k(·, ·) : Z ×Z →[0, ∞) is positive definite when for any n ≥2, x1, . . . , xn ∈Z and a1, . . . , an ∈R, it holds that i,j=1 aiajk(xi, xj) ≥0. A characteristic kernel is a positive definite kernel with the following additional property: for any two random variables X and Y with distributions FX and FY , E[k(·, X)] = E[k(·, Y )] if and only if FX = FY . (4) Therefore, both the strong negative type metric and the characteristic kernel are able to uniquely characterize the distribution, which guarantees the consistency property of distance correlation and Hilbert-Schmidt independence criterion [7, 13]. It was shown in [21] that for any given metric, there exists a fixed-point induced kernel such that distance covariance using the given metric equals Hilbert-Schmidt covariance using the induced kernel, and vice versa for any kernel and the induced metric. Note that this does not mean HSIC(X, Y ) using Gaussian kernel equals DCOV(X, Y ) using the Euclidean distance. It means there exists an induced metric of Gaussian kernel (or an induced kernel of Euclidean metric) such that these two population statistics are the same. 7",
+          "page_span": [
+            7,
+            7
+          ]
+        },
+        {
+          "id": "background-p010",
+          "text": "Definition 2. Let Z be a non-empty set. For any metric d(·, ·) : Z × Z →[0, ∞), its",
+          "page_span": [
+            7,
+            7
+          ]
+        },
+        {
+          "id": "background-p011",
+          "text": "fixed-point induced kernel is defined as ̃kd(xi, xj) = d(xi, z) + d(xj, z) −d(xi, xj), at an arbitrary but fixed point z. For any kernel k(·, ·) : Z ×Z →[0, ∞), its induced metric is defined as 2k(xi, xi) + 1 ̃dk(xi, xj) = 1 2k(xj, xj) −k(xi, xj). For ease of the equivalence presentation in this paper, the fixed-point transformation introduced here differs from the original definition in [21] by a factor of two. Next we introduce translation invariant metric and kernel [15]. Many commonly used metrics and kernels are translation invariant, e.g., the Euclidean distance, Lp norm, taxicab metric, any metric induced by a norm, the Gaussian kernel, the Laplacian kernel, etc. Definition 3. Let Z be a non-empty set. A metric d(·, ·) : Z × Z →[0, ∞) is translation invariant when there exists a function g(·) such that d(xi, xj) = g(xi −xj). Similarly, a kernel k(·, ·) : Z × Z →[0, ∞) is translation invariant when there exists a function g(·) such that k(xi, xj) = g(xi −xj). 8 3 Main Results In this section, we introduce the bijection, prove a number of desirable properties, then proceed to show how the bijection establishes the equivalence between distance and kernel testing. 3.1 The",
+          "page_span": [
+            8,
+            8
+          ]
+        },
+        {
+          "id": "background-p012",
+          "text": "Bijective Transformation",
+          "page_span": [
+            8,
+            8
+          ]
+        },
+        {
+          "id": "background-p013",
+          "text": "We propose the following bijection: Definition 4. Given sample data {xi, i = 1, . . . , n}. For any metric d(·, ·), we define its bijective induced kernel as ˆkd(xi, xj) = max s,t∈[n](d(xs, xt)) −d(xi, xj). For any kernel k(·, ·), we define the induced metric as ˆdk(xi, xj) = max s,t∈[n](k(xs, xt)) −k(xi, xj). The subscripts s, t ∈[n] is a shorthand for s = 1, . . . , n and t = 1, . . . , n. Note that the maximum element is always finite and well-defined for given sample data, but may not be fixed depending on the metric or kernel choice, making the bijection a data-adaptive transformation. The proposed bijection is tightly related to the fixed-point transformation: the bijective induced kernel is a shift version of the fixed-point induced kernel that eliminates the fixed-point z; while the two induced metrics are essentially the same for most common kernels. 9 Theorem 1. Given a metric d(·, ·) and a fixed point z, the bijective induced kernel and the fixed-point induced kernel are related via ˆkd(xi, xj) = ̃kd(xi, xj) + f(xi) + f(xj) for the shift function f(xi) = max s,t∈[n](d(xs, xt))/2 −d(xi, z). Given a positive definite and translation invariant kernel k(·, ·), the bijective",
+          "page_span": [
+            9,
+            9
+          ]
+        },
+        {
+          "id": "background-p014",
+          "text": "induced metric and the fixed-point induced metric are the same, i.e., for any xi, xj we have",
+          "page_span": [
+            9,
+            9
+          ]
+        },
+        {
+          "id": "background-p015",
+          "text": "ˆdk(xi, xj) = ̃dk(xi, xj). From now on, we always present the results for a given metric and the bijective induced kernel. All theorems established afterwards also hold for a given kernel and the bijective induced metric by replacing ˆkd(·, ·) with k(·, ·) and d(·, ·) with ˆdk(·, ·). Theorem 2. The bijective induced kernel satisfies the following properties:",
+          "page_span": [
+            10,
+            10
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2-identity-kd-xi-xj-max",
+      "title": "2. Identity: ˆkd(xi, xj) = max",
+      "paras": [
+        {
+          "id": "2-identity-kd-xi-xj-max-p001",
+          "text": "s,t∈[n]{ˆkd(xs, xt)} implies xi = xj, if and only if d(xi, xj) = 0 implies xi = xj.",
+          "page_span": [
+            10,
+            10
+          ]
+        }
+      ]
+    },
+    {
+      "id": "4-negative-type-metric-to-positive-de-nite-kernel-the-bijective-induced-kernel-kd",
+      "title": "4. Negative Type Metric to Positive Deﬁnite Kernel: the bijective induced kernel ˆkd(·, ·)",
+      "paras": [
+        {
+          "id": "4-negative-type-metric-to-positive-de-nite-kernel-the-bijective-induced-kernel-kd-p001",
+          "text": "is positive definite if and only if d(·, ·) is of negative type.",
+          "page_span": [
+            10,
+            10
+          ]
+        }
+      ]
+    },
+    {
+      "id": "5-bijectivity",
+      "title": "5. Bijectivity:",
+      "paras": [
+        {
+          "id": "5-bijectivity-p001",
+          "text": "ˆk ˆdk(·, ·) = k(·, ·). 10",
+          "page_span": [
+            10,
+            10
+          ]
+        }
+      ]
+    },
+    {
+      "id": "6-rank-preserving",
+      "title": "6. Rank Preserving:",
+      "paras": [
+        {
+          "id": "6-rank-preserving-p001",
+          "text": "d(xi, xs) < d(xi, xt) ⇒ˆkd(xi, xs) > ˆkd(xi, xt).",
+          "page_span": [
+            11,
+            11
+          ]
+        }
+      ]
+    },
+    {
+      "id": "7-translation-invariant-when-d-is-translation-invariant-kd-is-also-translation",
+      "title": "7. Translation Invariant: When d(·, ·) is translation invariant, ˆkd(·, ·) is also translation",
+      "paras": [
+        {
+          "id": "7-translation-invariant-when-d-is-translation-invariant-kd-is-also-translation-p001",
+          "text": "invariant. The first four properties are shared by both the bijection and fixed-point transformation. The last three properties are unique to the bijective induced kernel: bijectivity allows recovery of the original kernel and ensures no information is lost; rank preserving is important for any rank-based algorithm; and translation invariance is a necessity for follow-on inference to perform well such as in spectral clustering and support vector machine. Finally, note that we can alternatively define the bijection as: ˆdk(xi, xj) = 1 −k(xi, xj)/ max s,t∈[n](k(xs, xt)), ˆkd(xi, xj) = 1 −d(xi, xj)/ max s,t∈[n](d(xs, xt)), This is an equivalent definition up-to scaling by the maximum elements, and can be succinctly expressed in a matrix form: ˆDK = J −K/ max(K), ˆKD = J −D/ max(D). This alternative definition often facilitates implementation, computation, and visualization of the bijection, and all theoretical results in this manuscript still hold up-to a constant 11 scaling. For ease of presentation we shall stick to Definition 4 in this paper. 3.2 The Equivalence for Hypothesis Testing The bijection enables distance covariance and Hilbert-Schmidt independence criterion to be always",
+          "page_span": [
+            11,
+            11
+          ]
+        },
+        {
+          "id": "7-translation-invariant-when-d-is-translation-invariant-kd-is-also-translation-p002",
+          "text": "the same for testing, either between the biased methods or between",
+          "page_span": [
+            11,
+            11
+          ]
+        },
+        {
+          "id": "7-translation-invariant-when-d-is-translation-invariant-kd-is-also-translation-p003",
+          "text": "the unbiased methods. Namely, when the metric and kernel being used are bijective of each other, the two methods have the same p-value in testing. Theorem 3. Suppose distance covariance uses a given metric d(·, ·), and the Hilbert- Schmidt independence criterion ˆ HSIC uses the bijective induced kernel ˆkd(·, ·). Given any sample data (X, Y), it holds that DCOVb n(X, Y) = ˆ HSIC n(X, Y), DCOVn(X, Y) = ˆ HSICn(X, Y) + O( 1 n2), where the remainder term O( 1 n2) is invariant to permutation. Therefore, sample distance covariance and sample Hilbert-Schmidt covariance always yield the same p-value under permutation test. The above theorem holds when the covariance terms are replaced by the correlations. It also implies that distance and kernel methods are equivalent for two-sample testing, see [18]. There are two interesting observations from the proof: Firstly, if using the fixed-point transformation, the testing equivalence holds between the biased statistics but not between the unbiased statistics, i.e., the unbiased methods no longer share the same p-value when using the fixed-point transformation. Secondly, when using the bijective induced kernel, one can actually eliminate the",
+          "page_span": [
+            12,
+            12
+          ]
+        },
+        {
+          "id": "7-translation-invariant-when-d-is-translation-invariant-kd-is-also-translation-p004",
+          "text": "invariant remainder term in the",
+          "page_span": [
+            12,
+            12
+          ]
+        },
+        {
+          "id": "7-translation-invariant-when-d-is-translation-invariant-kd-is-also-translation-p005",
+          "text": "12 unbiased version by adding 1 n−1 to all the off-diagonal entries of the modified matrices CX and CY. 3.3 The Equivalence between Population Covariances Here we inspect the asymptotic properties of distance covariance and Hilbert-Schmidt independence criterion when using the bijection. The asymptotic properties need a separate treatment because the proposed bijection is data-adaptive in nature: the maximum element may increase to infinity as sample size increases. To that end, we define the population Hilbert-Schmidt covariance using a bijective induced kernel as the limit of sample covariance, and establish the equivalence between the population version as follows: Theorem 4. Given a random variable pair (X, Y ) and a given metric d(·, ·) where the population distance covariance is well-defined as in Equation 2. For the bijective induced kernel ˆkd(·, ·), we define the population Hilbert-Schmidt covariance as the limit of sample covariance: ˆ HSIC(X, Y ) = lim n→∞ ˆ HSICn(X, Y), Then the population Hilbert-Schmidt covariance equals the population distance covariance, i.e., ˆ HSIC(X, Y ) = DCOV(X, Y ) = E[d(X, X′)d(Y, Y ′)] + E[d(X, X′)]E[d(Y, Y ′)] −2E[d(X, X′)d(Y, Y ′′)]. This",
+          "page_span": [
+            12,
+            12
+          ]
+        },
+        {
+          "id": "7-translation-invariant-when-d-is-translation-invariant-kd-is-also-translation-p006",
+          "text": "leads to the next theorem:",
+          "page_span": [
+            12,
+            12
+          ]
+        },
+        {
+          "id": "7-translation-invariant-when-d-is-translation-invariant-kd-is-also-translation-p007",
+          "text": "13 Theorem 5. When the given metric d(·, ·) is of strong negative type, the bijective induced kernel ˆkd(·, ·) is asymptotically a characteristic kernel. When the given kernel k(·, ·) is characteristic, the bijective induced metric ˆdk(·, ·) is asymptotically of strong negative type. 4",
+          "page_span": [
+            13,
+            13
+          ]
+        }
+      ]
+    },
+    {
+      "id": "experiments",
+      "title": "Experiments",
+      "paras": [
+        {
+          "id": "experiments-p001",
+          "text": "4.1 The Equivalence Simulations Here we illustrate the testing equivalence via four representative simulations (linear, spiral, sine, and independent cloud) at n = 100 and p = q = 1 with some white noise. The exact functions can be found in appendix of [23], and a visualization is provided in Figure 1. For each relationship, we generate (X, Y), compute the distance correlation using Euclidean distance, compute the Hilbert-Schmidt correlation using the bijective induced kernel, and calculate their p-values under permutation test with r = 100 random permutations (same permutation applied to every method). The results are reported in Table 1 for both the biased and unbiased methods. As expected, the biased statistics are always the same, while the unbiased statistics are almost the same. The p-values are strictly the same between the biased methods, or between the unbiased methods. This validates that the bijection preserves the testing equivalence on sample data. Note that the actual numbers will be different each time due to random data generation, or as the sample size, dimensionality, dependency type changes. Nevertheless, the testing equivalence is always strict and holds between",
+          "page_span": [
+            14,
+            14
+          ]
+        },
+        {
+          "id": "experiments-p002",
+          "text": "dis-",
+          "page_span": [
+            14,
+            14
+          ]
+        },
+        {
+          "id": "experiments-p003",
+          "text": "tance correlation and Hilbert-Schimidt independence criterion when using the bijection. 14 Linear Spiral Sine Period 4 Independence Figure 1: Visualize linear, spiral, sine, and independent cloud relationships at n = 100 with noise. 15 Table 1: Sample Statistic and P-value using Distance Correlation and Hilbert-Schmidt Independence Criterion with Bijective Induced Metric. The last four rows are unbiased methods while the previous four rows are biased methods. (X, Y) Linear Spiral Sine Independence DCORb 0.1095 0.0351 0.0323 0.0091 p(DCORb n) 0.01 0.31 0.22 0.80 ˆ HSICOR 0.1095 0.0351 0.0323 0.0091 p( ˆ HSICOR n) 0.01 0.31 0.22 0.80 DCORn 0.0860 0.0066 −0.0092 p(DCORn) 0.01 0.24 0.25 0.78 ˆ HSICORn 0.0892 0.0138 0.0066 −0.0078 p( ˆ HSICORn) 0.01 0.24 0.25 0.78 4.2 Spectral Clustering Application In this section, we use spectral clustering to demonstrate the advantage of the bijection. Spectral clustering uses the eigen-decomposition of a kernel matrix to perform dimensionality reduction then clustering. It is popular in image segmentation [16, 25, 32] and a suitable benchmark to compare the quality of a kernel transformation. We set n = 1000 and generate wi from a two-dimensional",
+          "page_span": [
+            14,
+            14
+          ]
+        },
+        {
+          "id": "experiments-p004",
+          "text": "Gaussian mixture with three equally",
+          "page_span": [
+            14,
+            14
+          ]
+        },
+        {
+          "id": "experiments-p005",
+          "text": "likely components. Each component has a different mean with identity matrix as the covariance. We compute the Euclidean distance matrix of {wi}, transform it to the bijective induced kernel and the fixed-point induced kernel, and apply the spectral clustering algorithm from [16] to both kernel matrices. The top row of Figure 2 shows that the bijective induced kernel exhibits a clear block structure and is able to produce a perfect clustering result upon applying spectral clustering. The bottom row shows a somewhat distorted kernel matrix caused by the fixed-point (and apparently not rank-preserving nor translation-invariant), which causes incorrect groupings for many observations when 16 using spectral clustering. 4.3 Multiscale Graph Correlation for Kernel As another application, we show how the multiscale graph correlation can be directly applied to a kernel via the bijection. The original multiscale graph correlation is the optimal local distance correlation via nearest-neighbor, which is applicable to any distance metric and exhibits a better testing power over distance correlation [23, 31]. The bijection enables a straightforward kernel version: given any kernel, apply the",
+          "page_span": [
+            16,
+            16
+          ]
+        },
+        {
+          "id": "experiments-p006",
+          "text": "multiscale",
+          "page_span": [
+            16,
+            16
+          ]
+        },
+        {
+          "id": "experiments-p007",
+          "text": "graph correlation to the bijective induced metric, then test independence by permutation test. We compare the Hilbert-Schmidt independence criterion (which uses the Gaussian kernel with median distance as the bandwidth) with the multiscale graph correlation (using the bijective induced metric of the same Gaussian kernel), and evaluate their testing power for the four simulations in Figure 1 at n = 100. For each simulation, we repeatedly generate sample data for 1000 times, count how often each method correctly identifies the relationship, and compute the testing power of each statistic at α = 0.05 using 1000 permutations. Figure 3 shows the kernel multiscale graph correlation is able to improve the testing power for strongly nonlinear dependencies, exhibits almost the same power as Hilbert-Schmidt independence criterion for linear dependency, and correctly controls the type 1 error level for the independence relationship. Note that multiscale graph correlation cannot be directly applied to a fixed-point induced metric, as the nearest-neighbor structure of each observation is not preserved during the fixed-point transformation as evidenced from the left two panels of Figure 2. 17",
+          "page_span": [
+            17,
+            17
+          ]
+        },
+        {
+          "id": "experiments-p008",
+          "text": "Bijective Induced Kernel",
+          "page_span": [
+            17,
+            17
+          ]
+        },
+        {
+          "id": "experiments-p009",
+          "text": "40 Spectral Clustering via Bijective Kernel 1 Group 1 Group 2 Group 3 200 0.8 30 400 0.6 20 600 0.4 10 800 0.2 0 1000 0 200 600 1000 0 10 20 Fixed-Point Induced Kernel 40 Spectral Clustering via Fixed-Point Kernel Group 1 Group 2 Group 3 200 30 400 20 600 10 800 0 1000 200 600 1000 0 10 20 Figure 2: Generate {wi} from a 2D Gaussian mixture of three components at n = 1000. Starting with Euclidean distance, the first row visualizes the bijective induced kernel matrix and the spectral clustering result, and the second row visualizes the fixed-point induced kernel matrix and the spectral clustering result. 18 Linear 1 Spiral 1 0.8 0.8 Testing Power Testing Power 0.6 0.6 0.4 0.4 0.2 0.2 Kernel MGC HSIC 20 40 60 80 100 0 0 20 40 60 80 100 Sample Size Sample Size 1 Sine 1 Independence 0.8 0.8 Testing Power Testing Power 0.6 0.6 0.4 0.4 0.2 0.2 20 40 60 80 100 0 20 40 60 80 100 0 Sample Size Sample Size Figure 3: Comparing testing power of Hilbert-Schmidt independence criterion and Kernel multiscale graph correlation for four simulations. 19 Acknowledgment This work was graciously supported by the Microsoft Research, the National Science Foundation award DMS-1921310, the Defense Advanced",
+          "page_span": [
+            18,
+            18
+          ]
+        },
+        {
+          "id": "experiments-p010",
+          "text": "Research Projects Agency’s",
+          "page_span": [
+            18,
+            18
+          ]
+        },
+        {
+          "id": "experiments-p011",
+          "text": "(DARPA) SIMPLEX program through SPAWAR contract N66001-15-C-4041, and DARPA Lifelong Learning Machines program through contract FA8650-18-2-7834. The authors thank Dr. Minh Tang, Dr. Carey Priebe, and Dr. Franca Guilherme for their comments and suggestions. We thank Dr. Arthur Gretton and anonymous feedback regarding the asymptotic property of the bijection. We further thank the journal editor and reviewers for their valuable suggestions that significantly improved the organization and exposition of the paper.",
+          "page_span": [
+            20,
+            20
+          ]
+        }
+      ]
+    },
+    {
+      "id": "references",
+      "title": "References",
+      "paras": [
+        {
+          "id": "references-p001",
+          "text": "[1] Balasubramanian, K., B. Sriperumbudur, and G. Lebanon (2013). Ultrahigh dimensional feature screening via rkhs embeddings. In Proceedings of Machine Learning Research, pp. 126–134. [2] Chang, B., U. Kruger, R. Kustra, and J. Zhang (2013). Canonical correlation analysis based on hilbert-schmidt independence criterion and centered kernel target alignment. In International Conference on Machine Learning, pp. 316–324. [3] Fokianos, K. and M. Pitsillou (2018). Testing independence for multivariate time series via the auto-distance correlation matrix. Biometrika 105(2), 337–352. [4] Fukumizu, K., A. Gretton, X. Sun, and B. Schlkopf (2007). Kernel measures of conditional dependence. In Advances in neural information processing systems. 20 [5] Good, P. (2005). Permutation, Parametric, and Bootstrap Tests of Hypotheses. Springer. [6] Gretton, A. and L. Gyorfi(2010). Consistent nonparametric tests of independence. Journal of Machine Learning Research 11, 1391–1423. [7] Gretton, A., R. Herbrich, A. Smola, O. Bousquet, and B. Scholkopf (2005). Kernel methods for measuring independence. Journal of Machine Learning Research 6, 2075–2129. [8] Heller, R., Y. Heller, and M. Gorfine (2013). A",
+          "page_span": [
+            20,
+            20
+          ]
+        },
+        {
+          "id": "references-p002",
+          "text": "consistent multivariate test of associ-",
+          "page_span": [
+            20,
+            20
+          ]
+        },
+        {
+          "id": "references-p003",
+          "text": "ation based on ranks of distances. Biometrika 100(2), 503–510. [9] Heller, R., Y. Heller, S. Kaufman, B. Brill, and M. Gorfine (2016). Consistent distribution-free k-sample and independence tests for univariate random variables. Journal of Machine Learning Research 17(29), 1–54. [10] Kim, I., S. Balakrishnan, and L. Wasserman (2018). Robust multivariate nonparametric tests via projection-pursuit. https://arxiv.org/abs/1803.00715. [11] Lee, Y., C. Shen, C. E. Priebe, and J. T. Vogelstein (2019). Network dependence testing via diffusion maps and distance-based correlations. Biometrika 106(4), 857– 873. [12] Li, R., W. Zhong, and L. Zhu (2012). Feature screening via distance correlation learning. Journal of American Statistical Association 107, 1129–1139. [13] Lyons, R. (2013). Distance covariance in metric spaces. Annals of Probabil- 21 [14] Mehta, R., J. Chung, C. Shen, X. Ting, and J. T. Vogelstein (2020). Independence testing for multivariate time series. https://arxiv.org/abs/1908.06486. [15] Micchelli, C., Y. Xu, and H. Zhang (2006). Universal kernels. Journal of Machine Learning Research 7, 2651–2667. [16] Ng, A., M. Jordan, and Y. Weiss (2001). On spectral clustering: analysis",
+          "page_span": [
+            21,
+            21
+          ]
+        },
+        {
+          "id": "references-p004",
+          "text": "and an",
+          "page_span": [
+            21,
+            21
+          ]
+        },
+        {
+          "id": "references-p005",
+          "text": "algorithm. In Proceedings of the 14th International Conference on Neural Information Processing Systems, pp. 849 – 856. [17] Pan, W., X. Wang, W. Xiao, and H. Zhu (2018). A generic sure independence screening procedure. Journal of the American Statistical Association. [18] Panda, S., C. Shen, C. E. Priebe, and J. T. Vogelstein (2020). Multivariate multisample multiway nonparametric manova. https://arxiv.org/abs/1910.08883. [19] Rizzo, M. and G. Szekely (2010). DISCO analysis: A nonparametric extension of analysis of variance. Annals of Applied Statistics 4(2), 1034–1055. [20] Rizzo, M. and G. Szekely (2016). Energy distance. Wiley Interdisciplinary Reviews: Computational Statistics 8(1), 27–38. [21] Sejdinovic, D., B. Sriperumbudur, A. Gretton, and K. Fukumizu (2013). Equivalence of distance-based and rkhs-based statistics in hypothesis testing. Annals of Statistics 41(5), 2263–2291. [22] Shen, C. (2020). High-dimensional independence testing and maximum marginal correlation. https://arxiv.org/abs/2001.01095. 22 [23] Shen, C., C. E. Priebe, and J. T. Vogelstein (2020). From distance correlation to multiscale graph correlation. Journal of the American Statistical Association",
+          "page_span": [
+            22,
+            22
+          ]
+        },
+        {
+          "id": "references-p006",
+          "text": "115(529),",
+          "page_span": [
+            22,
+            22
+          ]
+        },
+        {
+          "id": "references-p007",
+          "text": "280–291. [24] Shen, C. and J. T. Vogelstein (2020). The chi-square test of distance correlation. https://arxiv.org/abs/1912.12150. [25] Shi, J. and J. Malik (2000). Normalized cuts and image segmentation. IEEE Transactions on Pattern Analysis and Machine Intelligence 22(8), 888 – 905. [26] Song, L., A. Smola, A. Gretton, K. Borgwardt, and J. Bedo (2007). Supervised feature selection via dependence estimation. In ICML ’07 Proceedings of the 24th international conference on Machine learning, pp. 823–830. [27] Szekely, G. and M. Rizzo (2005). Hierarchical clustering via joint between-within distances: Extending ward’s minimum variance method. Journal of Classification 22, 151–183. [28] Szekely, G. and M. Rizzo (2009). Brownian distance covariance. Annals of Applied Statistics 3(4), 1233–1303. [29] Szekely, G. and M. Rizzo (2014). Partial distance correlation with methods for dissimilarities. Annals of Statistics 42(6), 2382–2412. [30] Szekely, G., M. Rizzo, and N. Bakirov (2007). Measuring and testing independence by correlation of distances. Annals of Statistics 35(6), 2769–2794. [31] Vogelstein, J. T., Q. Wang, E. Bridgeford, C. E. Priebe, M. Maggioni, and C. Shen (2019).",
+          "page_span": [
+            23,
+            23
+          ]
+        },
+        {
+          "id": "references-p008",
+          "text": "Discovering and deciphering relationships across disparate data modalities.",
+          "page_span": [
+            23,
+            23
+          ]
+        },
+        {
+          "id": "references-p009",
+          "text": "eLife 8, e41690. 23 [32] von Luxburg, U. (2007). A tutorial on spectral clustering. Statistics and Comput- [33] Wang, S., C. Shen, A. Badea, C. E. Priebe, and J. T. Vogelstein (2019). Signal subgraph estimation via iterative vertex screening. https://arxiv.org/abs/1801.07683. [34] Wang, X., W. Pan, W. Hu, Y. Tian, and H. Zhang (2015). Conditional Distance Correlation. Journal of the American Statistical Association 110(512), 1726–1734. [35] Xiong, J., J. Arroyo, C. Shen, and J. T. Vogelstein (2020). Graph independence testing: Applications in multi-connectomics. https://arxiv.org/abs/1906.03661. [36] Zhang, Q., S. Filippi, A. Gretton, and D. Sejdinovic (2018). Large-scale kernel methods for independence testing. Statistics and Computing 28(1), 113–130. [37] Zhong, W. and L. Zhu (2015). An iterative approach to distance correlationbased sure independence screening. Journal of Statistical Computation and Simulation 85(11), 2331–2345. [38] Zhou, Z. (2012). Measuring nonlinear dependence in timeseries, a distance correlation approach. Journal of Time Series Analysis 33(3), 438–457. [39] Zhu, L., K. Xu, R. Li, and W. Zhong (2017). Projection correlation between two random vectors.",
+          "page_span": [
+            23,
+            23
+          ]
+        },
+        {
+          "id": "references-p010",
+          "text": "Biometrika 104(4), 829–843.",
+          "page_span": [
+            23,
+            23
+          ]
+        },
+        {
+          "id": "references-p011",
+          "text": "24",
+          "page_span": [
+            24,
+            24
+          ]
+        }
+      ]
+    },
+    {
+      "id": "appendix",
+      "title": "Appendix",
+      "paras": [
+        {
+          "id": "appendix-p001",
+          "text": "Proofs Theorem 1. Given a metric d(·, ·) and a fixed point z, the bijective induced kernel and the fixed-point induced kernel are related via ˆkd(xi, xj) = ̃kd(xi, xj) + f(xi) + f(xj) for the shift function f(xi) = max s,t∈[n](d(xs, xt))/2 −d(xi, z). Given a positive definite and translation invariant kernel k(·, ·), the bijective induced metric and the fixed-point induced metric are the same, i.e., for any xi, xj we have ˆdk(xi, xj) = ̃dk(xi, xj). Proof. The first part from metric to kernel follows easily by algebraic manipulation. To prove the second part where the two induced metrics are the same, it suffices to show that for any sample data {xi} and any i ∈[n], it holds that k(xi, xi) = max s,t∈[n](k(xs, xt)) Note that because of translation invariance, k(xi, xi) = k(xj, xj) for any i ̸= j, so k(xi, xi) must be the same maximum element for any i. We prove by contradiction: suppose k(xi, xi) is not the maximum element. Thus there must exist some i and j ̸= i such that k(xi, xj) > k(xi, xi). Denote K as the n × n kernel matrix of sample data {xi}. Let a be the 1 × n vector with 1 at ith entry, −1 at jth 1 entry, and zero elsewhere. Then aKaT = k(xi, xi) + k(xj, xj) −2k(xi, xj) <",
+          "page_span": [
+            25,
+            25
+          ]
+        },
+        {
+          "id": "appendix-p002",
+          "text": "0. This contradicts the kernel being positive definite. Therefore, k(xi, xi) must be the maxi-",
+          "page_span": [
+            25,
+            25
+          ]
+        },
+        {
+          "id": "appendix-p003",
+          "text": "mum element, and the two induced metrics are the same. Theorem 2. The bijective induced kernel satisfies the following properties:",
+          "page_span": [
+            26,
+            26
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2-identity-kd-xi-xj-max",
+      "title": "2. Identity: ˆkd(xi, xj) = max",
+      "paras": [
+        {
+          "id": "2-identity-kd-xi-xj-max-p001",
+          "text": "s,t∈[n]{ˆkd(xs, xt)} implies xi = xj, if and only if d(xi, xj) = 0 implies xi = xj.",
+          "page_span": [
+            26,
+            26
+          ]
+        }
+      ]
+    },
+    {
+      "id": "4-negative-type-metric-to-positive-de-nite-kernel-the-bijective-induced-kernel-kd",
+      "title": "4. Negative Type Metric to Positive Deﬁnite Kernel: the bijective induced kernel ˆkd(·, ·)",
+      "paras": [
+        {
+          "id": "4-negative-type-metric-to-positive-de-nite-kernel-the-bijective-induced-kernel-kd-p001",
+          "text": "is positive definite if and only if d(·, ·) is of negative type.",
+          "page_span": [
+            26,
+            26
+          ]
+        }
+      ]
+    },
+    {
+      "id": "5-bijectivity",
+      "title": "5. Bijectivity:",
+      "paras": [
+        {
+          "id": "5-bijectivity-p001",
+          "text": "ˆk ˆdk(·, ·) = k(·, ·).",
+          "page_span": [
+            26,
+            26
+          ]
+        }
+      ]
+    },
+    {
+      "id": "6-rank-preserving",
+      "title": "6. Rank Preserving:",
+      "paras": [
+        {
+          "id": "6-rank-preserving-p001",
+          "text": "d(xi, xs) < d(xi, xt) ⇒ˆkd(xi, xs) > ˆkd(xi, xt).",
+          "page_span": [
+            26,
+            26
+          ]
+        }
+      ]
+    },
+    {
+      "id": "7-translation-invariant-when-d-is-translation-invariant-kd-is-also-translation",
+      "title": "7. Translation Invariant: When d(·, ·) is translation invariant, ˆkd(·, ·) is also translation",
+      "paras": [
+        {
+          "id": "7-translation-invariant-when-d-is-translation-invariant-kd-is-also-translation-p001",
+          "text": "invariant. Proof. As all other properties are straightforward to verify, here we only prove property (4). Without loss of generality, we assume the maximum metric or kernel element is 2 always 1, since the property is invariant to constant scaling. Denote a = [a1, . . . , an] as Pn i=1 ai = ̄a, 1 as the column vector of ones, and b as a a row vector, its mean as 1 zero-mean vector. Note that a − ̄a1T is always a zero-mean vector. Given sample data {xi, i = 1, . . . , n}, denote D as the n × n distance matrix, ˆKD as the n × n bijective induced kernel matrix, and recall J is the matrix of ones. To prove the only if direction, it suffices to show that when a ˆKDaT ≥0 for any vector a, it holds that bDbT ≤0 for any zero-mean vector b. It follows that bDbT = b(J −ˆKD)bT = b(−ˆKD)bT ≤0. where D = J −ˆKD is the bijection, bJbT = 0, and the last inequality follows from observing that −a ˆKDaT ≤0 and b is a special case of a. To prove the if direction, it suffices to show that when bDbT ≤0 for any zero-mean vector b, it holds that a(J−D)aT ≥0 for any vector a. This is established by the following: (b + ̄a1T)(J −D)(b + ̄a1T)T = ̄a21TJ1 −bDbT −2 ̄a1TDbT − ̄a21TD1 = −bDbT + ̄a21TJ1 −2 ̄a1TDaT",
+          "page_span": [
+            26,
+            26
+          ]
+        },
+        {
+          "id": "7-translation-invariant-when-d-is-translation-invariant-kd-is-also-translation-p002",
+          "text": "+ ̄a21TD1",
+          "page_span": [
+            26,
+            26
+          ]
+        },
+        {
+          "id": "7-translation-invariant-when-d-is-translation-invariant-kd-is-also-translation-p003",
+          "text": "j=1 ˆdk(xi, xj)} + ̄a2 = −bDbT + n2 ̄a2 −2 ̄a i,j=1 ˆdk(xi, xj) i=1 {ai ≥−bDbT ≥0, where the first equality follows by expanding all terms and eliminating any term containing b1 = 0; the second equality follows by noting that b = (a− ̄a1T) and expand the term 2 ̄a1TDbT accordingly; the third equality decomposes the matrix notations into summa- 3 tions for every term except bDbT. The last line follows because −bDbT ≥0, and the other three terms on the fourth line is no smaller than 0: j=1 d(xi, xj)} + ̄a2 n2 ̄a2 −2 ̄a i=1 {ai i,j=1 d(xi, xj) = n2 ̄a2 − ̄a i=1 {(2ai − ̄a) j=1 d(xi, xj)} ≥n2 ̄a2 −n ̄a i=1 (2ai − ̄a) The third lines follows by noting that d(xi, xj) ≤1 because the maximum kernel element is assumed to be 1. Theorem 3. Suppose distance covariance uses a given metric d(·, ·), and the Hilbert- Schmidt independence criterion ˆ HSIC uses the bijective induced kernel ˆkd(·, ·). Given any sample data (X, Y), it holds that DCOVb n(X, Y) = ˆ HSIC n(X, Y), DCOVn(X, Y) = ˆ HSICn(X, Y) + O( 1 n2), where the remainder term O( 1 n2) is invariant to permutation. Therefore, sample distance covariance and sample Hilbert-Schmidt covariance always yield the same p-value under permutation",
+          "page_span": [
+            27,
+            27
+          ]
+        },
+        {
+          "id": "7-translation-invariant-when-d-is-translation-invariant-kd-is-also-translation-p004",
+          "text": "test. Proof. It suffices to prove the equivalence of the two covariance terms. Then the per-",
+          "page_span": [
+            27,
+            27
+          ]
+        },
+        {
+          "id": "7-translation-invariant-when-d-is-translation-invariant-kd-is-also-translation-p005",
+          "text": "muted statistics using distance covariance and Hilbert-Schmidt covariance are always the same (using the same permutation), leading to same p-value using permutation test. 4 Without loss of generality, assume max s,t∈[1,n](d(xs, xt)) = max s,t∈[1,n](d(ys, yt)) = 1. Given sample data X, we denote DX as the distance matrix, the bijective induced kernel matrix as ˆKX D, and similarly for Y. The equivalence for the biased covariances follows as: DCOVb n(X, Y) − ˆ HSIC n(X, Y) = 1 n2{trace(DXHDYH) −trace( ˆKX DH ˆKY DH)} = 1 n2{trace(DXHDYH) −trace((J −DX)H(J −DY)H)} = 1 n2{trace(DXHJH + DYHJH −JHJH)} = 0, where the last equality ie because of JH = J(I −1 nJ) = J −J = 0. To prove the unbiased version, we denote the modified matrices as CX and ˆCX respectively corresponding to the distance matrix DX and the induced kernel matrix ˆKX D. As their diagonal entries are always 0, it suffices to analyze the off-diagonal entries 5 of CX and ˆCX: for each i ̸= j, ˆCX(i, j) = ˆKX D(i, j) − 1 n −2 t=1 ˆKX D(i, t) − 1 n −2 s=1 ˆKX D(s, j) + 1 (n −1)(n −2) s,t=1 ˆKX D(s, t) = (1 −DX(i, j)) − 1 n −2 t=1 (1 −DX(i, t)) − 1 n −2 s=1 (1 −DX(s, j)) + 1 (n −1)(n −2) s,t=1 (1 −DX(s, t)) = −(CX(i, j) + 1 n",
+          "page_span": [
+            28,
+            28
+          ]
+        },
+        {
+          "id": "7-translation-invariant-when-d-is-translation-invariant-kd-is-also-translation-p006",
+          "text": "−1).",
+          "page_span": [
+            28,
+            28
+          ]
+        },
+        {
+          "id": "7-translation-invariant-when-d-is-translation-invariant-kd-is-also-translation-p007",
+          "text": "Therefore, the unbiased sample Hilbert-Schmidt covariance satisfies ˆ HSICn(X, Y) = 1 n(n −3)trace( ˆCX ˆCY) = 1 n(n −3)trace((CX + J −I n −1)(CY + J −I n −1)) = DCOVn(X, Y) + trace((n −1)CX(J −I) + (n −1)CY(J −I) + (J −I)2) n(n −1)2(n −3) = DCOVn(X, Y) + O( 1 n2) As the remainder term is invariant to permutation, the p-value is always the same between ˆ HSICn(X, Y) and DCOVn(X, Y). As evident by the second line above, the two unbiased sample covariances can be made exactly the same by adding 1 n to the modified matrices ˆCX and ˆCY. Note that one can replicate the equivalence proof between the biased covariances using the fixed-point induced kernel. However, such equivalence does not hold between 6 the unbiased covariances using the fixed-point induced kernel: as the fixed-point terms no longer cancel out, the remainder term is dependent on the choice of fixed-point and no longer invariant to permutation. Theorem 4. Given a random variable pair (X, Y ) and a given metric d(·, ·) where the population distance covariance is well-defined as in Equation 2. For the bijective induced kernel ˆkd(·, ·), we define the population Hilbert-Schmidt covariance as the limit of sample covariance:",
+          "page_span": [
+            30,
+            30
+          ]
+        },
+        {
+          "id": "7-translation-invariant-when-d-is-translation-invariant-kd-is-also-translation-p008",
+          "text": "ˆ HSIC(X, Y ) = lim",
+          "page_span": [
+            30,
+            30
+          ]
+        },
+        {
+          "id": "7-translation-invariant-when-d-is-translation-invariant-kd-is-also-translation-p009",
+          "text": "n→∞ ˆ HSICn(X, Y), Then the population Hilbert-Schmidt covariance equals the population distance covariance, i.e., ˆ HSIC(X, Y ) = DCOV(X, Y ) = E[d(X, X′)d(Y, Y ′)] + E[d(X, X′)]E[d(Y, Y ′)] −2E[d(X, X′)d(Y, Y ′′)]. Proof. Denote max s,t∈[1,n](d(xs, xt)) = an max s,t∈[1,n](d(ys, yt)) = bn. Based on the definition of ˆ HSIC(X, Y ) for induced kernel and the sample equivalence so 7 far, it follows that ˆ HSIC(X, Y ) −DCOV(X, Y ) = lim n→∞{ ˆ HSICn(X, Y) −DCOVn(X, Y)} = lim n→∞ 1 n2{trace( ˆKX DH ˆKY DH) −trace(DXHDYH)} = lim n→∞ 1 n2{trace((anJ −DX)H(bnJ −DY)H −DXHDYH)} = lim n→∞ 1 n2{trace(anbnJHJH −bnDXHJ −anJHDY} = 0. Namely, the maximum elements always cancel out, which does not affect the limiting equivalence even if the maximum increases to infinity. Therefore, it holds that ˆ HSIC(X, Y ) = DCOV(X, Y ) = E[k(X, X′)k(Y, Y ′)] + E[k(X, X′)]E[k(Y, Y ′)] −2E[k(X, X′)k(Y, Y ′′)], and the population Hilbert-Schmidt covariance using the induced kernel is always welldefined and equals the population distance covariance. Theorem 5. When the given metric d(·, ·) is of strong negative type, the bijective induced kernel ˆkd(·, ·) is asymptotically a characteristic kernel. When the given",
+          "page_span": [
+            31,
+            31
+          ]
+        },
+        {
+          "id": "7-translation-invariant-when-d-is-translation-invariant-kd-is-also-translation-p010",
+          "text": "kernel k(·, ·) is",
+          "page_span": [
+            31,
+            31
+          ]
+        },
+        {
+          "id": "7-translation-invariant-when-d-is-translation-invariant-kd-is-also-translation-p011",
+          "text": "characteristic, the bijective induced metric ˆdk(·, ·) is asymptotically of strong negative type. Proof. Given any characteristic kernel k(·, ·), the sample HSIC converges to 0 if and only if X and Y are independent. Then distance covariance using the bijective induced metric ˆdk(·, ·) is exactly the same and also converges to 0 if and only if X and Y are 8 independent by Theorem 4. Thus the induced metric must be asymptotically of strong negative type by [13]. Conversely, when d(·, ·) is of strong negative type, ˆkd(·, ·) must be asymptotically characteristic. 9",
+          "page_span": [
+            32,
+            32
+          ]
+        }
+      ]
+    }
+  ]
+}

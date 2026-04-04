@@ -1,0 +1,685 @@
+{
+  "id": "2507.11732v1",
+  "title": "Graph Neural Networks Powered by Encoder Embedding for Improved Node Learning",
+  "metadata": {
+    "source_path": "data/pdf_files/2507.11732v1.pdf",
+    "page_count": 14,
+    "hash": "4caef9f1c797c8f95b30941b76a186d9b69d6bd4380bbb3d349cf7e49469692a"
+  },
+  "sections": [
+    {
+      "id": "front-matter",
+      "title": "Front Matter",
+      "paras": [
+        {
+          "id": "front-matter-p001",
+          "text": "1 Graph Neural Networks Powered by Encoder Embedding for Improved Node Learning Shiyu Chen, Cencheng Shen, Youngser Park, Carey E. Priebe tasks like node clustering, which depend heavily on the quality of node representations. It can also affect node classification, where a well-informed initialization can significantly accelerate the learning process. A promising direction for addressing the limitations of current GNN initialization schemes is to leverage more structured and informative initial node embeddings. To that end, one-hot graph encoder embedding (GEE) [13] offers a lightning-fast and effective method for encoding graph nodes. This simple yet powerful technique can process graphs with millions of edges in seconds while producing embeddings that are both statistically principled and provably convergent to latent positions under random graph models. GEE has been successfully applied to a variety of graph learning tasks, including node classification, clustering, multi-graph embedding, latent community detection, and outlier detection [14]–[18]. While GEE provides fast, high-quality embeddings that capture global structural information and often performs competitively, it",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "front-matter-p002",
+          "text": "can occasionally fall short in capturing the",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "front-matter-p003",
+          "text": "intricate patterns and entangled inter-class relationships in complicated real-world networks. On the other hand, neuralnetwork based approaches excel at refining local patterns and capturing complex nonlinear structures, even when initialized with random or uninformative features. This insight suggests a natural and effective integration of the two approaches. In this paper, we propose and evaluate the GEE-powered GNN (GG), which incorporates GEE-generated embedding as the initial node features within the standard Graph Convolutional Network (GCN) architecture [1], [2], applied to both clustering and classification tasks. In the node clustering task, GG demonstrates not only faster convergence but also consistently superior performance compared to the baseline GNN with randomized initialization, ranking first across all 16 real-world datasets evaluated. For node classification, we further develop a concatenated variant, GG-C, which demonstrates excellent performance across a wide range of training set sizes—from as low as 5% (essentially a semisupervised setting) to 50% of the nodes used for training. The remainder of the paper is organized as follows: Section II introduces our",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "front-matter-p004",
+          "text": "implementations of the GG method",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "front-matter-p005",
+          "text": "based on GNN and GEE. Section III provides an intuitive theoretical motivation for GG using embedding visualizations and convergence rate analyses. Section IV presents clustering performance results on both simulated and real-world datasets. Section V describes the classification adaptation of GG-C, which differs from the clustering setting due to label availability and changes in the learning objective. Section VI reports classification results under various training percentages Abstract—Graph neural networks (GNNs) have emerged as a powerful framework for a wide range of node-level graph learning tasks. However, their performance is often constrained by reliance on random or minimally informed initial feature representations, which can lead to slow convergence and suboptimal solutions. In this paper, we leverage a statistically grounded method, one-hot graph encoder embedding (GEE), to generate high-quality initial node features that enhance the end-to-end training of GNNs. We refer to this integrated framework as the GEE-powered GNN (GG), and demonstrate its effectiveness through extensive simulations and real-world experiments across both unsupervised and supervised settings.",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "front-matter-p006",
+          "text": "In node clustering,",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "front-matter-p007",
+          "text": "GG consistently achieves state-of-the-art performance, ranking first across all evaluated real-world datasets, while exhibiting faster convergence compared to the standard GNN. For node classification, we further propose an enhanced variant, GG-C, which concatenates the outputs of GG and GEE and outperforms competing baselines. These results confirm the importance of principled, structure-aware feature initialization in realizing the full potential of GNNs. arXiv:2507.11732v1 [cs.LG] 15 Jul 2025 Index Terms—Graph Neural Networks, Graph Encoder Embedding, Semi-supervised Learning, Unsupervised Learning I. INTRODUCTION Graphs are ubiquitous data structures that naturally capture relationships between objects, playing a crucial role in domains such as social networks, recommendation systems, and biological networks. Motivated by the pressing need to effectively learn from such graph-structured data, graph neural networks (GNNs) [1]–[5] have collected significant interests in recent years and delivered promising results on link prediction, node clustering, and node classification [6]–[8]. Despite much progress in GNN research [9]–[12], the initialization of node embeddings is a",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "front-matter-p008",
+          "text": "critical yet underexplored",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "front-matter-p009",
+          "text": "aspect. Existing GNNs commonly rely on either raw node attributes or simplistic initialization schemes, such as degreebased features, random vectors, or identity matrices (when explicit features are unavailable). However, these arbitrary or minimally informed initializations frequently fail to capture the rich structural information encoded in the graph topology. As a result, they may lead to slower convergence, greater sensitivity to hyperparameter choices, and suboptimal solutions during training. This limitation is particularly important in Shiyu Chen is with the Department of Applied Mathematics and Statistics (AMS), Johns Hopkins University. E-mail: schen355@jh.edu Cencheng Shen is with the Department of Applied Economics and Statistics, University of Delaware. E-mail: shenc@udel.edu Carey E. Priebe and Youngser Park are with the Department of Applied Mathematics and Statistics (AMS), the Center for Imaging Science (CIS), and the Mathematical Institute for Data Science (MINDS), Johns Hopkins This work was supported in part by funding from Microsoft Research. 2 on both synthetic and real data. Additional experiments are provided in the supplementary material. The source code of",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "front-matter-p010",
+          "text": "our method is available on Github1. connections while reducing between-class edges. The regularization term i C⊤ F computes the Frobenius norm of the aggregated community assignments, thereby preventing trivial solutions by mitigating the collapse of clusters. 4) Prediction: The soft community assignment matrix C, derived from the GNN output via a softmax function, serves as a probability matrix. Each node is assigned to the community with the highest probability: II. CLUSTERING METHOD A. GNN The architecture considered in this paper utilizes the graph convolution network with residual skip connections [19] and employs the loss of deep modularity networks (DMoN) [8] to enhance community structure preservation. 1) GCN: The layer-wise propagation rule of GCN is defined as follows: ˆY = argmax(C, dim = 1). To formalize the entire unsupervised GNN pipeline, we encapsulate it as a single function F u GNN that maps the initial features Z(0) and the graph structure A to the final label predictions ˆY : Z(l+1) = σ \u0010 ̃D−1 2 Z(l)W (l)\u0011 . 2 ̃A ̃D−1 ˆY = F u GNN(Z(0), A). Here, ̃A = A + In is the adjacency matrix with added selfconnections, where A is the original adjacency matrix, In ∈",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "front-matter-p011",
+          "text": "Rn×n is the identity matrix and n is the number of nodes. The degree matrix ̃D of ̃A is defined as ̃Dii = P In the case of the vanilla GNN, we use a randomized initial embedding X0 as the input of F u GNN: j ̃Aij. W (l) represents the trainable weight matrix for the l-th layer, and σ(·) denotes the activation function, which in this case is the ReLU function, defined as σ(x) = max(0, x). Finally, Z(l) ∈ Rn×d is the activation matrix in the l-th layer, where Z(0) ˆYGNN = F u GNN(X0, A). In our implementation, X0 ∈Rn×k is initialized using the Xavier uniform initialization, where each embedding element is sampled from U \u0010 − 6 k+n, 6 k+n \u0011 . can be either randomized inital embeddings or specific node features. Here, d denotes the embedding dimension, which is set to match the number of clusters K. 2) Skip connections: Skip connections add the initial features to the outputs of each GCN layer to obtain the final representation ˆZ, which can be formulated as: B. GEE GEE is an efficient and flexible graph embedding method that can be applied with ground-truth labels, labels generated by other methods, partial labels, or without labels. The core step of supervised GEE is the",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "front-matter-p012",
+          "text": "multiplication of adjacency",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "front-matter-p013",
+          "text": "matrix A with a column-normalized one-hot encoding matrix W: ˆZ = l=0 Z(l), where L = 2 denotes the number of layers. In this way, the network ensures that meaningful information from earlier layers is preserved and leveraged throughout the training process, reducing the risk of feature degradation in deeper layers. 3) DMoN loss: The loss function of DMoN combines spectral modularity maximization with a regularization term to avoid trivial solutions and is formulated as: Z = AW, Wik = I{ Yi = k } nk , (1) where I(·) is the indicator function and nk = Pn j=1 I{Yj = k} is the size of community k ∈[1, K]. GEE first converts every node into a scaled one-hot vector: if node i belongs to community k, the entry Wik equals 1/nk; Otherwise, it is 0. Consequently, each column of W sums up to 1 and can be interpreted as a probability distribution over the nodes in that community. Multiplying A by W yields the final embedding matrix Z. The i-th row Zi summarizes how strongly node i is connected to all K clusters, while the k-th column Z·k serves as a ‘prototype’ vector for the community k in the adjacency space. In the clustering task, we adopt the unsupervised version of GEE. The procedure",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "front-matter-p014",
+          "text": "starts with a random label vector, then",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "front-matter-p015",
+          "text": "repeats: 1) compute node embeddings with the supervised GEE, and 2) run k-means on the embeddings to update the labels. The loop ends when the labels stop changing or when the maximum number of iterations M is reached. Formally, the whole routine can be viewed as a function F u GEE(A, k, M): C = softmax( ˆZ), √ −1, LDMoN(C; A) = −1 2mTr(C⊤BC) + C⊤ where C ∈Rn×k is the soft community assignment matrix, obtained by applying the softmax function to the GNN output ˆZ. The adjacency matrix of the graph is denoted as A, and m = 1 2 i,j Aij is the total number of edges. The modularity matrix B is defined as: B = A −vv⊤ 2m , where v represents the degree vector of the graph, computed as: v = A1n, with 1n ∈Rn being a column vector of ones. The term Tr(C⊤BC) corresponds to the modularity maximization component, which encourages dense within-class ( ˆZGEE, ˆYGEE) = F u GEE(A, k, M). (2) 1https://github.com/chenshy202/GG 3 Fig. 1: Visualization of Training Dynamics and Clustering Quality. This figure contrasts the training process of our proposed GG (top row) and a vanilla GNN (bottom row) on a Degree-Corrected Stochastic Block Model (DC-SBM) graph (see Subsection IV-A for detailed settings).",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "front-matter-p016",
+          "text": "It demonstrates that GG’s warm-start leads to a better initial state, faster convergence,",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "front-matter-p017",
+          "text": "and a superior final clustering quality. GG begins with a structured embedding (ARI = 0.05) and converges in only 1,800 epochs to a high-quality partition (ARI = 0.32). In contrast, the GNN starts from a random state (ARI ≈0.00) and requires a much longer training of 8,180 epochs to achieve an inferior result (ARI = 0.26). C. GEE-powered GNN (GG) This is where a learning-based approach, specifically using GNNs, offers a paradigm shift. Instead of directly searching the discrete space of partitions, a GNN reframes the problem as a continuous optimization task. By training a GNN with a differentiable modularity-style loss, the network learns lowdimensional node embeddings that are inherently optimized for community structure [8], [25], [26]. This learned, continuous representation space effectively ‘smooths out’ the notoriously rugged modularity landscape, making it amenable to gradient-based optimization. However, even in this smoother landscape, the non-convex nature of the optimization means that the choice of initialization remains critical. This motivates our core proposal: GG, a GNN that is warm-started with embeddings from the statistically consistent GEE, which combines the",
+          "page_span": [
+            3,
+            3
+          ]
+        },
+        {
+          "id": "front-matter-p018",
+          "text": "best of both",
+          "page_span": [
+            3,
+            3
+          ]
+        },
+        {
+          "id": "front-matter-p019",
+          "text": "worlds. The GEE initialization places the GNN in a promising region of the embedding space. From this advantaged starting point, the GNN’s training can fine-tune the representations and converge to markedly superior optima than vanilla GNN that rely on random initializations [1]. To empirically validate this hypothesis, we visualize the evolution of node embeddings for both GG and the vanilla GNN during training on a DC-SBM graph. As illustrated in We first generate a well-initialized node features ˆZGEE from Eq. (2), and utilize it as the input of the function F u GNN to obtain the predicted label vector ˆYGG: ˆYGG = F u GNN( ˆZGEE, A). III. THEORETICAL MOTIVATION Identifying meaningful community structures in graphs is a fundamental task in network analysis. Modularity optimization has emerged as a prominent approach [20], aiming to find partitions that maximize this score. However, directly optimizing modularity presents significant challenges. The problem is NP-hard [21], and its optimization landscape is notoriously ‘rugged,’ characterized by an exponential number of nearoptimal partitions [22], [23]. This often leads heuristic search algorithms to converge to local optima",
+          "page_span": [
+            3,
+            3
+          ]
+        },
+        {
+          "id": "front-matter-p020",
+          "text": "that are highly sensitive",
+          "page_span": [
+            3,
+            3
+          ]
+        },
+        {
+          "id": "front-matter-p021",
+          "text": "to initial conditions or node processing order. While subsequent algorithms like Leiden have made strides in guaranteeing well-connected communities [24], the fundamental challenge of navigating this rugged, NP-hard landscape via discrete, heuristic search persists. 4 Fig. 2: Clustering performance comparison of GEE, GNN and GG on DC-SBM graphs. This figure shows that our proposed GG offers the best trade-off between clustering accuracy (ARI, left) and speed (Time, right). While GEE is fastest, GG matches or surpasses its accuracy, especially on more challenging graphs (r > 0.08). Compared to the vanilla GNN, GG is both more accurate and substantially faster across all conditions. A. Simulation Figure 1, the impact of our warm-starting strategy is immediately apparent. GG (top row) begins at Epoch 0 with some discernible community structure (ARI = 0.05), visually confirming that it starts in a ”promising region” of the embedding space. Then it rapidly refines this structure, converging in only 1,800 epochs to a high-quality partition with an ARI of 0.32. In comparison, the randomly initialized GNN (bottom row) starts from a completely unstructured state (ARI = 0.00). Its learning",
+          "page_span": [
+            3,
+            3
+          ]
+        },
+        {
+          "id": "front-matter-p022",
+          "text": "trajectory is substantially slower, showing negligible",
+          "page_span": [
+            3,
+            3
+          ]
+        },
+        {
+          "id": "front-matter-p023",
+          "text": "improvement even by Epoch 1000 (ARI = 0.01). Ultimately, it requires a much longer training process (8,180 epochs) to reach a significantly inferior solution (ARI = 0.26). This side-by-side comparison offers an intuitive justification for our approach. By employing GEE as the initial node feature representation, owing to its statistically grounded formulation and its convergence to latent positions under random graph models [13], the method provides high-quality initial embeddings that capture the global structural properties of the graph. This strong initialization significantly benefits the subsequent neural network optimization process, enabling faster convergence and improved final results. In doing so, it effectively circumvent the challenges posed by the rugged and non-convex optimization landscape typical of GNN training. For simulations, we consider the stochastic block model (SBM) [27] and the degree-corrected SBM (DC-SBM) [28]. Here we present the results on DC-SBM, as it better captures the degree heterogeneity in real-world networks. Results for SBM are available in Appendix. In DC-SBM, the generative process for an edge between two nodes depends on three components:",
+          "page_span": [
+            4,
+            4
+          ]
+        },
+        {
+          "id": "front-matter-p024",
+          "text": "their community",
+          "page_span": [
+            4,
+            4
+          ]
+        },
+        {
+          "id": "front-matter-p025",
+          "text": "assignments, a shared block probability matrix, and individual degree parameters. First, each node i is assigned to a community, represented by a label Yi ∈{1, . . . , K}. The connectivity between these communities is governed by the block probability matrix B ∈[0, 1]K×K, where entry B(k, l) specifies the probability of a link between a node in community k and a node in community l. The key distinction from the standard SBM is the introduction of a degree parameter θi for each node to account for degree heterogeneity. Combining these elements, the adjacency matrix A ∈ {0, 1}n×n is generated as follows: Aij ∼Bernoulli (θiθjB(Yi, Yj)) where A(i, i) = 0 and A(j, i) = A(i, j) to ensure the graph is simple and undirected. For the experimental setup, the graphs are configured with n = 2000 nodes and K = 4 communities. To evaluate model performance under varying degrees of community separability, we fix the intra-community edge probability at 0.3 while systematically varying the inter-community probability r from 0 to 0.3 in increments of 0.02. To introduce degree heterogeneity, the degree correction parameters θi are drawn from a Beta distribution, β(1, 4). Furthermore, we impose a",
+          "page_span": [
+            4,
+            4
+          ]
+        },
+        {
+          "id": "front-matter-p026",
+          "text": "structural",
+          "page_span": [
+            4,
+            4
+          ]
+        },
+        {
+          "id": "front-matter-p027",
+          "text": "imbalance by setting the community sizes to a ratio of 1:2:3:4, a choice intended to better reflect the skewed community size distributions often found in real-world networks. To ensure the statistical reliability of our findings across all simulation experiments (including SBM in Appendix), we conduct 50 independent runs for each graph generated at every value of r for all simulations. We then report the mean and IV. CLUSTERING EVALUATION To systematically evaluate the performance of the proposed GG method, we conduct experiments on both synthetic and real-world datasets. The evaluation considers two parts: clustering accuracy, where we compare GG against GEE and the vanilla GNN; and running time, focusing on the convergence time difference between GG and the vanilla GNN. For each graph, whether real-world or synthetic, we generate three distinct sets of label predictions: ˆYGEE from GEE, ˆYGNN from a vanilla GNN, and ˆYGG from the proposed GG. We then assess the quality of these predictions against the ground-truth labels using the Adjusted Rand Index (ARI). The ARI measures the similarity between two clusterings, where a score of 1 indicates a perfect match, and values near 0",
+          "page_span": [
+            4,
+            4
+          ]
+        },
+        {
+          "id": "front-matter-p028",
+          "text": "suggest",
+          "page_span": [
+            4,
+            4
+          ]
+        },
+        {
+          "id": "front-matter-p029",
+          "text": "random partitioning. 5 TABLE I: Summary of datasets used in experiments social and communication networks (e.g., PolBlogs, LastFM, Email), web graphs based on hyperlinks (e.g., Chameleon, Wiki), biological interaction networks (e.g., Gene) and others representing a variety of structural properties and community distribution patterns. The key statistics of these datasets are summarized in Table I. The table also details the size of each community within the datasets. For datasets with more than four communities, the sizes of the four largest communities are listed. As shown in the table, imbalanced community sizes are a common characteristic of these networks. To ensure reliable results, all experiments are repeated for 50 independent trials, and we report the mean and standard error for both ARI and running time. The detailed results are presented in Tables II, with the best ARI score for each dataset highlighted in bold. The results clearly demonstrate the advantages of GG. Not only does it achieve the best accuracy on all real-world datasets, but it also operates with substantially less computational time than the vanilla GNN in most cases. This empirical observation aligns",
+          "page_span": [
+            4,
+            4
+          ]
+        },
+        {
+          "id": "front-matter-p030",
+          "text": "closely with the simulation results.",
+          "page_span": [
+            4,
+            4
+          ]
+        },
+        {
+          "id": "front-matter-p031",
+          "text": "Dataset Vertices Edges Classes Community sizes Cora 2708 5429 7 818, 426, 418, 351 Citeseer 3327 4732 6 701, 668, 596, 590 ACM 3025 13128 3 1061, 999, 965 Chameleon 2277 18050 5 521, 460, 456, 453 DBLP 4057 3528 4 EAT 399 203 4 102, 99, 99, 99 UAT 1190 13599 4 299, 297, 297, 297 BAT 131 1074 4 35, 32, 32, 32 KarateClub 34 156 4 13, 12, 5, 4 Email 1005 25571 42 109, 92, 65, 61 Gene 1103 1672 2 613, 490 Industry 219 630 3 133, 44, 42 LastFM 7624 27806 17 1303, 1098, 655, 515 PolBlogs 1490 33433 2 636, 588 Wiki 2405 16523 17 406, 361, 269, 228 TerroristRel 881 8592 3 633, 181, 67 V. CLASSIFICATION METHOD A. GNN standard error of the performance and running time, which are visualized as error bars in the result plots. The visualizations of node embeddings presented in Figure 1 are taken from a representative run of this experimental setup, specifically using a graph generated with r = 0.1. The results presented in Figure 2 empirically validate our core hypothesis: GG achieves a synergistic effect by leveraging GEE’s structurally-informed initialization to effectively guide the GNN’s learning process. In terms of clustering accuracy (left panel), the results reveal the distinct roles of",
+          "page_span": [
+            5,
+            5
+          ]
+        },
+        {
+          "id": "front-matter-p032",
+          "text": "each compo-",
+          "page_span": [
+            5,
+            5
+          ]
+        },
+        {
+          "id": "front-matter-p033",
+          "text": "nent. As anticipated, GEE demonstrates high accuracy when the community structure is clear (low r), which degrades as the network becomes more complex (r > 0.1). The vanilla GNN, while performing more consistently than GEE in this regime, still yields suboptimal results. This is the exact scenario where GG is designed to solve, which consistently outperforms the vanilla GNN across the entire difficulty spectrum. This demonstrates that GEE’s high-quality initialization allows the GNN component to avoid poor local optima and fine-tune its way to a superior solution. Regarding computational time (right panel), GEE is the fastest method, the vanilla GNN is the most costly, while GG strikes a fine balance, costing less than vanilla due to the better initialization. For node classification, we employ the same graph convolution network architecture except a different loss function. The layer-wise updates follow: Z(l+1) = σ \u0010 ̃D−1 2 Z(l)W (l)\u0011 , 2 ̃A ̃D−1 ˆZ = l=0 Z(l). The model is trained by minimizing the cross-entropy loss LCE, over the set of training nodes Vtrain. Given the output ˆZ, and ground-truth labels Y , the loss is defined as: exp( ˆZiYi) PK c=1 exp( ˆZic) ! LCE = − 1",
+          "page_span": [
+            5,
+            5
+          ]
+        },
+        {
+          "id": "front-matter-p034",
+          "text": "|Vtrain|",
+          "page_span": [
+            5,
+            5
+          ]
+        },
+        {
+          "id": "front-matter-p035",
+          "text": "i∈Vtrain log . (3) Once trained, the model produces the final prediction ˆY . The predicted class label for each node i is then determined by applying the argmax operator: ˆYi = arg max c ( ˆZic), c ∈[0, K −1]. To represent this entire end-to-end process, from the initial node representations Z(0) and the adjacency matrix A to the final label predictions, we define a single function F a GNN, The output is thus expressed as: B. Real Data We evaluate the performance of the proposed method on a diverse suite of 16 publicly available real-world graphs. Following the methodology of prior work [13], [29], [30], we select datasets from well-established network repositories2. This collection includes benchmark citation networks (e.g., Cora, Citeseer), co-authorship graphs (e.g., ACM, DBLP), ˆY = F a GNN(Z(0), A). For the vanilla GNN baseline, we use the same random initialization scheme as in the clustering task, generating an initial embedding matrix X0 as the input of F u GNN: 2Available: https://github.com/cshen6/GraphEmd and https://github.com/ yueliu1999/Awesome-Deep-Graph-Clustering ˆYGNN = F a GNN(X0, A). 6 TABLE II: Clustering accuracy (ARI) and running time on real-world datasets.",
+          "page_span": [
+            5,
+            5
+          ]
+        },
+        {
+          "id": "front-matter-p036",
+          "text": "The best result is highlighted in bold. Running",
+          "page_span": [
+            5,
+            5
+          ]
+        },
+        {
+          "id": "front-matter-p037",
+          "text": "time for GEE is excluded from comparison with GNN-based models due to its non-iterative nature. UAT Industry Wiki Cora LastFM Email KarateClub PolBlogs ARI GEE 0.090±0.001 0.061±0.006 0.116±0.002 0.137±0.004 0.341±0.004 0.436±0.005 0.449±0.014 0.812±0.001 GNN 0.126±0.002 0.099±0.005 0.106±0.003 0.111±0.004 0.274±0.009 0.340±0.003 0.725±0.011 0.745±0.003 GG 0.140±0.003 0.126±0.005 0.124±0.002 0.166±0.004 0.409±0.004 0.537±0.002 0.726±0.013 0.821±0.003 Running time (s) GEE 5.9±0.0 0.6±0.0 7.1±0.0 3.4±0.0 14.2±0.1 8.3±0.03 0.3±0.0 6.6±0.1 GNN 12.0±0.2 2.8±0.1 104.6±5.1 80.6±2.5 779.6±48.1 29.4±0.4 1.8±0.0 17.5±1.0 GG 12.4±0.3 2.9±0.1 65.1±3.7 59.2±3.7 474.1±29.9 28.2±0.3 1.8±0.0 10.4±0.1 Gene TerroristRel DBLP EAT Citeseer ACM Chameleon BAT ARI GEE 0.008±0.002 0.062±0.008 0.018±0.001 0.017±0.001 0.046±0.003 0.033±0.003 0.045±0.002 0.043±0.003 GNN 0.008±0.002 0.075±0.005 0.009±0.001 0.023±0.002 0.035±0.002 0.034±0.003 0.056±0.002 0.060±0.003 GG 0.011±0.002 0.078±0.009 0.022±0.001 0.044±0.005 0.056±0.003 0.059±0.003 0.060±0.002 0.085±0.007 Running time (s) GEE 1.3±0.0 2.5±0.1 2.6±0.0 2.6±0.0 3.2±0.0 5.8±0.0 13.0±0.1 0.7±0.0 GNN 8.4±0.3 7.9±0.2 85.9±5.2 4.6±0.1 93.7±3.7 54.0±2.9 44.6±2.1",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "front-matter-p038",
+          "text": "2.1±0.0 GG 7.9±0.1 7.8±0.2 70.3±3.2 4.5±0.1 63.5±3.0 47.8±2.8 31.3±1.0 2.1±0.0 B. GEE a richer representation for each node. Specifically, we concatenate the output of the supervised GEE, denoted as ˆZGEE, with the final GNN-refined embeddings from the GG model, denoted as ˆZGG. The concatenated embedding is then passed to a Linear Discriminant Analysis (LDA) classifier for final label prediction. Formally, the prediction can be expressed as: For GEE in the classification task, we generate node embeddings ˆZGEE using the supervised GEE algorithm (Eq. (1)), where the labels for test nodes Vtest are masked (e.g., set to −1) and not used by the GEE algorithm. We denote the masked label vector ̃Y as: ˆYGG−C = LDA([ ˆZGG, ˆZGEE]). ( Yi if i ∈Vtrain −1 if i ∈Vtest (4) ̃Yi = This design is particularly advantageous for node classification. If either embedding component contains little discriminative information, the LDA classifier remains unaffected; however, if one or both components offer additional informative signals, whether individually or jointly, LDA is wellpositioned to extract and leverage them. Intuitively, combining the global perspective of GEE with the locally refined",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "front-matter-p039",
+          "text": "features",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "front-matter-p040",
+          "text": "from GG enhances the expressive capacity of the representation. Using this masked label vector, the supervised GEE embeddings are then computed as: ˆZGEE = AW, Wik = I{ ̃Yi = k } nk . (5) To output labels for the test nodes, we use the linear discriminant analysis (LDA) on ˆZGEE: ˆYGEE = LDA( ˆZGEE). (6) VI. CLASSIFICATION EVALUATION C. GG In this section, we evaluate the node classification performance of the proposed methods. The evaluation is conducted on both synthetic graphs generated by the SBM and DC- SBM, as well as on the same set of real-world datasets used in the clustering analysis. A key part of this evaluation is to assess model performance under varying levels of data scarcity, which is achieved through different training sizes. Following the same warm-start strategy in the clustering task, the GG method for classification initializes GNN with features derived from GEE. Specifically, we utilize the supervised GEE embeddings, ˆZGEE (from Eq. (5)) as input of the function F a GNN to obtain the predicted label vector ˆY ′ GG: ˆYGG = F a GNN( ˆZGEE, A). A. Experimental Setup D. GG-C We systematically vary the proportion of labeled nodes available for training by four",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "front-matter-p041",
+          "text": "different training sizes. Specif-",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "front-matter-p042",
+          "text": "ically, we set the ratio of the test set (Vtest) to the combined training and validation sets (train/val set) to be 19:1, 9:1, 4:1, and 1:1. This corresponds to the use of 5%, 10%, 20%, and Recognizing that GEE and GG may capture complementary aspects of the graph, where GEE emphasizing global structure and GG refining local patterns, we introduce a variant termed GG-C, which concatenates the respective embeddings to form 7 Fig. 3: Classification performance comparison of GEE, GNN, GG and GG-C on DC-SBM graphs with 5% (top row) and 50% (bottom row) train/val set. This figure demonstrates the superiority of our GG and GG-C. They overcome the poor accuracy of the faster GNN (which is prone to local optima), while our concatenated variant, GG-C, also surpasses the classic GEE, particularly in the challenging low-label (5%) setting. 50% of the nodes for training and validation, respectively. Furthermore, to ensure that every class is represented during training and validation, we enforce a minimum of two training nodes and one validation node per class. From this combined training and validation pool, we then allocate 10% of the nodes for the validation set (Vval) and the remaining 90%",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "front-matter-p043",
+          "text": "for the training set (Vtrain). This partitioning",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "front-matter-p044",
+          "text": "strategy allows us to rigorously evaluate each method. Each method is evaluated by the classification accuracy. For a given set of nodes V, accuracy is defined as the fraction of correctly classified nodes. We denote this metric as Acc(V) and formalize it as: Regarding the running time of GG-C, it is reported jointly with GG in our figures and tables. This is because the additional computational cost of GG-C, which involves a simple feature concatenation and a non-intensive classifier like Linear Discriminant Analysis (LDA), is negligible compared to training process shared with GG. Therefore, for practical purposes, their running times are considered identical. B. Simulation Here we present two most representative train/val set proportions on DC-SBM: 50% (data-rich) and 5% (data-scarce), in Figure 3. The complete results, including those for the 10% and 20% train/val set proportions on DC-SBM and all results for SBM, are provided in Appendix. The graph generation parameters for this classification task are identical to those used in the clustering evaluation, except that we perform 200 independent runs. From the left two panels, it is evident that both GG and GG-C substantially",
+          "page_span": [
+            7,
+            7
+          ]
+        },
+        {
+          "id": "front-matter-p045",
+          "text": "outperform the vanilla GNN. A closer",
+          "page_span": [
+            7,
+            7
+          ]
+        },
+        {
+          "id": "front-matter-p046",
+          "text": "comparison with GEE sheds light on the underlying dynamics. When provided with sufficient training data (e.g., 50% of nodes labeled), GEE performs remarkably well, aligning with its theoretical guarantees. In such cases, GG and GG-C achieve similar high accuracy, indicating that GEE alone is already near-optimal. However, as the proportion of training/validation Acc(V) = 1 i∈V I( ˆYi = Yi), |V| where ˆYi is the predicted label for node i and Yi is its groundtruth label. During training, we employ an early stopping strategy for the GNN-based methods by monitoring accuracy on a separate validation set, Acc(Vval). The model parameters from the epoch that yields the highest validation accuracy are restored for the final evaluation on the test set, Acc(Vtest). To ensure a fair comparison, GEE is also evaluated under the same conditions, where the labels of nodes in the validation set are masked alongside the test set labels and are not used during its embedding generation process. 8 TABLE III: Classification accuracy and running time on real-world datasets of 5% train/val data. For accuracy, the best and second-best results are highlighted in bold and italic, respectively. For the",
+          "page_span": [
+            7,
+            7
+          ]
+        },
+        {
+          "id": "front-matter-p047",
+          "text": "GNN-based models (GNN, GG and GG-C), the",
+          "page_span": [
+            7,
+            7
+          ]
+        },
+        {
+          "id": "front-matter-p048",
+          "text": "fastest running time is also marked in bold. The running time of GEE is not highlighted and is excluded from direct comparison due to its non-iterative nature. ACM BAT DBLP EAT UAT Wiki Gene IIP Accuracy GEE 0.469±0.002 0.412±0.006 0.316±0.001 0.364±0.005 0.415±0.005 0.244±0.004 0.575±0.004 0.410±0.014 GNN 0.427±0.004 0.294±0.005 0.297±0.002 0.321±0.005 0.358±0.005 0.224±0.003 0.525±0.006 0.515±0.008 GG 0.492±0.005 0.382±0.007 0.329±0.002 0.351±0.005 0.404±0.006 0.326±0.003 0.531±0.005 0.510±0.010 GG-C 0.534±0.003 0.425±0.008 0.336±0.003 0.370±0.005 0.435±0.004 0.304±0.003 0.549±0.003 0.444±0.010 Running time (s) GEE 0.01±0.00 0.01±0.00 0.01±0.00 GNN 0.37±0.01 0.14±0.00 0.30±0.01 0.21±0.01 0.32±0.01 0.74±0.02 0.16±0.00 0.13±0.00 GG/GG-C 0.37±0.01 0.14±0.00 0.28±0.01 0.22±0.01 0.30±0.01 0.77±0.02 0.14±0.00 0.13±0.00 LastFM PolBlogs TerroristRel KarateClub Chameleon Cora Citeseer Accuracy GEE 0.333±0.004 0.723±0.005 0.737±0.010 0.648±0.016 0.267±0.004 0.349±0.006 0.244±0.002 GNN 0.431±0.003 0.706±0.009 0.683±0.006 0.257±0.012 0.288±0.003 0.318±0.006 0.238±0.003 GG 0.536±0.003 0.729±0.014 0.718±0.011 0.663±0.019 0.270±0.004 0.393±0.005 0.280±0.003 GG-C 0.509±0.003 0.815±0.009",
+          "page_span": [
+            8,
+            8
+          ]
+        },
+        {
+          "id": "front-matter-p049",
+          "text": "0.765±0.006",
+          "page_span": [
+            8,
+            8
+          ]
+        },
+        {
+          "id": "front-matter-p050",
+          "text": "0.729±0.014 0.333±0.003 0.426±0.004 0.303±0.003 Running time (s) GEE 0.01±0.00 0.01±0.00 0.01±0.00 GNN 1.58±0.04 0.34±0.01 0.26±0.01 0.13±0.00 0.57±0.01 0.38±0.01 0.36±0.01 GG/GG-C 2.18±0.05 0.30±0.01 0.25±0.01 0.13±0.00 0.56±0.02 0.39±0.02 0.38±0.01 data decreases (see Appendix for results under 10% and 20% training), GEE’s performance begins to degrade, though it still remains superior to the vanilla GNN. In the semi-supervised regime, GG provides a meaningful refinement over GEE, but its standalone accuracy does not substantially surpass GEE’s until GG-C is introduced. This provides a key insight: GEE offers a strong initialization, GG contributes nontrivial refinement, and their concatenation, combined with an LDA classifier, produces a fused representation that effectively leverages both global structural information from GEE and localized refinements from the GNN. In this view, GG-C acts as a hybrid model where the GEE component also serves as a regularizer, mitigating over-reliance on potentially noisy GNN outputs and promoting more stable and accurate predictions. From the right two panels, an interesting observation emerges: the vanilla GNN appears to converge slightly",
+          "page_span": [
+            8,
+            8
+          ]
+        },
+        {
+          "id": "front-matter-p051",
+          "text": "faster",
+          "page_span": [
+            8,
+            8
+          ]
+        },
+        {
+          "id": "front-matter-p052",
+          "text": "than the GG-based models. However, this should not be interpreted as better efficiency. Rather, it reflects premature convergence to a suboptimal local minimum, a common consequence of poor initialization, which may terminate early without achieving meaningful optimization. Importantly, the time difference between GG and vanilla GNN is marginal and negligible across all classification tasks. our evaluation, with the exception of the Email dataset, which was excluded due to several classes containing fewer than three samples, violating our minimum class size requirement. Results for the 5% and 50% training/validation set proportions are presented in Table III and Table IV, respectively. Additional results for the 10% and 20% settings are provided in Appendix. Both GG and GEE serve as strong baselines, and in most cases outperform the vanilla GNN. However, neither consistently dominates the other across all datasets. By contrast, the GG-C version, which fuses the embeddings from both GG and GEE, successfully captures complementary information from both global and local representations. As a result, it achieves superior performance across a diverse set of graph data. In nearly every",
+          "page_span": [
+            8,
+            8
+          ]
+        },
+        {
+          "id": "front-matter-p053",
+          "text": "case, GG-C either ranks as the top performer",
+          "page_span": [
+            8,
+            8
+          ]
+        },
+        {
+          "id": "front-matter-p054",
+          "text": "or closely follows the best-performing method in terms of classification accuracy. VII. CONCLUSION In this work, we introduced the GEE-powered GNN (GG) method, grounded in the core insight that improved feature initialization can mitigate the well-known challenges associated with random initializations in graph Neural networks, such as slow convergence and convergence to suboptimal solutions. Through extensive experiments on both synthetic and real-world datasets, we demonstrated that GG consistently enhances performance across node-level tasks. For node clustering, the GEE-based warm-start enables GG to better explore the optimization landscape, leading to faster convergence and C. Real data For experiments on real-world datasets, we performed 100 independent runs for each data split to ensure statistical robustness. All publicly available datasets were included in 9 TABLE IV: Classification accuracy and running time on real-world datasets of 50% train/val data. For accuracy, the best and second-best results are highlighted in bold and italic, respectively. For the GNN-based models (GNN, GG and GG-C), the fastest running time is also marked in bold. The running time of GEE is not",
+          "page_span": [
+            8,
+            8
+          ]
+        },
+        {
+          "id": "front-matter-p055",
+          "text": "highlighted and is excluded from direct comparison",
+          "page_span": [
+            8,
+            8
+          ]
+        },
+        {
+          "id": "front-matter-p056",
+          "text": "due to its non-iterative nature. ACM BAT DBLP EAT UAT Wiki Gene Industry Accuracy GEE 0.749±0.002 0.350±0.008 0.538±0.001 0.314±0.008 0.497±0.003 0.592±0.001 0.762±0.002 0.601±0.005 GNN 0.544±0.008 0.370±0.007 0.379±0.005 0.357±0.005 0.385±0.006 0.406±0.006 0.606±0.009 0.511±0.006 GG 0.751±0.004 0.319±0.008 0.532±0.002 0.248±0.005 0.439±0.005 0.617±0.001 0.704±0.009 0.614±0.005 GG-C 0.759±0.002 0.394±0.007 0.536±0.002 0.385±0.007 0.472±0.004 0.612±0.001 0.744±0.003 0.624±0.005 Running time (s) GEE 0.01±0.00 0.01±0.00 0.01±0.00 GNN 0.40±0.01 0.14±0.00 0.32±0.01 0.24±0.01 0.37±0.01 0.85±0.04 0.19±0.01 0.14±0.00 GG/GG-C 0.70±0.03 0.13±0.00 0.54±0.02 0.21±0.01 0.47±0.02 0.93±0.02 0.18±0.01 0.14±0.00 LastFM PolBlogs TerroristRel KarateClub Chameleon Cora Citeseer Accuracy GEE 0.717±0.001 0.907±0.002 0.899±0.001 0.826±0.011 0.263±0.004 0.724±0.001 0.545±0.001 GNN 0.621±0.003 0.737±0.012 0.712±0.012 0.390±0.015 0.281±0.002 0.477±0.006 0.373±0.005 GG 0.773±0.001 0.869±0.011 0.865±0.010 0.803±0.014 0.320±0.004 0.739±0.002 0.577±0.002 GG-C 0.766±0.001 0.915±0.002 0.908±0.002 0.838±0.009 0.379±0.004 0.749±0.002 0.582±0.001 Running time (s) GEE 0.02±0.00 0.01±0.00 0.01±0.00 0.02±0.00 GNN",
+          "page_span": [
+            9,
+            9
+          ]
+        },
+        {
+          "id": "front-matter-p057",
+          "text": "1.58±0.04",
+          "page_span": [
+            9,
+            9
+          ]
+        },
+        {
+          "id": "front-matter-p058",
+          "text": "0.43±0.01 0.29±0.01 0.12±0.00 0.62±0.03 0.46±0.02 0.44±0.01 GG/GG-C 2.80±0.08 0.48±0.03 0.36±0.02 0.12±0.00 1.05±0.05 0.78±0.03 0.74±0.02 superior clustering quality. For node classification, where the loss function is task-specific and the optimization may trade off between global and local structure, our concatenated variant GG-C strikes an effective balance, retaining global information from GEE while benefiting from local refinement through GNN. These findings point to a promising direction in GNN research: rather than focusing solely on deeper or more sophisticated neural architectures, substantial improvements can be achieved by designing more principled initialization strategies. Such strategies act as a form of implicit regularization, improving generalization and reducing the risk of overfitting, particularly in low-label or semi-supervised settings. Among many graph embedding algorithms, we chose GEE for its statistical properties and computational efficiency, providing a theoretical-sound node features with minimal overhead. The broader implications of this work extend beyond graph learning. The idea of leveraging statistically informed, structure-aware initializations",
+          "page_span": [
+            9,
+            9
+          ]
+        },
+        {
+          "id": "front-matter-p059",
+          "text": "can be applied to a wide range",
+          "page_span": [
+            9,
+            9
+          ]
+        },
+        {
+          "id": "front-matter-p060",
+          "text": "of neural architectures. There are multiple avenues for future research, such as extensions to dynamic or temporal graphs where initialization may adapt to evolving structure, and generalization to non-graph domains such as recommendation systems or vision, where a combination of pretrained features and local refinement could be similarly beneficial. [2] ——, “Variational graph auto-encoders,” arXiv preprint arXiv:1611.07308, 2016. [3] W. L. Hamilton, R. Ying, and J. Leskovec, “Inductive representation learning on large graphs,” in Proceedings of the 31st International Conference on Neural Information Processing Systems, ser. NIPS ’17, vol. 30, 2017, pp. 1025–1035. [4] P. Veliˇckovi ́c, G. Cucurull, A. Casanova, A. Romero, P. Li`o, and Y. Bengio, “Graph attention networks,” in Proceedings of ICLR, 2018. [5] M. Schlichtkrull, T. N. Kipf, P. Bloem, R. Van Den Berg, I. Titov, and M. Welling, “Modeling relational data with graph convolutional networks,” in The semantic web: 15th international conference, ESWC 2018, Heraklion, Crete, Greece, June 3–7, 2018, proceedings 15. Springer, 2018, pp. 593–607. [6] M. Zhang and Y. Chen, “Link prediction based on graph neural networks,” in",
+          "page_span": [
+            9,
+            9
+          ]
+        },
+        {
+          "id": "front-matter-p061",
+          "text": "Proceedings of the 32nd International Conference on Neural",
+          "page_span": [
+            9,
+            9
+          ]
+        },
+        {
+          "id": "front-matter-p062",
+          "text": "Information Processing Systems, ser. NeurIPS ’18, vol. 31, 2018, pp. 5161–5170. [7] M. Zhang, P. Li, Y. Xia, K. Wang, and L. Jin, “Labeling trick: A theory of using graph neural networks for multi-node representation learning,” Advances in Neural Information Processing Systems, vol. 34, pp. 9061– 9073, 2021. [8] A. Tsitsulin, J. Palowitch, B. Perozzi, and E. M ̈uller, “Graph clustering with graph neural networks,” Journal of Machine Learning Research, vol. 24, no. 127, pp. 1–21, 2023. [9] H. Cai, V. W. Zheng, and K. C.-C. Chang, “A comprehensive survey of graph embedding: Problems, techniques, and applications,” IEEE transactions on knowledge and data engineering, vol. 30, no. 9, pp. 1616–1637, 2018. [10] Z. Wu, S. Pan, F. Chen, G. Long, C. Zhang, and S. Y. Philip, “A comprehensive survey on graph neural networks,” IEEE transactions on neural networks and learning systems, vol. 32, no. 1, pp. 4–24, 2020. [11] Z. Zhang, P. Cui, and W. Zhu, “Deep learning on graphs: A survey,” IEEE Transactions on Knowledge and Data Engineering, vol. 34, no. 1, pp. 249–270, 2022. [12] C. E. Priebe, C. Shen, N. Huang, and T. Chen, “A simple spectral failure mode for graph convolutional networks,” IEEE",
+          "page_span": [
+            9,
+            9
+          ]
+        },
+        {
+          "id": "front-matter-p063",
+          "text": "Transactions on Pattern",
+          "page_span": [
+            9,
+            9
+          ]
+        },
+        {
+          "id": "front-matter-p064",
+          "text": "Analysis and Machine Intelligence, vol. 44, no. 11, pp. 8689–8693, 2022. [13] C. Shen, Q. Wang, and C. E. Priebe, “One-hot graph encoder embed-",
+          "page_span": [
+            9,
+            9
+          ]
+        }
+      ]
+    },
+    {
+      "id": "references",
+      "title": "References",
+      "paras": [
+        {
+          "id": "references-p001",
+          "text": "[1] T. N. Kipf and M. Welling, “Semi-supervised classification with graph convolutional networks,” arXiv preprint arXiv:1609.02907, 2016. 10 ding,” IEEE Transactions on Pattern Analysis and Machine Intelligence, vol. 45, no. 6, pp. 7933–7938, 2022. [14] C. Shen, J. Larson, H. Trinh, and C. E. Priebe, “Refined graph encoder embedding via self-training and latent community recovery,” Social Network Analysis and Mining, vol. 15, p. 14, 2025. [15] C. Shen, Y. Dong, C. E. Priebe, J. Larson, H. Trinh, and Y. Park, “Principal graph encoder embedding and principal community detection,” IEEE Transactions on Network Science and Engineering, 2025. [16] C. Shen, J. Larson, H. Trinh, X. Qin, Y. Park, and C. E. Priebe, “Discovering communication pattern shifts in large-scale labeled networks using encoder embedding and vertex dynamics,” IEEE Transactions on Network Science and Engineering, vol. 11, no. 2, pp. 2100–2109, 2024. [17] C. Shen, C. E. Priebe, J. Larson, and H. Trinh, “Synergistic graph fusion via encoder embedding,” Information Sciences, vol. 678, p. 120912, 2024. [18] C. Shen, “Encoder embedding for general graph and node classification,” Applied Network Science, vol. 9, p. 66, 2024.",
+          "page_span": [
+            9,
+            9
+          ]
+        },
+        {
+          "id": "references-p002",
+          "text": "[19] G. Li, M. Muller, A. Thabet, and B. Ghanem, “Deepgcns: Can gcns go as deep as cnns?” in Proceedings of the IEEE/CVF international conference on computer vision, 2019, pp. 9266–9275. [20] M. E. Newman and M. Girvan, “Finding and evaluating community structure in networks,” Physical review E, vol. 69, no. 2, p. 026113, 2004. [21] U. Brandes, D. Delling, M. Gaertler, R. Gorke, M. Hoefer, Z. Nikoloski, and D. Wagner, “On modularity clustering,” IEEE transactions on knowledge and data engineering, vol. 20, no. 2, pp. 172–188, 2008. [22] B. H. Good, Y.-A. De Montjoye, and A. Clauset, “Performance of modularity maximization in practical contexts,” Physical Review E—Statistical, Nonlinear, and Soft Matter Physics, vol. 81, no. 4, p. 046106, 2010. [23] S. Fortunato, “Community detection in graphs,” Physics reports, vol. [24] V. Traag, L. Waltman, and N. Van Eck, “From louvain to leiden: guaranteeing well-connected communities. sci. rep. 9, 5233,” 2019. [25] X. Zhang, H. Liu, Q. Li, and X.-M. Wu, “Attributed graph clustering via adaptive graph convolution,” arXiv preprint arXiv:1906.01210, 2019. [26] D. Bo, X. Wang, C. Shi, M. Zhu, E. Lu, and P. Cui, “Structural deep clustering",
+          "page_span": [
+            10,
+            10
+          ]
+        },
+        {
+          "id": "references-p003",
+          "text": "network,” in Proceedings of the web conference 2020, 2020,",
+          "page_span": [
+            10,
+            10
+          ]
+        },
+        {
+          "id": "references-p004",
+          "text": "pp. 1400–1410. [27] P. W. Holland, K. B. Laskey, and S. Leinhardt, “Stochastic blockmodels: First steps,” Social networks, vol. 5, no. 2, pp. 109–137, 1983. [28] Y. Zhao, E. Levina, and J. Zhu, “Consistency of community detection in networks under degree-corrected stochastic block models,” Annals of Statistics, vol. 40, no. 4, pp. 2266–2292, 2012. [29] Y. Liu, J. Xia, S. Zhou, X. Yang, K. Liang, C. Fan, Y. Zhuang, S. Z. Li, X. Liu, and K. He, “A survey of deep graph clustering: Taxonomy, challenge, application, and open resource,” arXiv preprint arXiv:2211.12875, 2022. [30] S. Wang, J. Yang, J. Yao, Y. Bai, and W. Zhu, “An overview of advanced deep graph node clustering,” IEEE Transactions on Computational Social Systems, vol. 11, no. 1, pp. 1302–1314, 2024. Cencheng Shen received the BS degree in Quantitative Finance from National University of Singapore in 2010, and the PhD degree in Applied Mathematics and Statistics from Johns Hopkins University in 2015. He is an associate professor in the Department of Applied Economics and Statistics at University of Delaware. His research interests include graph embedding, dependence measures, and neural networks. Youngser Park received the",
+          "page_span": [
+            10,
+            10
+          ]
+        },
+        {
+          "id": "references-p005",
+          "text": "B.E. degree in elec-",
+          "page_span": [
+            10,
+            10
+          ]
+        },
+        {
+          "id": "references-p006",
+          "text": "trical engineering from Inha University in Seoul, Korea in 1985, the M.S. and Ph.D. degrees in computer science from The George Washington University in 1991 and 2011 respectively. From 1998 to 2000 he worked at the Johns Hopkins Medical Institutes as a senior research engineer. From 2003 until 2011 he worked as a senior research analyst, and has been an associate research scientist since 2011 then research scientist since 2019 in the Center for Imaging Science at the Johns Hopkins University. At Johns Hopkins, he holds joint appointments in the The Institute for Computational Medicine and the Human Language Technology Center of Excellence. His current research interests are clustering algorithms, pattern classification, and data mining for high-dimensional and graph data. Carey E. Priebe received the BS degree in mathematics from Purdue University in 1984, the MS degree in computer science from San Diego State University in 1988, and the PhD degree in information technology (computational statistics) from George Mason University in 1993. From 1985 to 1994 he worked as a mathematician and scientist in the US Navy research and development laboratory system. Since 1994 he has been a",
+          "page_span": [
+            10,
+            10
+          ]
+        },
+        {
+          "id": "references-p007",
+          "text": "professor in the Department of Applied",
+          "page_span": [
+            10,
+            10
+          ]
+        },
+        {
+          "id": "references-p008",
+          "text": "Mathematics and Statistics at Johns Hopkins University. His research interests include computational statistics, kernel and mixture estimates, statistical pattern recognition, model selection, and statistical inference for high-dimensional and graph data. He is a Senior Member of the IEEE, an Elected Member of the International Statistical Institute, a Fellow of the Institute of Mathematical Statistics, and a Fellow of the American Statistical Association. Shiyu Chen received the B.E. degree in computer science from Sun Yat-sen University, Guangzhou, China, in 2024. He is currently pursuing the M.S. degree in data science at Johns Hopkins University. His research interests include graph neural networks, random graph models, and statistical learning on graphs. 11",
+          "page_span": [
+            10,
+            10
+          ]
+        }
+      ]
+    },
+    {
+      "id": "appendix",
+      "title": "Appendix",
+      "paras": [
+        {
+          "id": "appendix-p001",
+          "text": "VIII. CLUSTERING EVALUATION This section provides supplementary results for our methods on graphs generated by Stochastic Block Model (SBM) [27]. The SBM can be understood as a simplified case of the DC-SBM (described in the main text) that does not account for degree heterogeneity. The probability of an edge between nodes i and j depends solely on their community assignments, with the adjacency matrix A being generated as: A(i, j) ∼Bernoulli(B(Yi, Yj)). For this experiment, we generate graphs with n = 800 nodes and K = 4 imbalanced communities (1:2:3:4 ratio). We fix the intra-community link probability to 0.15 and vary the inter-community link probability, r, from 0 to 0.15. The results for clustering accuracy (ARI) and running time are presented in Figure 4. The trends are highly consistent with the DC-SBM experiments, confirming that GG is the best overall method. While GEE excels in low-noise settings (r < 0.06), its performance sharply declines in more challenging scenarios. This dropoff is so significant that it even hinders GG’s performance, which underscores the need for a high-quality and stable initialization to achieve optimal results efficiently. IX. CLASSIFICATION",
+          "page_span": [
+            11,
+            11
+          ]
+        },
+        {
+          "id": "appendix-p002",
+          "text": "EVALUATION",
+          "page_span": [
+            11,
+            11
+          ]
+        },
+        {
+          "id": "appendix-p003",
+          "text": "A. Simulation This subsection provides supplementary results for our simulation studies on classification task. To offer a more complete picture of model performance on DC-SBM under varying data scarcity, we present the results for training proportions of 10% and 20% in Figure 5. Additionally, for the classification task on SBM graphs, we used the same graph generation parameters as in the clustering study but conducted 200 independent trials for each graph generated at every value of r to ensure high statistical confidence. The results for SBM across all data-splitting ratios are presented in Figures 6. B. Real Data Table V summarizes the performance on real-world datasets with 10% and 20% of nodes used for training and validation. Across these settings, our GG-C consistently delivers the top performance, closely followed by our GG. Fig. 4: Clustering performance comparison of GEE, GNN and GG on SBM graphs. This figure shows our GG method significantly outperforms the vanilla GNN in both accuracy and speed. Crucially, it also surpasses the classic GEE on more challenging graphs (r > 0.08), making it the most effective method overall. 12 Fig. 5: Classification performance",
+          "page_span": [
+            11,
+            11
+          ]
+        },
+        {
+          "id": "appendix-p004",
+          "text": "comparison of GEE, GNN, GG and GG-C on DC-SBM graphs with 10% (top row) and",
+          "page_span": [
+            11,
+            11
+          ]
+        },
+        {
+          "id": "appendix-p005",
+          "text": "20% (bottom row) train/val set. The results show that GG and GG-C consistently deliver the best performance. They not only overcome the poor accuracy of the faster GNN, which is prone to local optima, but they also demonstrate a distinct advantage over GEE, especially as the amount of labeled data decreases. 13 Fig. 6: Classification performance comparison of GEE, GNN, GG, and GG-C on SBM graphs. Each row corresponds to a different proportion of nodes used for the train/val set, ranging from 5% (top row) to 50% (bottom row). This figure confirms the superiority of our GG and GG-C methods. They consistently outperform the fast-but-inaccurate GNN (prone to local optima), and the advantage of GG-C over GEE is most significant in low-label settings (e.g., 5% and 10%), showcasing their excellent data efficiency for semi-supervised learning. 14 TABLE V: Classification accuracy and running time on real-world datasets with 10% (top) and 20% (bottom) train/val data. For accuracy, the best and second-best results are highlighted in bold and italic, respectively. For the GNN-based models (GNN, GG and GG-C), the fastest running time is also marked in bold. The running time of GEE is not",
+          "page_span": [
+            12,
+            12
+          ]
+        },
+        {
+          "id": "appendix-p006",
+          "text": "highlighted and is",
+          "page_span": [
+            12,
+            12
+          ]
+        },
+        {
+          "id": "appendix-p007",
+          "text": "excluded from direct comparison due to its non-iterative nature. (a) Results with 10% Train/Val Data ACM BAT DBLP EAT UAT Wiki Gene IIP Accuracy GEE 0.546±0.002 0.424±0.006 0.353±0.001 0.380±0.006 0.473±0.003 0.353±0.003 0.618±0.003 0.509±0.010 GNN 0.464±0.005 0.304±0.005 0.309±0.003 0.333±0.005 0.377±0.004 0.283±0.003 0.544±0.006 0.524±0.006 GG 0.565±0.006 0.392±0.008 0.365±0.002 0.335±0.006 0.430±0.005 0.419±0.002 0.567±0.005 0.536±0.009 GG-C 0.603±0.002 0.427±0.007 0.376±0.003 0.380±0.005 0.467±0.003 0.411±0.002 0.594±0.003 0.527±0.007 Running time (s) GEE 0.01±0.00 0.01±0.00 0.01±0.00 GNN 0.38±0.01 0.14±0.00 0.32±0.01 0.21±0.01 0.35±0.01 0.76±0.02 0.18±0.01 0.13±0.00 GG/GG-C 0.48±0.02 0.13±0.00 0.35±0.01 0.22±0.01 0.35±0.01 0.79±0.02 0.14±0.00 0.12±0.00 LastFM PolBlogs TerroristRel KarateClub Chameleon Cora Citeseer Accuracy GEE 0.444±0.002 0.780±0.004 0.815±0.005 0.648±0.016 0.283±0.004 0.450±0.002 0.302±0.002 GNN 0.495±0.003 0.729±0.009 0.699±0.007 0.257±0.012 0.309±0.003 0.359±0.005 0.267±0.005 GG 0.601±0.002 0.770±0.013 0.797±0.009 0.663±0.019 0.283±0.004 0.478±0.005 0.344±0.003 GG-C 0.592±0.002 0.842±0.007 0.835±0.003 0.729±0.014 0.354±0.003 0.515±0.004 0.362±0.003 Running",
+          "page_span": [
+            14,
+            14
+          ]
+        },
+        {
+          "id": "appendix-p008",
+          "text": "time (s)",
+          "page_span": [
+            14,
+            14
+          ]
+        },
+        {
+          "id": "appendix-p009",
+          "text": "GEE 0.02±0.00 0.01±0.00 0.01±0.00 GNN 1.87±0.05 0.36±0.01 0.27±0.01 0.13±0.00 0.63±0.02 0.40±0.01 0.36±0.01 GG/GG-C 2.33±0.05 0.33±0.01 0.30±0.01 0.12±0.00 0.64±0.03 0.51±0.02 0.46±0.02 (b) Results with 20% Train/Val Data ACM BAT DBLP EAT UAT Wiki Gene IIP Accuracy GEE 0.634±0.001 0.410±0.008 0.413±0.001 0.354±0.007 0.507±0.002 0.460±0.002 0.665±0.003 0.558±0.006 GNN 0.500±0.006 0.331±0.005 0.333±0.003 0.341±0.004 0.389±0.005 0.351±0.003 0.564±0.007 0.505±0.005 GG 0.646±0.005 0.375±0.007 0.419±0.003 0.299±0.005 0.448±0.005 0.512±0.002 0.616±0.007 0.560±0.009 GG-C 0.670±0.002 0.415±0.008 0.429±0.003 0.368±0.006 0.484±0.003 0.504±0.002 0.647±0.003 0.574±0.006 Running time (s) GEE 0.01±0.00 0.01±0.00 0.01±0.00 GNN 0.39±0.01 0.13±0.00 0.32±0.01 0.23±0.01 0.40±0.01 0.85±0.03 0.20±0.01 0.13±0.00 GG/GG-C 0.59±0.03 0.13±0.00 0.43±0.02 0.22±0.01 0.44±0.02 0.91±0.02 0.16±0.01 0.13±0.00 LastFM PolBlogs TerroristRel KarateClub Chameleon Cora Citeseer Accuracy GEE 0.560±0.001 0.842±0.003 0.865±0.002 0.648±0.016 0.279±0.004 0.554±0.002 0.385±0.002 GNN 0.556±0.002 0.746±0.012 0.710±0.009 0.257±0.012 0.313±0.003 0.408±0.005 0.308±0.003 GG 0.672±0.002 0.816±0.012 0.829±0.013 0.663±0.019 0.293±0.004",
+          "page_span": [
+            14,
+            14
+          ]
+        },
+        {
+          "id": "appendix-p010",
+          "text": "0.584±0.004 0.430±0.002 GG-C 0.666±0.002 0.874±0.005 0.873±0.002 0.729±0.014 0.373±0.003 0.609±0.003 0.439±0.002 Running time (s) GEE 0.02±0.00 0.01±0.00 0.02±0.00 GNN 1.77±0.06 0.41±0.01 0.29±0.01 0.12±0.00 0.64±0.02 0.42±0.01 0.39±0.01 GG/GG-C 2.48±0.06 0.39±0.02 0.30±0.01 0.12±0.00 0.70±0.03 0.66±0.02 0.65±0.02",
+          "page_span": [
+            14,
+            14
+          ]
+        }
+      ]
+    }
+  ]
+}

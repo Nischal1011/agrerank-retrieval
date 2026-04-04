@@ -1,0 +1,1885 @@
+{
+  "id": "2307.13868v2",
+  "title": "2307.13868v2",
+  "metadata": {
+    "source_path": "data/pdf_files/2307.13868v2.pdf",
+    "page_count": 28,
+    "hash": "31f2f4a8c42dcaa1f26e524d8a55e4a17b0e0be02bbd418ae9490caf36995c0d"
+  },
+  "sections": [
+    {
+      "id": "front-matter",
+      "title": "Front Matter",
+      "paras": [
+        {
+          "id": "front-matter-p001",
+          "text": "Learning sources of variability from high-dimensional observational studies Eric W. Bridgeford1,†, Jaewon Chung1, Brian Gilbert1, Sambit Panda1, Adam Li3, Cencheng Shen2, Alexandra Badea4, Brian Caffo1, Joshua T. Vogelstein1. Abstract. Causal inference studies whether the presence of a variable influences an observed outcome. As measured by quantities such as the “average treatment effect,” this paradigm is employed across numerous biological fields, from vaccine and drug development to policy interventions. Unfortunately, the majority of these methods are often limited to univariate outcomes. Our work generalizes causal estimands to outcomes with any number of dimensions or any measurable space, and formulates traditional causal estimands for nominal variables as causal discrepancy tests. We propose a simple framework under which universally consistent conditional independence tests are universally consistent causal discrepancy tests. Numerical experiments illustrate that our method, Causal cDcorr, leads to improvements in both finite sample validity and power when compared to existing strategies when the assumptions of this framework are violated. Our methods are all open source",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "front-matter-p002",
+          "text": "and available at github.com/ebridge2/cdcorr.",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "front-matter-p003",
+          "text": "arXiv:2307.13868v2 [stat.ME] 28 Nov 2023 1 Introduction Many of the earliest developments in statistics have focused on differentiating sources of variability in scientific data. In one of the most impactful works of statistics, Fisher [8] pioneered the concept of the anova, a test for determining whether two groups of outcomes fundamentally differ from one another (the two-sample test). This early work was made possible for univariate outcomes through assumptions about how the outcomes could differ (that is, each of the two samples of outcomes were iid within-group) and strong distributional assumptions. To overcome the former limitation, early efforts focused on the development of regression techniques to account for factors which influenced the distribution of each group of outcomes (so called ‘covariates’), loosening iid assumptions to independence given the covariate [1, 23]. Similarly, these regression techniques allowed further generalizations of anova to the case where the outcomes have more than two groups, facilitating a so-called conditional anova[1, 23]. More recently, techniques have been developed to address other limitations of anova. manova, or multivariate anova,",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "front-matter-p004",
+          "text": "extends the idea of determining differences in distribution from univariate to",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "front-matter-p005",
+          "text": "multivariate data via leveraging parametric Gaussian assumptions [32, 33, 36]. The assumption of multivariate Gaussianity have been further loosened via independence tests [56], which can be combined with iid assumptions to produce asymptotically consistent tests on arbitrary metric spaces. It has been illustrated that these tests can be augmented [26] to facilitate non-parametric K-sample testing. Correspondingly, numerous conditional independence tests have been proposed [48, 53, 60] which therefore enable non-parametric conditional K-sample testing. Unfortunately, these more complicated strategies are not without limitations. Shah and Peters [48] demonstrate that there is no conditional independence test which can achieve both sensitivity and specificity without additional assumptions placed on the joint distribution of the outcomes (for each group) and the covariates. These developments in the statistical hypothesis testing literature have been juxtaposed by efforts to determine whether a predictor actually ‘causes’ an effect on an outcome in the presence of other covariates [2, 45]. In the simplest possible case where the potential predictor is binary (it is either present, or",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "front-matter-p006",
+          "text": "it is not present), the predictor is often known as a ‘treatment,’ and the causal estimand is",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "front-matter-p007",
+          "text": "known as an ‘average treatment effect’ [40, 41] or a ‘conditional average treatment effect’ [37] (the effect of the treatment on the outcome, depending on the value taken by the covariates). These methods can be understood to address the limitations posed by Shah and Peters [48] by placing additional assumptions on the joint distribution via a ‘potential outcome’ or ‘counterfactual’ framework, where the causal effect is measured in terms of differences (usually in the expectation) of the potential outcomes 1 Johns Hopkins University, 2 University of Delaware, 3 Columbia University, 4 Duke University † Corresponding author: Eric W. Bridgeford (ebridge2@jhu.edu). 1 [13, 28, 29]. An effort to harmonize the conditional independence testing and causal literature has been addressed by multivariate causal discrepancy testing, which focuses on the question of determining whether two potential outcome distributions differ [27]. It is unclear the extent to which these techniques generalize when the samples do not overlap in terms of upstream covariates (more specifically, the confounders; so called “covariate imbalance”), which is an common data presentation in observational settings.",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "front-matter-p008",
+          "text": "Informally, it is unclear how robust these techniques are to the situation when the",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "front-matter-p009",
+          "text": "underlying causal assumptions fail, or are poorly reflected in the data sample. Moreover, there is little insight into formally characterizing causal discrepancy testing for more than two groups, which leaves a logical disconnect for many settings. Finally, it is unclear how sensitive and specific these tests are under non-linearities and non-monotonicities, which presents a substantial hurdle to their utility in highdimensional settings. Inspired by Park et al. [27] and Bridgeford et al. [3], we introduce practical estimands which generalize the concepts of causal effects to data of arbitrary distribution (so long as realizations are measurable) and any number of treatment groups. First, we prove that, under general assumptions, any conditional independence test can be used to produce a K-sample causal conditional discrepancy test in both randomized clinical studies and observational studies. This result directly unifies the rich field of independence testing with causal discrepancy testing, and provides explicit theoretical motivation for the use of independence tests in causal structure learning [38] with nominal treatment variables. Second, we illustrate additional assumptions",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "front-matter-p010",
+          "text": "needed to generalize these results to unconditional potential",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "front-matter-p011",
+          "text": "outcomes, drawing a parallel between causal conditional discrepancy testing with causal unconditional discrepancy testing in the same manner as the parallel between the average treatment effect and the conditional average treatment effect. Third, we propose simple and practical procedures for augmenting existing approaches for conditional independence testing to better suit the conditional discrepancy testing regime. Our proposed strategy, Causal cDcorr, achieves substantial improvements in finite-sample validity and finite-sample power over existing approaches that are typically used for conditional discrepancy testing and conditional independence testing in the case of nominally-grouped data across regimes with both low and high degrees of covariate imbalance. We explore the values of this perspective across a range of simulations in both low and high-dimensional regimes, and show that our augmentations to existing conditional independence tests facilitate principled causal inference across a variety of multivariate contexts in which other techniques do not generalize, including non-linearities and non-monotonicities, higher moment differences across groups, and multi-group",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "front-matter-p012",
+          "text": "settings. Together, we",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "front-matter-p013",
+          "text": "believe that these results suggest the value of harmonizing causal perspectives with cutting-edge developments in non-parametric statistics. 2 Preliminaries Throughout this work, we use the notation defined in Table 1. From anova to conditional K-sample testing Some of the earliest works that yielded the development of modern statistical inference addressed the 2-sample testing problem. In its simplest form, the outcome yi takes values y ∈R and the group ti takes values t ∈[2]. The 2-sample testing problem is defined as a test of: H0 : Fyi|1 = Fyi|2 against HA : Fyi|1 ̸= Fyi|2. In the case where Fyi|t are N \u0000 μt, σ2\u0001 and each yi are independent samples, this problem is known as the one-way anova[8], and can be addressed via the F test [1, 23]. This was later relaxed via the development of the development of the conditional anova, wherein the test can be sufficiently generalized to K-samples, and can incorporate other covariates via a likelihood ratio test [1, 23]. In this case, we are interested in the K-sample conditional discrepancy, defined in Definition 1. 2 Symbol Meaning ui a random variable ui a realization of a random variable ui a space defining the values taken by",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "front-matter-p014",
+          "text": "realizations; e.g., ui ∈U",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "front-matter-p015",
+          "text": "[N] shorthand for the set {1, . . . , N} yi a random variable representing an outcome xi a random variable representing a covariate ti a random variable denoting group/treatment Fui,wi joint distribution of (ui, wi) fui,wi(u, w) joint density evaluated at (u, v) Fui|wi distribution of ui conditional on wi Fui|w distribution of ui conditional on the event wi = w P(ui = u) probability mass for the event where ui = u yi(k) potential outcome for an individual i in group k Table 1: The notation table used within this work. Definition 1 (K-sample conditional discrepancy). For outcomes yi taking values y ∈Y, a grouping variable ti taking values t ∈[K], and a set of covariates xi taking values x ∈X , a K-sample conditional discrepancy exists if for some k, l ∈[K] and x ∈X , then: Fyi|k,x ̸= Fyi|l,x. Intuitively, a K-sample conditional discrepancy exists if, conditional on the covariates x, there is a difference in the outcome distributions for some pair of groups k and l conditional on the covariates x. A natural test can be developed with: H0 : a conditional discrepancy does not exist for any k, l, x HA : a conditional discrepancy exists. (1) The K-sample conditional discrepancy can be",
+          "page_span": [
+            3,
+            3
+          ]
+        },
+        {
+          "id": "front-matter-p016",
+          "text": "intuited via linear regression, where assuming that εi",
+          "page_span": [
+            3,
+            3
+          ]
+        },
+        {
+          "id": "front-matter-p017",
+          "text": "iid ∼ \u0000 0, σ2\u0001 : yi = μti(xi) + εi, In the case where μti(xi) = μti + f(xi) + g(xi, ti) (a model with a group-specific offset, a covariatespecific term delineated by f, and an interaction term delineated by g) and the functions f and g are assumed to be known, this can be tested directly via the likelihood ratio test [1]. With this linear regression intuition in mind, the interpretation of such a test is very similar to that of the one-way anova, and the hypothesis simplifies to a test of whether the group means μt and the interactions are equal for all groups against the alternative that for some pair of groups, they are unequal. This approach was further relaxed by the conditional manova, wherein we instead suppose that ⃗εi iid ∼N \u0010 ⃗0, Σ \u0011 , and we allow yi to take values ⃗y ∈RP , where for each dimension p, we model: yip = μtip + fp(xi) + gp(xi, ti) + εip. A suitable test can be developed using this strategy via cManova[18, 32, 33, 36], detailed in Appendix B.2, when the functions f and g are known (optionally, additional parametric assumptions may be placed on Σ to yield an identifiable solution to the linear model [18, 23]). Conclusions do not generally 3 apply without",
+          "page_span": [
+            3,
+            3
+          ]
+        },
+        {
+          "id": "front-matter-p018",
+          "text": "Gaussian assumptions, and the technique cannot be applied to high-dimensional datasets",
+          "page_span": [
+            3,
+            3
+          ]
+        },
+        {
+          "id": "front-matter-p019",
+          "text": "without additional parametric assumptions or regularization [4]. A closely related problem to the K-sample conditional discrepancy problem is the conditional independence testing problem. It is framed as follows: we observe samples (⃗yi,⃗vi, ⃗xi) ∈Rp × Rq × Rr for i ∈[n]. We suppose the existence of three random variables ⃗yi, ⃗wi, and ⃗yi, where (⃗yi, ⃗vi,⃗xi) are sampled independently and identically from Fyi,vi,xi. The two random variables ⃗yi and ⃗vi are independent conditionally on ⃗xi if and only if Fyi,vi|xi = Fyi|xiFvi|xi. So, the conditional independence testing problem can be stated as: H0 : Fyi,vi|xi = Fyi|xiFvi|xi against HA : Fyi,vi|xi ̸= Fyi|xiFvi|xi. (2) Under general assumptions, consistent conditional independence tests of Equation (2) are consistent k-sample conditional discrepancy tests from Equation (1), as explained in Remark 2. Remark 2 (Consistent independence testing and consistent k-sample conditional discrepancy testing). Suppose the setup described in 3, and let vi be a random K-dimensional vector, where for each t ∈[K]: ( 1 ti = t 0 ti ̸= t . vit = g(ti) = Then for any k, l ∈[K] and x ∈X , Fyi|k,x ̸= Fyi|l,x if and only if Fyi,vi|xi=x ̸=",
+          "page_span": [
+            4,
+            4
+          ]
+        },
+        {
+          "id": "front-matter-p020",
+          "text": "Fyi|xi=xFvi|xi=x.",
+          "page_span": [
+            4,
+            4
+          ]
+        },
+        {
+          "id": "front-matter-p021",
+          "text": "This trivial result proven explicitly by direct application of the main result from Panda et al. [26] allows us to tie together k-sample conditional discrepancy testing with conditional independence testing, and can therefore be used to construct a relaxation of the assumptions inherent in the cManova framework (Gaussianity, and choice of the functions fp and gp for all p). The Generalized Covariance Measure (GCM) [48] addresses this problem using a regression of yi onto vi conditional on xi. This strategy instead investigates vanishing correlation, a normalized covariance between the scaled residuals and (vi, xi) [21]. Further, GCM flexibly extends the intuition of cManova to higher-dimensional settings and achieves consistency outside of gaussian contexts [48]. Derivatives of the Hilbert-Schmidt Information Criterion (Hsic) leverage normalized conditional cross-covariance operators (such as kernelCDTest) on reproducing kernel Hilbert spaces (RKHSs) [27], but are limited to 2-class settings. Other generalizations leveraging RKHSs have been proposed, such as the Randomized Conditional Independence Test (RCIT) and the Randomized Correlation Test (RCoT) [53], but the finite-sample",
+          "page_span": [
+            4,
+            4
+          ]
+        },
+        {
+          "id": "front-matter-p022",
+          "text": "performance of these techniques in k-sample regimes and when the",
+          "page_span": [
+            4,
+            4
+          ]
+        },
+        {
+          "id": "front-matter-p023",
+          "text": "positivity criterion is not ensured a priori are unknown. Further, two generalizations of Energy statistics, the conditional distance correlation (cDcorr) and the partial distance correlation (pDcorr) have been developed to subvert these limitations under the growing distance correlation framework [56]. pDcorr provides numerous intuitive and computational advantages similar to Dcorr[56], but unfortunately is not a dependence measure [55]. cDcorr provides a test which has shown high testing power under a range of dependence structures, particularly when the relationship between the two random variables given the third is non-monotonic or non-linear [60]. From average treatment effects to causal conditional discrepancies Juxtaposed by the developments in the conditional testing literature, the average treatment effect [2, 45] has long formed the backbone of many investigations in causal inference. We obtain the observed data (yi, ti, xi), where yi ∈R is the outcome, ti ∈{1, 2} is the (binary) treatment/intervention of interest (either treated or untreated), and xi are the vector of baseline covariates (potential confounders), for individuals i ∈[n]. To investigate this problem, we",
+          "page_span": [
+            4,
+            4
+          ]
+        },
+        {
+          "id": "front-matter-p024",
+          "text": "assume the existence of three random variables, (yi, ti, xi), which",
+          "page_span": [
+            4,
+            4
+          ]
+        },
+        {
+          "id": "front-matter-p025",
+          "text": "are sampled independently and identically from some unknown data-generating distribution Fyi,ti,xi. 4 Additionally, we assume the existence of two counterfactual random variables, yi(1) and yi(2), which represent the potential outcomes under the two possible treatments. Conceptually, the theory of causal inference rests on the consistency assumption, which asserts that there is a single version of each treatment level; e.g., if ti = t, then yi = yi(t) [7]. Under this framework, the observed outcome is: yi = yi(1)1{ti=1} + yi(2)1{ti=2}, where only one of the potential outcomes will actually be realized in the observed data. The average treatment effect (ATE) is given by: γ ≜ATE = E[yi(2) −yi(1)] = E[yi(2)] −E[yi(1)] (3) To test whether there is an ATE implies the following hypothesis test: H0 : γ = 0 against HA : γ ̸= 0. (4) The most obvious issue regarding the ATE is that, in practice, we observe realizations of yi (the observed data), and not yi(t) (the counterfactual data); this is known as the “fundamental problem of causal inference.” When is E[yi(t)] identifiable from the observed data, and how do we identify it? The identifiability of E[yi(t)] is ensured by the ignorability,",
+          "page_span": [
+            4,
+            4
+          ]
+        },
+        {
+          "id": "front-matter-p026",
+          "text": "consistency, positivity, and the no in-",
+          "page_span": [
+            4,
+            4
+          ]
+        },
+        {
+          "id": "front-matter-p027",
+          "text": "terference constraints. Ignorability is said to hold provided that (yi(2), yi(1)) ⊥⊥ti xi; that is, the treatment is independent with respect to the observed baseline covariates. This condition will hold if the study executes it by design (such as in a perfect randomized trial) or all confounders have been recorded with the baseline covariates [15]. The consistency assumption is described above. Positivity holds if, for each possible treatment t, Pr(ti = t xi = x) > 0 for any x in the support of xi [42, 43]. Conceptually, any possible individual with a given covariate level could have been observed in either the treated or untreated group. No interference asserts that there is no impact between the treatment assignments of other participants on the potential outcomes of a given participant; this allows yi(k) to be well-defined without reference to other individuals’ treatment assignments [13]. When the consistency and no interference assumptions hold, these two assumptions are collectively referred to as the Stable-Unit Treatment Value Assumption (SUTVA) [13, 17, 46]. Under the G-computation formula [37], if these assumptions hold, then: E[yi(t)] = E \u0002 \u0002 yi ti = t, xi \u0003\u0003 , and the",
+          "page_span": [
+            5,
+            5
+          ]
+        },
+        {
+          "id": "front-matter-p028",
+          "text": "ATE can be expressed as:",
+          "page_span": [
+            5,
+            5
+          ]
+        },
+        {
+          "id": "front-matter-p029",
+          "text": "γ = E \u0002 \u0002 yi ti = 2, xi \u0003\u0003 −E \u0002 \u0002 yi ti = 1, xi \u0003\u0003 . (5) As a general measure of treatment effects, the average treatment effect, as defined above, is rather limiting. First, treatment effects aren’t necessarily constant across all individuals. One could conceptualize an intervention which has a strongly positive effect on younger people, but has a negative effect on older people. The average treatment effect ends up \"averaging away\" the heterogeneous effect of treatment on younger and older people, with the average treatment effect ending up being zero. This has been overcome by study of conditional (on baseline covariates, such as age) average treatment effects (the CATE) [11]: γx ≜CATE(x) = E \u0002 yi(2) −yi(1) xi = x \u0003 = E \u0002 yi(2) xi = x \u0003 −E \u0002 yi(1) xi = x \u0003 and a relevant test is whether, for each possible x: H0 : γx = 0 against HA : γx ̸= 0, (6) 5 but these too are not without limitations. These limiting definitions of treatment effects are well-defined for multivariate data, in that two multivariate random variables can differ in expectation (or not). However, treatments may impact outcomes beyond simple differences in expectation, such as differences in higher order moments.",
+          "page_span": [
+            5,
+            5
+          ]
+        },
+        {
+          "id": "front-matter-p030",
+          "text": "While one could augment the outcome of interest to be other useful functions",
+          "page_span": [
+            5,
+            5
+          ]
+        },
+        {
+          "id": "front-matter-p031",
+          "text": "such as the square of the outcome, it is unclear in practice how to search over this space of measurable functions to better characterize treatment effects. The setup that we follow for the remainder of this work is noted in Setup 3. Setup 3 (Causal). We obtain the observed data (yi, ti, xi), where yi ∈Y is the outcome, ti ∈[T] is the nominal treatment, and xi ∈X are a collection of baseline covariates (potential confounders), for i ∈[n] individuals. We assume that the tuple (yi, ti, xi) is a realization of the random tuple (yi, ti, xi), where: 1. yi is the Y-valued random outcome, where (Y, δy) is a metric space, 2. ti is the nominal treatment which is a [T]-valued random variable, 3. xi are the X -valued random baseline covariates, where for all x ∈X , fxi(x) > 0,",
+          "page_span": [
+            6,
+            6
+          ]
+        }
+      ]
+    },
+    {
+      "id": "4-for-each-individual-the-treatment-assignment-mechanism-is-consistent-where-the-coun",
+      "title": "4. For each individual, the treatment assignment mechanism is consistent, where the coun-",
+      "paras": [
+        {
+          "id": "4-for-each-individual-the-treatment-assignment-mechanism-is-consistent-where-the-coun-p001",
+          "text": "terfactual random variables yi(k) represent the potential outcome under treatment k, with distribution Fyi(k). The outcome is: k=1 yi(k)1{ti=k}. yi = We assume that the tuples (yi, ti, xi) are sampled independently and identically from some unknown data-generating distribution Fyi,ti,xi. Note that the potential outcome yi(k) is not a function of the treatment assignments for any other individuals j ̸= i, implying that the no interference criterion is satisfied. A natural generalization of the hypothesis given in Equation (6) for the case where K = 2 to data of arbitrary distribution is the causal conditional discrepancy test, first explored explicitly by Park et al. [27]: H0 : Fyi(1)|xi=x = Fyi(2)|xi=xfor all x ∈X against HA : Fyi(1)|xi=x ̸= Fyi(2)|xi=x for some x ∈X. (7) That this hypothesis can be relaxed to arbitrary K-sample tests, and can be generalized and tested via augmentations of any conditional independence test, serves as the motivation for this work. 3 Theory 3.1 From conditional K-sample tests to causal conditional discrepancy tests We can further relax this to the case where we have arbitrarily many treatment levels, by a modification of the definition presented by",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "4-for-each-individual-the-treatment-assignment-mechanism-is-consistent-where-the-coun-p002",
+          "text": "Park et al. [27]:",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "4-for-each-individual-the-treatment-assignment-mechanism-is-consistent-where-the-coun-p003",
+          "text": "Definition 4 (K-sample causal conditional discrepancy). Suppose the setup described in Setup 3. A K-sample causal conditional discrepancy exists if for any k, l ∈[K] and for any x ∈X : Fyi(k)|xi=x ̸= Fyi(l)|xi=x. We explicitly incorporate the language causal conditional discrepancy to emphasize explicitly that this effect represents a conditional (on the covariates) discrepancy in the potential outcome distributions under nominal treatments. In this case for K = 2, this definition is equivalent to the definition of a Conditional Distributional Treatment Effect (CoDiTE) given by Park et al. [27]. A suitable hypothesis test for a K-sample causal conditional discrepancy is a K-sample causal discrepancy test. 6 Definition 5 (K-sample causal conditional discrepancy test). Suppose the setup in Setup 3, where the nominal treatment variable ti is a [K]-valued random variable where K ≥2. A K-sample causal discrepancy test is: H0 : Fyi(k)|xi=x = Fyi(l)|xi=x for all k, l, x against HA : Fyi(k)|xi=x ̸= Fyi(l)|xi=x for some k, l, x. As it was for the CATE, we do not observe realizations of yi(k) in practice, as these outcomes are only potential outcomes under the treatment. This means that the",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "4-for-each-individual-the-treatment-assignment-mechanism-is-consistent-where-the-coun-p004",
+          "text": "hypothesis test in Definition 5 is not",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "4-for-each-individual-the-treatment-assignment-mechanism-is-consistent-where-the-coun-p005",
+          "text": "directly testable in practice without additional assumptions. Unlike the K-sample causal discrepancy test, which tests for discrepancies in the conditional (on only the covariates) distributions of the potential outcomes, the K-sample conditional discrepancy test implied by Definition 1 in Equation (1) for discrepancies in the conditional (on both the covariates and the nominal treatment assignment ti) distributions of the realized outcomes yi. Under causal assumptions, the K-sample conditional discrepancy test is a K-sample causal discrepancy test. Lemma 6 (K-sample conditional and causal discrepancy testing equivalence). Assume the setup described in 3. Further, suppose that:",
+          "page_span": [
+            7,
+            7
+          ]
+        }
+      ]
+    },
+    {
+      "id": "1-the-treatment-assignment-is-ignorable-yi-1-yi-k-ti",
+      "title": "1. The treatment assignment is ignorable: (yi(1), ..., yi(K)) ⊥⊥ti",
+      "paras": [
+        {
+          "id": "1-the-treatment-assignment-is-ignorable-yi-1-yi-k-ti-p001",
+          "text": "xi, and",
+          "page_span": [
+            7,
+            7
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2-the-treatment-assignments-are-positive-for-all-levels-of-the-covariates-p",
+      "title": "2. The treatment assignments are positive for all levels of the covariates: P",
+      "paras": [
+        {
+          "id": "2-the-treatment-assignments-are-positive-for-all-levels-of-the-covariates-p-p001",
+          "text": "\u0000 ti = k xi = x \u0001 > 0 for any x ∈X . Then a consistent test of Equation (1) for a K-sample conditional discrepancy is equivalent to a K- sample causal conditional discrepancy test in Definition 5. See proof on page 19. 3.2 Hypothesis Testing By Lemma 6, under causal assumptions, conditional K-sample tests can be used for inference about potential outcomes. We can tie this into ith K-sample causal discrepancy testing, with any consistent conditional independence test via the following corollary: Corollary 7 (Consistent Conditional Independence Tests and Consistent K-sample causal discrepancy tests). Assume the setup described in Setup 3. Further, suppose that:",
+          "page_span": [
+            7,
+            7
+          ]
+        }
+      ]
+    },
+    {
+      "id": "1-the-treatment-assignment-is-ignorable-yi-1-yi-k-ti",
+      "title": "1. The treatment assignment is ignorable: (yi(1), ..., yi(K)) ⊥⊥ti",
+      "paras": [
+        {
+          "id": "1-the-treatment-assignment-is-ignorable-yi-1-yi-k-ti-p001",
+          "text": "xi, and",
+          "page_span": [
+            7,
+            7
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2-the-treatment-assignments-are-positive-for-all-levels-of-the-covariates-p",
+      "title": "2. The treatment assignments are positive for all levels of the covariates: P",
+      "paras": [
+        {
+          "id": "2-the-treatment-assignments-are-positive-for-all-levels-of-the-covariates-p-p001",
+          "text": "\u0000 ti = k xi = x \u0001 > 0 for any x ∈X . Then a consistent conditional independence test of Equation (2) is equivalent to a consistent K-sample causal conditional discrepancy test in Definition 5. See proof on page 19. Briefly, as long as we can identify a consistent conditional independence test for a related problem of identifying the independence of yi and vi conditional on the covariates xi, and the causal assumptions of ignorability and positivity are applicable, then we can obtain evidence for a K-sample causal conditional discrepancy on the basis of a conditional independence test. Note that this theorem provides guarantees for the hypotheses to be equivalent; it does not make guarantees about a particular conditional independence test being consistent in a given setting. For instance, we may need further qualifications for a conditional independence test to be a consistent test, such as finite first and second moments of the outcomes and the baseline covariates. 3.3 K-sample Causal Unconditional Discrepencies The above approaches readily generalize to discrepencies, in which Fyi(k) ̸= Fyi(l) for some k, l with additional assumptions (called an unconditional causal discrepancy).",
+          "page_span": [
+            7,
+            7
+          ]
+        },
+        {
+          "id": "2-the-treatment-assignments-are-positive-for-all-levels-of-the-covariates-p-p002",
+          "text": "Appendix C derives the above results and sufficient additional assumptions",
+          "page_span": [
+            7,
+            7
+          ]
+        },
+        {
+          "id": "2-the-treatment-assignments-are-positive-for-all-levels-of-the-covariates-p-p003",
+          "text": "for the approaches described herein to the unconditional case. Intuitively, our main result is that tests for K-sample conditional discrepancy tests are equivalent to K-sample (unconditional) causal discrepency tests if differences in the covariate distributions (across groups) can be characterized by shifts in the 7 density of the outcome (conditional on the covariates) that are in the same “direction” across all levels of the covariate(s) xi. Somewhat contrary to intuition, under standard causal assumptions, unconditional conditional discrepancy tests are not equivalent to unconditional causal discrepancy tests without the restrictive assumption that these “shifts” are constant across all covariates. Under this more restrictive framework, a similar approach to corollary 7 gives that unconditional discrepancy tests can be used to test for unconditional causal discrepancies. In the more general case, as long as the discrepancy is in the same direction (and may be of different magnitudes), conditional discrepancy tests can be used for unconditional causal discrepancy tests. Together, these results give us the ability to characterize unconditional causal discrepancies to causal",
+          "page_span": [
+            7,
+            7
+          ]
+        },
+        {
+          "id": "2-the-treatment-assignments-are-positive-for-all-levels-of-the-covariates-p-p004",
+          "text": "conditional discrepancies in much the same way as characterizations of",
+          "page_span": [
+            7,
+            7
+          ]
+        },
+        {
+          "id": "2-the-treatment-assignments-are-positive-for-all-levels-of-the-covariates-p-p005",
+          "text": "the ATE to CATEs. 4 Numerical Experiments 4.1 Conditional independence tests In this paper, we consider the effectiveness of cManova, kernelCDTest, RCIT, RCoT, GCM, and cDcorr for K-sample causal conditional discrepancy testing. We also benchmark these strategies against the distance correlation, Dcorr, which facilitates a strategy for unconditional causal discrepancy testing (see Appendix C). The reason that we compare to Dcorr is that it is possible that by ignoring covariates entirely, we may see increased finite-sample testing power due to computational efficiency under certain contexts, despite a loss of testing validity or power under others. See Appendix B for details on the methods and statistical tests employed. 4.2 Causal Assumptions in Observational Studies The results discussed in Lemma 6 and Corollary 7, which allow us to make causal conclusions on the basis of the outcome of a K-sample conditional discrepancy test or conditional independence test, apply only in the event that the causal assumptions hold: ignorability, positivity, and no interference. Other than the no interference criterion, both the ignorability and positivity assumptions can be readily reasoned in",
+          "page_span": [
+            8,
+            8
+          ]
+        },
+        {
+          "id": "2-the-treatment-assignments-are-positive-for-all-levels-of-the-covariates-p-p006",
+          "text": "randomized trials: if we randomly assign",
+          "page_span": [
+            8,
+            8
+          ]
+        },
+        {
+          "id": "2-the-treatment-assignments-are-positive-for-all-levels-of-the-covariates-p-p007",
+          "text": "people to a treatment or control group (conditionally or unconditionally on baseline covariates, as long as we measure the covariates we use to randomly assign treatment or controls), both the ignorability and positivity assumptions can be satisfied [24]. The no interference criterion can be reasoned through via domain expertise by noting whether or not the treatment group of individuals impacts the outcomes of other individuals [39]. Consider, for instance, a case where we want to measure the impact of a vaccine, and we treat individuals with a vaccine who will only be exposed to other vaccinated individuals. The no interference assumption could be violated since the treatments of the vaccinated individuals could impact the potential outcomes of the other individuals. However, what happens if our data is not randomized, but is observational, in that the researcher does not have explicit control over ensuring treatment assignments in a randomized fashion? Intuitively, ignorability can be conceptualized as no unmeasured confounding, in that any confounding variables must be collected in the observed data [10]. This criterion can be limiting in that while strong assumptions can be",
+          "page_span": [
+            8,
+            8
+          ]
+        },
+        {
+          "id": "2-the-treatment-assignments-are-positive-for-all-levels-of-the-covariates-p-p008",
+          "text": "made about unobserved variables, it is unverifiable in the obtained data sample. Causal",
+          "page_span": [
+            8,
+            8
+          ]
+        },
+        {
+          "id": "2-the-treatment-assignments-are-positive-for-all-levels-of-the-covariates-p-p009",
+          "text": "inference in these observational settings is therefore limited by the sensitivity of the ignorability assumption to these unmeasured variables [40]. The no interference criterion is similar in interpretation as it is for the randomized trial case. Ignorability aside, the positivity assumption can prove difficult to reason through. Conceptually, positivity asserts that for all levels of the covariate under study, there is a non-zero probability of a sample obtaining the treatment or the control. This assumption is impossible to verify in an observational study, since it is statistically a pre-hoc criterion. However, we can take principled approaches to identify subsamples of the data upon which this might be the case. Attempts to rectify this assumption are practically addressed via matching [31, 54]. Through matching, we attempt to identify a subset of the samples from an observational study upon which positivity might hold by trimming subjects whose treatment group assignment is deterministic in 8 the empirical sample based on their observed covariates [19]. A number of techniques have been proposed to ascertain positivity from observational studies [54]. In this investigation, we",
+          "page_span": [
+            8,
+            8
+          ]
+        },
+        {
+          "id": "2-the-treatment-assignments-are-positive-for-all-levels-of-the-covariates-p-p010",
+          "text": "choose to",
+          "page_span": [
+            8,
+            8
+          ]
+        },
+        {
+          "id": "2-the-treatment-assignments-are-positive-for-all-levels-of-the-covariates-p-p011",
+          "text": "address this via vector matching (VM) as proposed by Lopez and Gutman [22], which is a strategy for matching subjects across multiple treatments and is closely related to propensity score matching for more than two treatments. In the case where the treatment is nominal, the generalized propensity score r(t, x) is the probability Pr(t = t|x = x) of being assigned to treatment group t given the baseline covariates x. For a given individual with baseline covariates xi, a set of generalized propensity scores R(xi) = {ˆr(t, xi)}t∈[K] are estimated using a multinomial regression model. For each treatment t ∈[K], we compute the following quantities: \u0012 max i∈[n]:ti=t′{ˆr(t, xi)} \u0013 (8) \u0012 min i∈[n]:ti=t′{ˆr(t, xi)} \u0013 , h(t) ≜min t′∈[K] l(t) ≜max t′∈[K] Individuals i with ˆr(t, xi) ̸∈(l(t), h(t)) for any t ∈[K] are discarded from successive hypothesis testing. Intuitively, VM ensures that no retained individuals have covariates which occur with extremely low probability (or extremely high probability) for any particular group. Strategies which first preprocess observational data using VM are henceforth referred to as “causal”, and we use this strategy for Causal cDcorr. The model employed for",
+          "page_span": [
+            9,
+            9
+          ]
+        },
+        {
+          "id": "2-the-treatment-assignments-are-positive-for-all-levels-of-the-covariates-p-p012",
+          "text": "multinomial regression is given in Appendix D.",
+          "page_span": [
+            9,
+            9
+          ]
+        },
+        {
+          "id": "2-the-treatment-assignments-are-positive-for-all-levels-of-the-covariates-p-p013",
+          "text": "4.3 Simulations We empirically investigate the flexibility, validity, and accuracy of K-sample causal conditional discrepancy testing using simulations that extend beyond our theoretical claims and mirror observational frameworks. In Figure 1, we illustrate the simulations under which our proposed techniques are evaluated. n = 100 samples are collected from the indicated statistical model, with variable “dimensionality” and “balance”. The “dimensionality” indicates the number of dimensions of the outcome, and the “balance” indicates the level of similarity for the covariate distributions of the different treatment groups. The y-axis indicates the outcome in the first dimension, and the x-axis indicates the covariate associated with a single sample point. The solid line indicates the average outcome for a given group at a particular covariate level. The causal conditional discrepancy that we wish to detect is illustrated by the difference between these two lines for a given covariate level (the signal). For successive dimensions, the relationship between the outcome and the covariate for a given group remains the same; however, the signal to noise ratio (per-dimension) decreases as",
+          "page_span": [
+            9,
+            9
+          ]
+        },
+        {
+          "id": "2-the-treatment-assignments-are-positive-for-all-levels-of-the-covariates-p-p014",
+          "text": "the dimen-",
+          "page_span": [
+            9,
+            9
+          ]
+        },
+        {
+          "id": "2-the-treatment-assignments-are-positive-for-all-levels-of-the-covariates-p-p015",
+          "text": "sionality increases. We run each simulation in a low dimensionality (D = 10) and high dimensionality (D = 101) regime. The dimensionality for high dimensional simulations was chosen such that the simulation exhibits the high-dimensionality, low sample size phenomenon (HDLSS) [12], which presents a challenge for parametric techniques as the number of dimensions exceeds the number of samples. Hence, cManova-like strategies cannot be employed without restrictive assumptions on the true underlying model [6], which may not be practical for many high-dimensional datasets (such as connectomics or genomics datasets) or new datasets which are not yet fully understood. Figure 1.I. Sigmoidal indicates a simulation with a sigmoidal relationship between the outcome at a given dimension and the covariate. The effect size measures the degree to which the second group is rotated about the other group (effect size of 0 corresponds to the two distributions being identical, and effect size of 1 corresponds to the second group being rotated 180 degrees). This simulation was designed to test the sensitivity of the included tests to a causal conditional discrepancy when there is no unconditional causal",
+          "page_span": [
+            9,
+            9
+          ]
+        },
+        {
+          "id": "2-the-treatment-assignments-are-positive-for-all-levels-of-the-covariates-p-p016",
+          "text": "discrepancy, as effect sizes of both 0 and 1 correspond to the unconditional",
+          "page_span": [
+            9,
+            9
+          ]
+        },
+        {
+          "id": "2-the-treatment-assignments-are-positive-for-all-levels-of-the-covariates-p-p017",
+          "text": "outcome distributions being identical across both groups across all dimensions. This is due to the fact that the effect that is introduced is a rotation of the outcomes about a particular covariate level. Figure 1.II. Non-Monotone shows a simulation with a non-monotone relationship between the outcome at a given dimension and the covariate. In this case, an unconditional causal discrepancy exists. We would expect that high performing techniques will perform as well as or better than unconditional causal discrepancy tests in this context. Figure 1.III. K-Group indicates a simulation with three groups, wherein 9 I. Sigmoidal II. Non-Monotone III. K-Group IV. Heteroskedastic (A). Before VM (B). After VM Figure 1: Four simulations to empirically evaluate causal conditional discrepancy tests. n = 100 samples are selected from one of four simulation settings (I. to IV.) for a given degree of covariate balance, dimensionality, and effect size ∆. Each point shows a single sample from the given model. For I.-III., the solid line indicates the true outcome for a particular group at a given covariate level. For IV., the opaque boxes indicate the standard deviation from the mean for each",
+          "page_span": [
+            9,
+            9
+          ]
+        },
+        {
+          "id": "2-the-treatment-assignments-are-positive-for-all-levels-of-the-covariates-p-p018",
+          "text": "group. All simulations",
+          "page_span": [
+            9,
+            9
+          ]
+        },
+        {
+          "id": "2-the-treatment-assignments-are-positive-for-all-levels-of-the-covariates-p-p019",
+          "text": "are shown for ∆= 1.0 with low balance (40% covariate distribution overlap). Appendix D illustrates the simulations for ranges of effect size from 0.0 to 1.0 to demonstrate the causal conditional discrepancy that should be detected. Marginal histograms are indicated in both the outcome and the covariate dimension. (A) illustrates all n = 100 samples before VM, and (B) illustrates the samples retained after VM. VM trims the samples to have alignment (across groups) with respect to the covariate distribution. the first group has a different covariate distribution from the second two groups. The effect size again measures the degree to which the first group is rotated about the other two groups (as in 1.I. Sigmoidal). Figure 1.IV. Heteroskedastic indicates a simulation where the covariance of the outcome for one group exceeds that of the other group for each possible value of the covariate, despite the fact that the average outcome (conditional on the covariate value) is identical across both groups. The effect size measures how many times larger the covariance is for the first group than the second group. These simulations were conducted under various balance contexts, where the",
+          "page_span": [
+            10,
+            10
+          ]
+        },
+        {
+          "id": "2-the-treatment-assignments-are-positive-for-all-levels-of-the-covariates-p-p020",
+          "text": "balance indicates the",
+          "page_span": [
+            10,
+            10
+          ]
+        },
+        {
+          "id": "2-the-treatment-assignments-are-positive-for-all-levels-of-the-covariates-p-p021",
+          "text": "fraction of samples which have the same covariate distribution. The remaining samples are collected from asymmetric covariate distributions. When balance is low (shown in Figure 1(A), with a balance of 40%) this induces group-specific imbalance in which the treatment groups being compared do not have common support. For Causal cDcorr, the samples are first filtered using VM, as described in Methods",
+          "page_span": [
+            10,
+            10
+          ]
+        }
+      ]
+    },
+    {
+      "id": "4-2-the-effects-of-this-pre-processing-step-are-indicated-in-figure-1-b-note-that-vm-pre-processes",
+      "title": "4.2. The effects of this pre-processing step are indicated in Figure 1(B). Note that VM pre-processes",
+      "paras": [
+        {
+          "id": "4-2-the-effects-of-this-pre-processing-step-are-indicated-in-figure-1-b-note-that-vm-pre-processes-p001",
+          "text": "the samples so that both groups have common covariate support. The outcomes are finally randomly rotated in D-dimensional space to ensure that the techniques are incorporating information across dimensions (as the top dimension contains more signal than successive dimensions) [52]. Appendix D provides technical details for each simulation employed, and illustrates similar plots across a range of effect sizes for a given setting. 5 Results of Numerical Experiments 5.1 Causal cDcorr provides a substantial improvement in finite-sample validity over cDcorr In Corollary 7, we made the observation that if ignorability and positivity hold along with the assumptions of Setup 3, then a consistent conditional independence test is a test for a k-sample causal discrepancy test. Conceptually, what this means is that as the sample size grows, the k-sample causal conditional discrepancy test is informative for differentiating whether or not the data provides sufficient information to reject the null hypothesis of interest in Definition 5 for an acceptable type I error threshold α. In an observational dataset, however, we simply observe the data: we do not have any information as to 10 whether the",
+          "page_span": [
+            10,
+            10
+          ]
+        },
+        {
+          "id": "4-2-the-effects-of-this-pre-processing-step-are-indicated-in-figure-1-b-note-that-vm-pre-processes-p002",
+          "text": "positivity criterion is satisfied, and we do know whether sample size is sufficient for our",
+          "page_span": [
+            10,
+            10
+          ]
+        },
+        {
+          "id": "4-2-the-effects-of-this-pre-processing-step-are-indicated-in-figure-1-b-note-that-vm-pre-processes-p003",
+          "text": "causal conditional discrepancy test to be informative. Therefore, the ability to conduct valid inference in the absence of omniscent knowledge about the positivity condition and for datasets with a finite number of samples is imperative. We turn to simulation to investigate the implications of a lack of covariate balance on the empirical validity. To investigate the empirical validity, we run all simulations with an effect size ∆= 0 (the outcome distributions conditional on the covariates are identical, and H0 is true) and decrease the covariate balance from 1 (the covariate distributions are identical across all groups) to 0.2 (the covariate distribution differs for one of the groups for all but 20% of samples). Under this framework, empirically valid tests for causal conditional discrepancies will reject the null hypothesis in favor of the alternative at a rate ≤α irrespective of the level of covariate balance (the Type I Error Rate for a given simulation at a given level of covariate balance). Conceptually, when covariate balance is low, it may not be possible to ascertain whether differences between the groups are due to the covariate distribution asymmetries or the group",
+          "page_span": [
+            11,
+            11
+          ]
+        },
+        {
+          "id": "4-2-the-effects-of-this-pre-processing-step-are-indicated-in-figure-1-b-note-that-vm-pre-processes-p004",
+          "text": "assignment due to confounding by the covariate. Tests",
+          "page_span": [
+            11,
+            11
+          ]
+        },
+        {
+          "id": "4-2-the-effects-of-this-pre-processing-step-are-indicated-in-figure-1-b-note-that-vm-pre-processes-p005",
+          "text": "which make a type I error at a rate > α may be aliasing the outcome/group effect (conditional on the covariate) with the outcome/covariate effect. In Figure 2, we explore the statistical validity of all proposed conditional independence tests in various k-sample causal discrepancy testing settings by examining the type I error rate with the effect size ∆= 0 (no effect is present). Empirically valid statistical tests will make a type I error at a rate ≤α = 0.05. We decrease the balance between the groups from 1.0 to 0.2, and compute estimates of the type I error rate. For each statistic, we also assess the frequency of type I errors by computing the number of times that the lower limit of a 90% confidence interval (Wald test) is not ≤α = 0.05. As the balance between the different groups decreases, cDcorr tends to make type I errors at an increasing rate (and, indeed, although the plots have been “cut-off” at a type I error rate of 0.3 in favor of increased resolution near α = 0.05 for the other techniques, the “cut-off” lines all reach a power of 1.0 at or before the balance reaches its minimum value of 0.2). cManova, RCIT, and RCoT frequently make type I errors at a rate > α over",
+          "page_span": [
+            11,
+            11
+          ]
+        },
+        {
+          "id": "4-2-the-effects-of-this-pre-processing-step-are-indicated-in-figure-1-b-note-that-vm-pre-processes-p006",
+          "text": "25% of the time. GCM makes type I errors infrequently (about 10% of the",
+          "page_span": [
+            11,
+            11
+          ]
+        },
+        {
+          "id": "4-2-the-effects-of-this-pre-processing-step-are-indicated-in-figure-1-b-note-that-vm-pre-processes-p007",
+          "text": "time). By augmenting cDcorr with VM to produce Causal cDcorr, the validity improves markedly: cDcorr goes from frequently making type I errors (53 of 80 possible settings) to never making type I errors (0 of 80 settings). kernelCDTest also never makes type I errors, but is not amenable to K-group settings. 5.2 Causal cDcorr empirically dominates other techniques for causal conditional discrepancy testing These simulations were conducted under two balance contexts (high and low balance) in which the covariate distribution is equal for a high portion (80%) and a low portion (40%) of the samples, with the remaining samples collected from asymmetric covariate distributions. In the low balance case (shown in Figure 1A) this induces group-specific imbalance in which the treatment groups being compared do not have common support. For Causal strategies, the samples are first filtered using VM, as described in Methods 4.2. The effects of this pre-processing step are indicated in Figure 1B. For a given effect size and simulation setting, statistical power is estimated over R = 200 repetitions at α = 0.05 and is shown in Figure 3. Validity (Effect size ∆= 0.0) is investigated thoroughly in",
+          "page_span": [
+            11,
+            11
+          ]
+        },
+        {
+          "id": "4-2-the-effects-of-this-pre-processing-step-are-indicated-in-figure-1-b-note-that-vm-pre-processes-p008",
+          "text": "Figure",
+          "page_span": [
+            11,
+            11
+          ]
+        },
+        {
+          "id": "4-2-the-effects-of-this-pre-processing-step-are-indicated-in-figure-1-b-note-that-vm-pre-processes-p009",
+          "text": "2. cDcorr and Dcorr (which can be used as tests for unconditional causal discrepancies, rather than causal conditional discrepancies; Appendix C) are invalid in numerous contexts, such as Figure 3.I. and Figure 3.III., the sigmoidal and K-group settings. In these cases, type I error can be ascertained from the statistical power with an effect size of ∆= 0. In particular, note that the Dcorr power curves appear particularly puzzling: the power is maximal at ∆= 0.5, and falls for larger or smaller effect sizes. These simulations were constructed such that at ∆= 1.0, the unconditional causal discrepancy was minimized, despite the fact that the distributions are conditionally (on the covariates) maximally dissimilar. At ∆= 0.0, an unconditional effect appears to be present at a rate ≥α simply because the group conditional covariate distributions are different. This can be conceptualized as the unconditional 11 I. Sigmoidal II. Non-Monotone IV. Heteroskedastic III. K-Group (B) High Dimensional (A) Low Dimensional Type I Error Rate Type I Error Rate : 80/80 : 27/80 : 27/40 : 60/60 : 56/80 : 51/80 : 72/80 Balance Balance Balance Balance Figure 2: Causal cDcorr and kernelCDTest provide",
+          "page_span": [
+            11,
+            11
+          ]
+        },
+        {
+          "id": "4-2-the-effects-of-this-pre-processing-step-are-indicated-in-figure-1-b-note-that-vm-pre-processes-p010",
+          "text": "valid statistical tests across multiple simulation settings for",
+          "page_span": [
+            11,
+            11
+          ]
+        },
+        {
+          "id": "4-2-the-effects-of-this-pre-processing-step-are-indicated-in-figure-1-b-note-that-vm-pre-processes-p011",
+          "text": "k-sample causal conditional discrepancy testing. The four simulation settings in I. to IV. in low (A) and high-dimensional (B) contexts. Valid statistical tests will tend to reject the null hypothesis in favor of the alternative at a rate ≤α when no effect is present. Each line reflects the type I error rate of a particular test (line color) at a given balance for α = 0.05 (black dashed line) when the effect size ∆= 0. The ribbon indicates a 90% confidence interval of the estimated type I error rate estimate over R = 100 repetitions. The legend at the right indicates the line color for the statistical test, as well as the fraction of times that the lower limit of the 90% CI falls ≤α across (simulation, dimensionality, balance) settings. When balance is high, cDcorr is always valid, but as the balance decreases, cDcorr is almost never valid (with the exception of the “nonmonotone” setting, II.). Likewise, cManova, RCoT, RCIT, and GCM do not achieve empirical validity in at least 75% of all settings. Only Causal cDcorr and kernelCDTest show reasonably high empirical validity (> 75%) for causal conditional discrepancy testing. effect (between the outcome and group) being aliased with",
+          "page_span": [
+            12,
+            12
+          ]
+        },
+        {
+          "id": "4-2-the-effects-of-this-pre-processing-step-are-indicated-in-figure-1-b-note-that-vm-pre-processes-p012",
+          "text": "the outcome/covariate effect due to the",
+          "page_span": [
+            12,
+            12
+          ]
+        },
+        {
+          "id": "4-2-the-effects-of-this-pre-processing-step-are-indicated-in-figure-1-b-note-that-vm-pre-processes-p013",
+          "text": "disparate covariate distributions. Appendix D provides further clarity as to why the the unconditional distributions are identical across all groups when ∆= 1.0 for the sigmoidal and K-group settings. Causal cDcorr, both variations of cManova, and kernelCDTest are the only approaches which are valid under all contexts. This result provides significant caution to the use of unconditional effect tests in data with conditional effects, as this unanticipated “effect aliasing” may arise. Of the remaining tests, GCM has almost no power in any of the simulations except for the nonmonotone simulation. RCIT and RCoT have almost no power in the k-group settings, and have low power in the sigmoidal and non-monotone setting when dimensionality is high. kernelCDTest tends to be overly conservative in contexts in which an effect is present, and generally has much lower power than Causal cDcorr (As shown in Figure 3.I., Figure 3.II., and Figure 3.IV.) across all but Figure 3.I.(A), Figure 3.I.(B), and Figure 3.IV.(B) where their disparity is relatively minor. In particular, Causal cDcorr is always more powerful in high dimensional regimes of Figure 3.(C)-(D). Further, Causal cDcorr flexibly",
+          "page_span": [
+            12,
+            12
+          ]
+        },
+        {
+          "id": "4-2-the-effects-of-this-pre-processing-step-are-indicated-in-figure-1-b-note-that-vm-pre-processes-p014",
+          "text": "operates in the K-group regime Figure 3.III., for which there is no analogous extension",
+          "page_span": [
+            12,
+            12
+          ]
+        },
+        {
+          "id": "4-2-the-effects-of-this-pre-processing-step-are-indicated-in-figure-1-b-note-that-vm-pre-processes-p015",
+          "text": "of kernelCDTest. cManova approaches have no power in regimes in which the causal conditional discrepancy can be categorized as a difference in higher order moments, as in IV., in which the two groups differ only in their second moment. Finally, cManova approaches cannot be natively extended to the HDLSS regimes of Figure 3.(C)-(D) without further considerations, as-noted in Section 4.1. Taken together with the results of Figure 2, this suggests that augmentation of cDcorr with VM to produce Causal cDcorr provides a flexible, valid, and powerful test for uncovering k-sample causal conditional discrepancies across a range of contexts, including when the covariate/outcome relationship is nonlinear or non-monotone, and when the relationship across groups manifests in higher-order moments. 6 Discussion In this work, we introduce a conceptual framework for defining and understanding causal sources of heterogeneity in outcomes across nominal treatment regimes. This work builds upon the efforts of Park et al. [27], and provides a theoretical framework in which conditional independence tests produce k-sample causal conditional discrepancy tests. We give sufficient conditions for k-sample",
+          "page_span": [
+            12,
+            12
+          ]
+        },
+        {
+          "id": "4-2-the-effects-of-this-pre-processing-step-are-indicated-in-figure-1-b-note-that-vm-pre-processes-p016",
+          "text": "(unconditional) causal discrepancy tests to be equivalent to k-sample causal conditional discrepancy",
+          "page_span": [
+            12,
+            12
+          ]
+        },
+        {
+          "id": "4-2-the-effects-of-this-pre-processing-step-are-indicated-in-figure-1-b-note-that-vm-pre-processes-p017",
+          "text": "12 Low Dimensionality High Dimensionality (A) Low Dim, Low Balance (B) Low Dim, High Balance (C) High Dim, Low Balance (D) High Dim, High Balance Statistical Power Statistical Power Statistical Power Statistical Power I. Sigmoidal II. Non-Monotone IV. Heteroskedastic III. K-Group Effect Size Effect Size Effect Size Effect Size Figure 3: Causal cDcorr provides a flexible statistical test for causal effect detection which balances statistical power and validity. n = 100 simulations are sampled from four regimes, under two levels of covariate overlap (low and high covariate balance), and two levels of dimensionality (low and high dimensionality), each for R = 200 repetitions. The effect size ∆(x-axis) for a particular simulation setting indicates the disparity between the different groups, and the statistical power for a given technique (colored lines) indicates the fraction of repetitions in which the test indicated a p-value ≤α (y-axis). α = 0.05 is indicated with the black dashed line. Colored ribbons reflect a 90% confidence interval of the estimated statistical power. ∆= 0 corresponds to the groups being identical (valid tests will reject the null hypothesis at a rate ≤α). As ∆",
+          "page_span": [
+            12,
+            12
+          ]
+        },
+        {
+          "id": "4-2-the-effects-of-this-pre-processing-step-are-indicated-in-figure-1-b-note-that-vm-pre-processes-p018",
+          "text": "increases to 1, powerful tests will see the statistical power increase. kernelCDTest appears to be reasonably powerful, but",
+          "page_span": [
+            12,
+            12
+          ]
+        },
+        {
+          "id": "4-2-the-effects-of-this-pre-processing-step-are-indicated-in-figure-1-b-note-that-vm-pre-processes-p019",
+          "text": "does not operate on the k-group simulation. Causal cDcorr is the only powerful test in all simulations. tests, which generalizes the relationship between the ATE and the CATE to multivariate frameworks. While the theoretical framework which we elucidated is almost certainly violated in observational investigations, we demonstrate how augmentation of conditional independence tests via VM yields tests which achieve both high power and empirical validity in finite sample contexts. These features are often missed entirely by other methods; in particular, in a number of contexts power decreases as the effect size increases, indicating that they are extremely subject to biases due to confounding. In this sense, while they may be theoretically powerful when n is arbitrarily large, they are extremely subject to finite-sample issues when confounding is present. Together, we believe that this work demonstrates the utility of devising assumption-driven statistical tests for conditional independence testing on the basis of causality. Connections to causal structure learning and causal discovery The framework that we have introduced features direct applications in the field of constraint-based",
+          "page_span": [
+            13,
+            13
+          ]
+        },
+        {
+          "id": "4-2-the-effects-of-this-pre-processing-step-are-indicated-in-figure-1-b-note-that-vm-pre-processes-p020",
+          "text": "causal discovery. Typically, constraint-based",
+          "page_span": [
+            13,
+            13
+          ]
+        },
+        {
+          "id": "4-2-the-effects-of-this-pre-processing-step-are-indicated-in-figure-1-b-note-that-vm-pre-processes-p021",
+          "text": "causal discovery is implemented via incorporation of conditional independence tests with strategies such as the PC or the FCI algorithms [50, 51]. These procedures typically decompose the sets of variables under study into nodes in a graph, and proceed to iteratively build a graph of causal dependencies (a directed acyclic graph, or DAG 13 [28, 29]) through progressively more restrictive conditional independence tests (e.g., iteratively “building” a proper conditioning set xi from the observed data through sequences of conditional independence tests). In the case where sets of variables that we wish to test are nominal, the conditional independence tests used are conditional discrepancy tests, of which we have directly compared our techniques to, such as kernelCDTest [27]. Through elucidating explicit statistical assumptions necessary for conditional independence tests to be causal conditional discrepancy tests, we were able to yield a new test, Causal cDcorr, by attempting to faithfully modify the observed data to better reflect the underlying statistical assumptions. Causal cDcorr showed substantial improvements in both finite sample sensitivity and specificity (it shows higher",
+          "page_span": [
+            13,
+            13
+          ]
+        },
+        {
+          "id": "4-2-the-effects-of-this-pre-processing-step-are-indicated-in-figure-1-b-note-that-vm-pre-processes-p022",
+          "text": "validity in null experiments, and power generally",
+          "page_span": [
+            13,
+            13
+          ]
+        },
+        {
+          "id": "4-2-the-effects-of-this-pre-processing-step-are-indicated-in-figure-1-b-note-that-vm-pre-processes-p023",
+          "text": "increases with effect size), and generalizability (it applies readily to greater than 2-level contexts, where we have more than binary treatment levels), while maintaining empirical validity. Inherently, the success or failure at recovering the underlying causal structure is directly a function of the sensitivity and specificity of the conditional independence tests leveraged to true underlying dependencies in the data. We believe that this demonstrates that our assumption-driven statistical framework may yield fruitful improvements to causal structure learning as it relates to nominal variables, and will allow our methodologies to inform new developments in this exciting avenue of work. Limitations and future work A chief limitation of this work is that we largely focus on the nominal treatment case; e.g., where ti is a [T]-valued random variable. Indeed, it is often the case where one may wish to investigate continuous or multivariate treatments through more general conditional independence tests. In the case of continuous or multivariate ti, the positivity assumption becomes one of densities rather than probabilities. With (T , δt) a metric space and ti a T -valued random",
+          "page_span": [
+            14,
+            14
+          ]
+        },
+        {
+          "id": "4-2-the-effects-of-this-pre-processing-step-are-indicated-in-figure-1-b-note-that-vm-pre-processes-p024",
+          "text": "variable, the",
+          "page_span": [
+            14,
+            14
+          ]
+        },
+        {
+          "id": "4-2-the-effects-of-this-pre-processing-step-are-indicated-in-figure-1-b-note-that-vm-pre-processes-p025",
+          "text": "positivity assumption states fti|x(t) > 0 for all t ∈T and for all x ∈X . In light of Lemma 6, our sums become integrals, and the results that we have developed herein remain otherwise identical. Due to the flexibility of cDcorr, the approach upon which Causal cDcorr was based, we believe that this limitation can be overcome with similar pre-processing and analytical strategies to how we worked towards better reflecting the positivity assumption in observational data in the nominal case. Many strategies exist which attempt to bin continuous or multivariate treatments into discrete bins (either through stratification or binning of the treatment variable in the continuous or multivariate case), which would directly extend under the framework which we have proposed. However, the utility of these strategies are dubious due to their tendency to impart strong biases and a resulting loss of statistical power [44]. Both parametric and non-parametric strategies exist which broadly attempt to “re-weight” the observed samples in observational studies which can be empirically conceptualized as assumptiondriven approaches working towards the positivity assumption from observational data. These",
+          "page_span": [
+            14,
+            14
+          ]
+        },
+        {
+          "id": "4-2-the-effects-of-this-pre-processing-step-are-indicated-in-figure-1-b-note-that-vm-pre-processes-p026",
+          "text": "similarly",
+          "page_span": [
+            14,
+            14
+          ]
+        },
+        {
+          "id": "4-2-the-effects-of-this-pre-processing-step-are-indicated-in-figure-1-b-note-that-vm-pre-processes-p027",
+          "text": "leverage the generalized propensity score, where r(t, x) = fti|x(t) [14, 16, 37] is a density instead of a probability. These techniques include entropy balancing [57, 58] and more classical weight-stabilization approaches [38]. Natively, the cDcorr procedure [60] directly incorporates weight to reflect conditional structures in the model. The non-parametric models used to infer weights could be directly altered to reflect better finite-sample characteristics, and thereby directly tune for positivity, using the generalized propensity score while maintaining the asymptotic theoretical guarantees afforded by the traditional cDcorr approach. Acknowledgements The authors are grateful for the support from the National Science Foundation (NSF) administered through NSF Career Award NSF 17-537, the National Institute of Health (NIH) through National Institute of Mental Health (NIMH) Research Projects 1R01MH120482-01 and RF1MH128696- 01, and the NIH through Research Project RO1AG066184-01. Code and Data Availability Statement All figures within this manuscript can be reproduced via the github repository at github.com/ebridge2/cdcorr/. 14 Author Contributions EWB wrote the paper; EWB and JTV",
+          "page_span": [
+            14,
+            14
+          ]
+        },
+        {
+          "id": "4-2-the-effects-of-this-pre-processing-step-are-indicated-in-figure-1-b-note-that-vm-pre-processes-p028",
+          "text": "revised the manuscript; EWB and JTV",
+          "page_span": [
+            14,
+            14
+          ]
+        },
+        {
+          "id": "4-2-the-effects-of-this-pre-processing-step-are-indicated-in-figure-1-b-note-that-vm-pre-processes-p029",
+          "text": "conducted study conception; EWB conducted study design; EWB interpreted the results; EWB, JC, and SP contributed code; EWB and JTV devised the statistical methods; AB processed and interpreted the mouse connectomes; EWB analyzed the data; BG, AL, CS, BC, and JTV provided valuable feedback and discussion throughout the work.",
+          "page_span": [
+            15,
+            15
+          ]
+        }
+      ]
+    },
+    {
+      "id": "1-agresti-foundations-of-linear-and-generalized-linear-models-wiley-series-in-probability-and-statistics",
+      "title": "1. Agresti, Foundations of Linear and Generalized Linear Models (Wiley Series in Probability and Statistics).",
+      "paras": [
+        {
+          "id": "1-agresti-foundations-of-linear-and-generalized-linear-models-wiley-series-in-probability-and-statistics-p001",
+          "text": "Hoboken, NJ, USA: Wiley, Feb. 2015. [Online]. Available: https: //www.amazon.com/Foundations-Linear-Generalized-Probability-Statistics/dp/1118730038",
+          "page_span": [
+            15,
+            15
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2-s-athey",
+      "title": "2. S. Athey,",
+      "paras": [
+        {
+          "id": "2-s-athey-p001",
+          "text": "G. Imbens, T. Pham, and S. Wager, “Estimating average treatment effects: Supplementary analyses and remaining challenges,” American Economic Review, vol. 107, no. 5, pp. 278–81, May 2017. [Online]. Available: https://www.aeaweb.org/articles?id=10.1257/aer. p20171042",
+          "page_span": [
+            15,
+            15
+          ]
+        }
+      ]
+    },
+    {
+      "id": "3-e-w-bridgeford-m-powell-g-kiar-s-noble-j-chung-s-panda-r-lawrence-t-xu",
+      "title": "3. E. W. Bridgeford, M. Powell, G. Kiar, S. Noble, J. Chung, S. Panda, R. Lawrence, T. Xu,",
+      "paras": [
+        {
+          "id": "3-e-w-bridgeford-m-powell-g-kiar-s-noble-j-chung-s-panda-r-lawrence-t-xu-p001",
+          "text": "M. Milham, B. Caffo, and J. T. Vogelstein, “Batch Effects are Causal Effects: Applications in Human Connectomics,” bioRxiv, Oct. 2022. [Online]. Available: https://doi.org/10.1101/2021.09.03.458920",
+          "page_span": [
+            15,
+            15
+          ]
+        }
+      ]
+    },
+    {
+      "id": "4-t-t-cai-and-y-xia-high-dimensional-sparse-manova-j-multivariate-anal-vol-131-pp-174",
+      "title": "4. T. T. Cai and Y. Xia, “High-dimensional sparse MANOVA,” J. Multivariate Anal., vol. 131, pp. 174–",
+      "paras": [
+        {
+          "id": "4-t-t-cai-and-y-xia-high-dimensional-sparse-manova-j-multivariate-anal-vol-131-pp-174-p001",
+          "text": "196, Oct. 2014.",
+          "page_span": [
+            15,
+            15
+          ]
+        }
+      ]
+    },
+    {
+      "id": "5-t-chen-and-c-guestrin-xgboost",
+      "title": "5. T. Chen and C. Guestrin, “XGBoost:",
+      "paras": [
+        {
+          "id": "5-t-chen-and-c-guestrin-xgboost-p001",
+          "text": "A scalable tree boosting system,” in Proceedings of the 22nd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining, ser. KDD ’16. New York, NY, USA: ACM, 2016, pp. 785–794. [Online]. Available: http://doi.acm.org/10.1145/2939672.2939785",
+          "page_span": [
+            15,
+            15
+          ]
+        }
+      ]
+    },
+    {
+      "id": "6-y-y-chi-and-k-e-muller-two-step-hypothesis-testing-when-the-number-of-variables-exceeds",
+      "title": "6. Y.-Y. Chi and K. E. Muller, “Two-Step Hypothesis Testing When the Number of Variables Exceeds",
+      "paras": [
+        {
+          "id": "6-y-y-chi-and-k-e-muller-two-step-hypothesis-testing-when-the-number-of-variables-exceeds-p001",
+          "text": "the Sample Size,” Comm. Statist. Simulation Comput., vol. 42, no. 5, p. 1113, 2013.",
+          "page_span": [
+            15,
+            15
+          ]
+        }
+      ]
+    },
+    {
+      "id": "7-s-r-cole-and-c-e-frangakis-the-consistency-statement-in-causal-inference-a-definition-or",
+      "title": "7. S. R. Cole and C. E. Frangakis, “The Consistency Statement in Causal Inference: A Definition or",
+      "paras": [
+        {
+          "id": "7-s-r-cole-and-c-e-frangakis-the-consistency-statement-in-causal-inference-a-definition-or-p001",
+          "text": "an Assumption?” Epidemiology, vol. 20, no. 1, p. 3, Jan. 2009.",
+          "page_span": [
+            15,
+            15
+          ]
+        }
+      ]
+    },
+    {
+      "id": "8-r-a-fisher-the-design-of-experiments",
+      "title": "8. R. A. Fisher, The Design of Experiments.",
+      "paras": [
+        {
+          "id": "8-r-a-fisher-the-design-of-experiments-p001",
+          "text": "Edinburgh: Oliver and Boyd, 1935.",
+          "page_span": [
+            15,
+            15
+          ]
+        }
+      ]
+    },
+    {
+      "id": "9-j-fox-and-s-weisberg",
+      "title": "9. J. Fox and S. Weisberg,",
+      "paras": [
+        {
+          "id": "9-j-fox-and-s-weisberg-p001",
+          "text": "An R Companion to Applied Regression. Thousand Oaks, CA, USA: SAGE Publications, Inc, Oct. 2018. [Online]. Available: https://www.amazon.com/ R-Companion-Applied-Regression/dp/1544336470",
+          "page_span": [
+            15,
+            15
+          ]
+        }
+      ]
+    },
+    {
+      "id": "10-s-greenland-and-j-m-robins-identifiability-exchangeability-and-confounding-revisited",
+      "title": "10. S. Greenland and J. M. Robins, “Identifiability, exchangeability and confounding revisited,”",
+      "paras": [
+        {
+          "id": "10-s-greenland-and-j-m-robins-identifiability-exchangeability-and-confounding-revisited-p001",
+          "text": "Epidemiologic Perspectives & Innovations : EP+I, vol. 6, p. 4, 2009.",
+          "page_span": [
+            15,
+            15
+          ]
+        }
+      ]
+    },
+    {
+      "id": "11-j-hahn-l-schkade-and-j-lau-the-role-of-propensity-score-matching-in-an-observational-study",
+      "title": "11. J. Hahn, L. Schkade, and J. Lau, “The role of propensity score matching in an observational study",
+      "paras": [
+        {
+          "id": "11-j-hahn-l-schkade-and-j-lau-the-role-of-propensity-score-matching-in-an-observational-study-p001",
+          "text": "of treatment effect,” Biometrics, vol. 54, no. 1, pp. 290–299, 1998.",
+          "page_span": [
+            15,
+            15
+          ]
+        }
+      ]
+    },
+    {
+      "id": "12-p-hall-j-marron-and-a-neeman-geometric-representation-of-high-dimension-low-sample",
+      "title": "12. P. Hall, J. Marron, and A. Neeman, “Geometric Representation of High Dimension, Low Sample",
+      "paras": [
+        {
+          "id": "12-p-hall-j-marron-and-a-neeman-geometric-representation-of-high-dimension-low-sample-p001",
+          "text": "Size Data on JSTOR,” pp. 427–444, 2005, [Online; accessed 10. Mar. 2023]. [Online]. Available: https://www.jstor.org/stable/3647669",
+          "page_span": [
+            15,
+            15
+          ]
+        }
+      ]
+    },
+    {
+      "id": "13-m-a-hern-n-and-j-m-robins-instruments-for-causal-inference-an-epidemiologist-s-dream",
+      "title": "13. M. A. Hernán and J. M. Robins, “Instruments for causal inference: an epidemiologist’s dream?”",
+      "paras": [
+        {
+          "id": "13-m-a-hern-n-and-j-m-robins-instruments-for-causal-inference-an-epidemiologist-s-dream-p001",
+          "text": "Epidemiology (Cambridge, Mass.), vol. 17, no. 4, pp. 360–372, 2006.",
+          "page_span": [
+            15,
+            15
+          ]
+        }
+      ]
+    },
+    {
+      "id": "14-k-hirano-and-g-w-imbens",
+      "title": "14. K. Hirano and G. W. Imbens,",
+      "paras": [
+        {
+          "id": "14-k-hirano-and-g-w-imbens-p001",
+          "text": "“The Propensity Score with Continuous Treatments,” in Applied Bayesian Modeling and Causal Inference from Incomplete-Data Perspectives. Chichester, England, UK: John Wiley & Sons, Ltd, Jul. 2004, pp. 73–84.",
+          "page_span": [
+            15,
+            15
+          ]
+        }
+      ]
+    },
+    {
+      "id": "15-p-w-holland-statistics-and-causal-inference-journal-of-the-american-statistical-association",
+      "title": "15. P. W. Holland, “Statistics and causal inference,” Journal of the American Statistical Association,",
+      "paras": [
+        {
+          "id": "15-p-w-holland-statistics-and-causal-inference-journal-of-the-american-statistical-association-p001",
+          "text": "vol. 81, no. 396, pp. 945–960, 1986.",
+          "page_span": [
+            15,
+            15
+          ]
+        }
+      ]
+    },
+    {
+      "id": "16-k-imai-and-d-a-van-dyk-causal-inference-with-general-treatment-regimes-j-am-stat",
+      "title": "16. K. Imai and D. A. van Dyk, “Causal Inference With General Treatment Regimes,” J. Am. Stat.",
+      "paras": [
+        {
+          "id": "16-k-imai-and-d-a-van-dyk-causal-inference-with-general-treatment-regimes-j-am-stat-p001",
+          "text": "Assoc., vol. 99, no. 467, pp. 854–866, Sep. 2004.",
+          "page_span": [
+            15,
+            15
+          ]
+        }
+      ]
+    },
+    {
+      "id": "17-g-w-imbens-and-d-b-rubin-causal-inference-for-statistics-social-and-biomedical-sciences",
+      "title": "17. G. W. Imbens and D. B. Rubin, Causal Inference for Statistics, Social, and Biomedical Sciences:",
+      "paras": [
+        {
+          "id": "17-g-w-imbens-and-d-b-rubin-causal-inference-for-statistics-social-and-biomedical-sciences-p001",
+          "text": "15 An Introduction. Cambridge University Press, 2015.",
+          "page_span": [
+            15,
+            15
+          ]
+        }
+      ]
+    },
+    {
+      "id": "18-j",
+      "title": "18. J.",
+      "paras": [
+        {
+          "id": "18-j-p001",
+          "text": "D. Jobson, “MANOVA, Discriminant Analysis and Qualitative Response Models,” in Applied Multivariate Data Analysis. New York, NY, USA: Springer, New York, NY, 1992, pp. 209– 344.",
+          "page_span": [
+            16,
+            16
+          ]
+        }
+      ]
+    },
+    {
+      "id": "19-j-kang-w-chan-m-o-kim-and-p-m-steiner-practice-of-causal-inference-with-the-propensity-of",
+      "title": "19. J. Kang, W. Chan, M.-O. Kim, and P. M. Steiner, “Practice of causal inference with the propensity of",
+      "paras": [
+        {
+          "id": "19-j-kang-w-chan-m-o-kim-and-p-m-steiner-practice-of-causal-inference-with-the-propensity-of-p001",
+          "text": "being zero or one: assessing the effect of arbitrary cutoffs of propensity scores,” Communications for statistical applications and methods, vol. 23, no. 1, p. 1, Jan. 2016.",
+          "page_span": [
+            16,
+            16
+          ]
+        }
+      ]
+    },
+    {
+      "id": "20-a-li-and-r-o-ness-py-why-dodiscover-mar-2023-online-accessed-12-mar-2023-online",
+      "title": "20. A. Li and R. O. Ness, “py-why/dodiscover,” Mar. 2023, [Online; accessed 12. Mar. 2023]. [Online].",
+      "paras": [
+        {
+          "id": "20-a-li-and-r-o-ness-py-why-dodiscover-mar-2023-online-accessed-12-mar-2023-online-p001",
+          "text": "Available: https://github.com/py-why/dodiscover",
+          "page_span": [
+            16,
+            16
+          ]
+        }
+      ]
+    },
+    {
+      "id": "21-c-li-and-x-fan-on-nonparametric-conditional-independence-tests-for-continuous-variables",
+      "title": "21. C. Li and X. Fan, “On nonparametric conditional independence tests for continuous variables,”",
+      "paras": [
+        {
+          "id": "21-c-li-and-x-fan-on-nonparametric-conditional-independence-tests-for-continuous-variables-p001",
+          "text": "Wiley Interdiscip. Rev. Comput. Stat., vol. 12, Dec. 2019.",
+          "page_span": [
+            16,
+            16
+          ]
+        }
+      ]
+    },
+    {
+      "id": "22-m",
+      "title": "22. M.",
+      "paras": [
+        {
+          "id": "22-m-p001",
+          "text": "J. Lopez and R. Gutman, “Matching to estimate the causal effects from multiple treatments,” 2014, [Online; accessed 9. Feb. 2023]. [Online]. Available: https: //www.semanticscholar.org/paper/Matching-to-estimate-the-causal-effects-from-Lopez-Gutman/ 11ca8c8fa81498fe75349cff0001552c89115c8c",
+          "page_span": [
+            16,
+            16
+          ]
+        }
+      ]
+    },
+    {
+      "id": "23-p-mccullagh-generalized-linear-models-chapman-hall-crc-monographs-on-statistics-and-applied-probability",
+      "title": "23. P. McCullagh, Generalized Linear Models (Chapman & Hall/CRC Monographs on Statistics and Applied Probability",
+      "paras": [
+        {
+          "id": "23-p-mccullagh-generalized-linear-models-chapman-hall-crc-monographs-on-statistics-and-applied-probability-p001",
+          "text": "New York, NY, USA: Routledge, Aug. 1989. [Online]. Available: https: //www.amazon.com/Generalized-Chapman-Monographs-Statistics-Probability/dp/0412317605",
+          "page_span": [
+            16,
+            16
+          ]
+        }
+      ]
+    },
+    {
+      "id": "24-j-m-oakes-effect-identification-in-comparative-effectiveness-research-egems-vol-1-no-1",
+      "title": "24. J. M. Oakes, “Effect Identification in Comparative Effectiveness Research,” eGEMs, vol. 1, no. 1,",
+      "paras": [
+        {
+          "id": "24-j-m-oakes-effect-identification-in-comparative-effectiveness-research-egems-vol-1-no-1-p001",
+          "text": "2013.",
+          "page_span": [
+            16,
+            16
+          ]
+        }
+      ]
+    },
+    {
+      "id": "25-s-panda-s-palaniappan-j-xiong-e-w-bridgeford-r-mehta-c-shen-and-j-t-vogelstein",
+      "title": "25. S. Panda, S. Palaniappan, J. Xiong, E. W. Bridgeford, R. Mehta, C. Shen, and J. T. Vogelstein,",
+      "paras": [
+        {
+          "id": "25-s-panda-s-palaniappan-j-xiong-e-w-bridgeford-r-mehta-c-shen-and-j-t-vogelstein-p001",
+          "text": "“hyppo: A Multivariate Hypothesis Testing Python Package,” arXiv, Jul. 2019.",
+          "page_span": [
+            16,
+            16
+          ]
+        }
+      ]
+    },
+    {
+      "id": "26-s-panda-c-shen-r-perry-j-zorn-a-lutz-c-e-priebe-and-j-t-vogelstein-nonpar-manova",
+      "title": "26. S. Panda, C. Shen, R. Perry, J. Zorn, A. Lutz, C. E. Priebe, and J. T. Vogelstein, “Nonpar MANOVA",
+      "paras": [
+        {
+          "id": "26-s-panda-c-shen-r-perry-j-zorn-a-lutz-c-e-priebe-and-j-t-vogelstein-nonpar-manova-p001",
+          "text": "via Independence Testing,” arXiv, Oct. 2019.",
+          "page_span": [
+            16,
+            16
+          ]
+        }
+      ]
+    },
+    {
+      "id": "27-j",
+      "title": "27. J.",
+      "paras": [
+        {
+          "id": "27-j-p001",
+          "text": "Park, U. Shalit, B. Schölkopf, and K. Muandet, “Conditional Distributional Treatment Effect with Kernel Conditional Mean Embeddings and U-Statistic Regression,” in International Conference on Machine Learning. PMLR, Jul. 2021, pp. 8401–8412. [Online]. Available: https://proceedings.mlr.press/v139/park21c.html",
+          "page_span": [
+            16,
+            16
+          ]
+        }
+      ]
+    },
+    {
+      "id": "28-j-pearl-causal-inference-in-statistics-an-overview-ssu-vol-3-no-none-pp-96-146-jan-2009",
+      "title": "28. J. Pearl, “Causal inference in statistics: An overview,” ssu, vol. 3, no. none, pp. 96–146, Jan 2009.",
+      "paras": [
+        {
+          "id": "28-j-pearl-causal-inference-in-statistics-an-overview-ssu-vol-3-no-none-pp-96-146-jan-2009-p001",
+          "text": "29. ——, On measurement bias in causal inference. Arlington, TX, USA: AUAI Press, Jul 2010.",
+          "page_span": [
+            16,
+            16
+          ]
+        }
+      ]
+    },
+    {
+      "id": "30-j",
+      "title": "30. J.",
+      "paras": [
+        {
+          "id": "30-j-p001",
+          "text": "Peters and R. D. Shah, “GeneralisedCovarianceMeasure: Test for Conditional Independence Based on the Generalized Covariance Measure (GCM),” Mar. 2023, [Online; accessed 12. Mar. 2023]. [Online]. Available: https://cran.r-project.org/web/packages/ GeneralisedCovarianceMeasure/index.html",
+          "page_span": [
+            16,
+            16
+          ]
+        }
+      ]
+    },
+    {
+      "id": "31-m-l-petersen-k-e-porter-s-gruber-y-wang-and-m-j-van-der-laan-diagnosing-and-re",
+      "title": "31. M. L. Petersen, K. E. Porter, S. Gruber, Y. Wang, and M. J. van der Laan, “Diagnosing and re-",
+      "paras": [
+        {
+          "id": "31-m-l-petersen-k-e-porter-s-gruber-y-wang-and-m-j-van-der-laan-diagnosing-and-re-p001",
+          "text": "sponding to violations in the positivity assumption,” Stat. Methods Med. Res., vol. 21, no. 1, p. 31, Feb. 2012.",
+          "page_span": [
+            16,
+            16
+          ]
+        }
+      ]
+    },
+    {
+      "id": "32-k-c-pillai-distributions-of-characteristic-roots-in-multivariate-analysis-part-i-null-distributions",
+      "title": "32. K. C. Pillai, “Distributions of Characteristic Roots in Multivariate Analysis Part I. Null Distributions",
+      "paras": [
+        {
+          "id": "32-k-c-pillai-distributions-of-characteristic-roots-in-multivariate-analysis-part-i-null-distributions-p001",
+          "text": "on JSTOR,” Canadian Journal of Statistics / La Revue Canadienne de Statistique, vol. 4, no. 2, pp. 157–183, 1976. [Online]. Available: https://www.jstor.org/stable/3315134",
+          "page_span": [
+            16,
+            16
+          ]
+        }
+      ]
+    },
+    {
+      "id": "33-k-c-s-pillai-distributions-of-characteristic-roots-in-multivariate-analysis-part-ii-non-null",
+      "title": "33. K. C. S. Pillai, “Distributions of Characteristic Roots in Multivariate Analysis Part II. Non-Null",
+      "paras": [
+        {
+          "id": "33-k-c-s-pillai-distributions-of-characteristic-roots-in-multivariate-analysis-part-ii-non-null-p001",
+          "text": "Distributions on JSTOR,” Canadian Journal of Statistics / La Revue Canadienne de Statistique, vol. 5, no. 1, pp. 1–62, 1977. [Online]. Available: https://www.jstor.org/stable/3315084",
+          "page_span": [
+            16,
+            16
+          ]
+        }
+      ]
+    },
+    {
+      "id": "34-k-pillai-on-a-generalised-trace-criterion-for-testing-the-separate-effects-of-a-set-of-independent",
+      "title": "34. K. Pillai, “On a generalised \"trace\" criterion for testing the separate effects of a set of independent",
+      "paras": [
+        {
+          "id": "34-k-pillai-on-a-generalised-trace-criterion-for-testing-the-separate-effects-of-a-set-of-independent-p001",
+          "text": "variables,” Biometrika, vol. 46, no. 3-4, pp. 404–409, 1959.",
+          "page_span": [
+            16,
+            16
+          ]
+        }
+      ]
+    },
+    {
+      "id": "35-r-core-team-r-a-language-and-environment-for-statistical-computing-r-foundation-for",
+      "title": "35. R Core Team, R: A Language and Environment for Statistical Computing, R Foundation for",
+      "paras": [
+        {
+          "id": "35-r-core-team-r-a-language-and-environment-for-statistical-computing-r-foundation-for-p001",
+          "text": "Statistical Computing, Vienna, Austria, 2022. [Online]. Available: https://www.R-project.org/",
+          "page_span": [
+            16,
+            16
+          ]
+        }
+      ]
+    },
+    {
+      "id": "36-c-r-rao-an-asymptotic-expansion-of-the-distribution-of-wilk-s-criterion-international-statistical",
+      "title": "36. C. R. Rao, “An asymptotic expansion of the distribution of Wilk’s criterion,” International Statistical",
+      "paras": [
+        {
+          "id": "36-c-r-rao-an-asymptotic-expansion-of-the-distribution-of-wilk-s-criterion-international-statistical-p001",
+          "text": "Institute, 1951. [Online]. Available: http://repository.ias.ac.in/71616 16",
+          "page_span": [
+            16,
+            16
+          ]
+        }
+      ]
+    },
+    {
+      "id": "37-j-robins-a-new-approach-to-causal-inference-in-mortality-studies-with-a-sustained-exposure",
+      "title": "37. J. Robins, “A new approach to causal inference in mortality studies with a sustained exposure",
+      "paras": [
+        {
+          "id": "37-j-robins-a-new-approach-to-causal-inference-in-mortality-studies-with-a-sustained-exposure-p001",
+          "text": "period—application to control of the healthy worker survivor effect,” Mathematical Modelling, vol. 7, no. 9, pp. 1393–1512, Jan 1986.",
+          "page_span": [
+            17,
+            17
+          ]
+        }
+      ]
+    },
+    {
+      "id": "38-j-m-robins-m-hern-n-and-b-brumback-marginal-structural-models-and-causal",
+      "title": "38. J. M. Robins, M. Á. Hernán, and B. Brumback, “Marginal Structural Models and Causal",
+      "paras": [
+        {
+          "id": "38-j-m-robins-m-hern-n-and-b-brumback-marginal-structural-models-and-causal-p001",
+          "text": "Inference in Epidemiology,” Epidemiology, vol. 11, no. 5, p. 550, Sep. 2000. [Online]. Available: https://journals.lww.com/epidem/fulltext/2000/09000/marginal_structural_models_and_ causal_inference_in.11.aspx",
+          "page_span": [
+            17,
+            17
+          ]
+        }
+      ]
+    },
+    {
+      "id": "39-p-r-rosembaum-interference-between-units-in-randomized-experiments-on-jstor",
+      "title": "39. P. R. Rosembaum, “Interference between Units in Randomized Experiments on JSTOR,”",
+      "paras": [
+        {
+          "id": "39-p-r-rosembaum-interference-between-units-in-randomized-experiments-on-jstor-p001",
+          "text": "pp. 191–200, Mar. 2007, [Online; accessed 9. Feb. 2023]. [Online]. Available: https: //www.jstor.org/stable/27639831",
+          "page_span": [
+            17,
+            17
+          ]
+        }
+      ]
+    },
+    {
+      "id": "40-p-r-rosenbaum-from-association-to-causation-in-observational-studies-the-role-of-tests-of",
+      "title": "40. P. R. Rosenbaum, “From Association to Causation in Observational Studies: The Role of Tests of",
+      "paras": [
+        {
+          "id": "40-p-r-rosenbaum-from-association-to-causation-in-observational-studies-the-role-of-tests-of-p001",
+          "text": "Strongly Ignorable Treatment Assignment,” J. Am. Stat. Assoc., vol. 79, no. 385, pp. 41–48, Mar. 1984.",
+          "page_span": [
+            17,
+            17
+          ]
+        }
+      ]
+    },
+    {
+      "id": "41-p-r-rosenbaum-and-d-b-rubin-the-central-role-of-the-propensity-score-in-observational-studies",
+      "title": "41. P. R. Rosenbaum and D. B. Rubin, “The central role of the propensity score in observational studies",
+      "paras": [
+        {
+          "id": "41-p-r-rosenbaum-and-d-b-rubin-the-central-role-of-the-propensity-score-in-observational-studies-p001",
+          "text": "for causal effects,” Biometrika, vol. 70, no. 1, pp. 41–55, Apr 1983. 42. ——, “Constructing a control group using multivariate matched sampling methods that incorporate the propensity score,” The American Statistician, vol. 39, no. 1, pp. 33–38, 1985. [Online]. Available: http://www.jstor.org/stable/2683903 43. ——, “Design of observational studies,” Springer Science & Business Media, 2010.",
+          "page_span": [
+            17,
+            17
+          ]
+        }
+      ]
+    },
+    {
+      "id": "44-p-royston-d-g-altman-and-w-sauerbrei-dichotomizing-continuous-predictors-in-multiple-re",
+      "title": "44. P. Royston, D. G. Altman, and W. Sauerbrei, “Dichotomizing continuous predictors in multiple re-",
+      "paras": [
+        {
+          "id": "44-p-royston-d-g-altman-and-w-sauerbrei-dichotomizing-continuous-predictors-in-multiple-re-p001",
+          "text": "gression: a bad idea,” Stat. Med., vol. 25, no. 1, pp. 127–141, Jan. 2006.",
+          "page_span": [
+            17,
+            17
+          ]
+        }
+      ]
+    },
+    {
+      "id": "45-d-b-rubin-estimating-causal-effects-of-treatments-in-randomized-and-nonrandomized-studies",
+      "title": "45. D. B. Rubin, “Estimating causal effects of treatments in randomized and nonrandomized studies,”",
+      "paras": [
+        {
+          "id": "45-d-b-rubin-estimating-causal-effects-of-treatments-in-randomized-and-nonrandomized-studies-p001",
+          "text": "Journal of Educational Psychology, vol. 66, no. 5, pp. 688–701, 1974. 46. ——, “Randomization analysis of experimental data: The fisher randomization test,” Journal of Educational Statistics, vol. 5, no. 1, pp. 34–58, 1980.",
+          "page_span": [
+            17,
+            17
+          ]
+        }
+      ]
+    },
+    {
+      "id": "47-s-seabold-and-j-perktold-statsmodels-econometric-and-statistical-modeling-with-python-in-9th",
+      "title": "47. S. Seabold and J. Perktold, “statsmodels: Econometric and statistical modeling with python,” in 9th",
+      "paras": [
+        {
+          "id": "47-s-seabold-and-j-perktold-statsmodels-econometric-and-statistical-modeling-with-python-in-9th-p001",
+          "text": "Python in Science Conference, 2010.",
+          "page_span": [
+            17,
+            17
+          ]
+        }
+      ]
+    },
+    {
+      "id": "48-r-d-shah-and-j-peters-the-hardness-of-conditional-independence-testing-and-the-generalised",
+      "title": "48. R. D. Shah and J. Peters, “The Hardness of Conditional Independence Testing and the Generalised",
+      "paras": [
+        {
+          "id": "48-r-d-shah-and-j-peters-the-hardness-of-conditional-independence-testing-and-the-generalised-p001",
+          "text": "Covariance Measure,” arXiv, Apr. 2018.",
+          "page_span": [
+            17,
+            17
+          ]
+        }
+      ]
+    },
+    {
+      "id": "49-c-shen-s-panda-and-j-t-vogelstein-the-chi-square-test-of-distance-correlation-j-comput",
+      "title": "49. C. Shen, S. Panda, and J. T. Vogelstein, “The Chi-Square Test of Distance Correlation,” J. Comput.",
+      "paras": [
+        {
+          "id": "49-c-shen-s-panda-and-j-t-vogelstein-the-chi-square-test-of-distance-correlation-j-comput-p001",
+          "text": "Graph. Stat., vol. 31, no. 1, pp. 254–262, Jan. 2022.",
+          "page_span": [
+            17,
+            17
+          ]
+        }
+      ]
+    },
+    {
+      "id": "50-p",
+      "title": "50. P.",
+      "paras": [
+        {
+          "id": "50-p-p001",
+          "text": "Spirtes, “An Anytime Algorithm for Causal Inference,” in International Workshop on Artificial Intelligence and Statistics. PMLR, Jan. 2001, pp. 278–285. [Online]. Available: https://proceedings.mlr.press/r3/spirtes01a.html",
+          "page_span": [
+            17,
+            17
+          ]
+        }
+      ]
+    },
+    {
+      "id": "51-p-spirtes-c-glymour-and-r-scheines-causation-prediction-and-search",
+      "title": "51. P. Spirtes, C. Glymour, and R. Scheines, Causation, Prediction, and Search.",
+      "paras": [
+        {
+          "id": "51-p-spirtes-c-glymour-and-r-scheines-causation-prediction-and-search-p001",
+          "text": "New York, NY, USA: Springer. [Online]. Available: https://link.springer.com/book/10.1007/978-1-4612-2748-9",
+          "page_span": [
+            17,
+            17
+          ]
+        }
+      ]
+    },
+    {
+      "id": "52-g-stewart-the-efficient-generation-of-random-orthogonal-matrices-with-an-application-to",
+      "title": "52. G. Stewart, “The Efficient Generation of Random Orthogonal Matrices with an Application to",
+      "paras": [
+        {
+          "id": "52-g-stewart-the-efficient-generation-of-random-orthogonal-matrices-with-an-application-to-p001",
+          "text": "Condition Estimators on JSTOR,” pp. 403–409, Jun. 1980, [Online; accessed 15. Feb. 2023]. [Online]. Available: https://www.jstor.org/stable/2156882",
+          "page_span": [
+            17,
+            17
+          ]
+        }
+      ]
+    },
+    {
+      "id": "53-e-v-strobl-k-zhang-and-s-visweswaran-approximate-kernel-based-conditional-independence",
+      "title": "53. E. V. Strobl, K. Zhang, and S. Visweswaran, “Approximate Kernel-Based Conditional Independence",
+      "paras": [
+        {
+          "id": "53-e-v-strobl-k-zhang-and-s-visweswaran-approximate-kernel-based-conditional-independence-p001",
+          "text": "Tests for Fast Non-Parametric Causal Discovery,” Journal of Causal Inference, vol. 7, no. 1, Mar. 2019.",
+          "page_span": [
+            17,
+            17
+          ]
+        }
+      ]
+    },
+    {
+      "id": "54-e-a-stuart-matching-methods-for-causal-inference-a-review-and-a-look-forward-statist-sci",
+      "title": "54. E. A. Stuart, “Matching Methods for Causal Inference: A Review and a Look Forward,” Statist. Sci.,",
+      "paras": [
+        {
+          "id": "54-e-a-stuart-matching-methods-for-causal-inference-a-review-and-a-look-forward-statist-sci-p001",
+          "text": "vol. 25, no. 1, pp. 1–21, Feb 2010.",
+          "page_span": [
+            17,
+            17
+          ]
+        }
+      ]
+    },
+    {
+      "id": "55-g-j-sz-kely-and-m-l-rizzo-partial-distance-correlation-with-methods-for-dissimilarities-ann",
+      "title": "55. G. J. Székely and M. L. Rizzo, “Partial distance correlation with methods for dissimilarities,” Ann.",
+      "paras": [
+        {
+          "id": "55-g-j-sz-kely-and-m-l-rizzo-partial-distance-correlation-with-methods-for-dissimilarities-ann-p001",
+          "text": "Stat., vol. 42, no. 6, pp. 2382–2412, Dec 2014.",
+          "page_span": [
+            17,
+            17
+          ]
+        }
+      ]
+    },
+    {
+      "id": "56-g-j-sz-kely-m-l-rizzo-and-n-k-bakirov-measuring-and-testing-dependence-by-correlation-of",
+      "title": "56. G. J. Székely, M. L. Rizzo, and N. K. Bakirov, “Measuring and testing dependence by correlation of",
+      "paras": [
+        {
+          "id": "56-g-j-sz-kely-m-l-rizzo-and-n-k-bakirov-measuring-and-testing-dependence-by-correlation-of-p001",
+          "text": "distances,” Ann. Stat., vol. 35, no. 6, pp. 2769–2794, Dec 2007.",
+          "page_span": [
+            17,
+            17
+          ]
+        }
+      ]
+    },
+    {
+      "id": "57-s-t-bbicke-entropy-balancing-for-continuous-treatments-cepa-discussion-papers-oct-2020",
+      "title": "57. S. Tübbicke, “Entropy Balancing for Continuous Treatments,” CEPA Discussion Papers, Oct. 2020.",
+      "paras": [
+        {
+          "id": "57-s-t-bbicke-entropy-balancing-for-continuous-treatments-cepa-discussion-papers-oct-2020-p001",
+          "text": "17 [Online]. Available: https://ideas.repec.org/p/pot/cepadp/21.html",
+          "page_span": [
+            17,
+            17
+          ]
+        }
+      ]
+    },
+    {
+      "id": "58-b-g-vegetabile-b-a-griffin-d-l-coffman-m-cefalu-m-w-robbins-and-d-f-mccaffrey",
+      "title": "58. B. G. Vegetabile, B. A. Griffin, D. L. Coffman, M. Cefalu, M. W. Robbins, and D. F. McCaffrey,",
+      "paras": [
+        {
+          "id": "58-b-g-vegetabile-b-a-griffin-d-l-coffman-m-cefalu-m-w-robbins-and-d-f-mccaffrey-p001",
+          "text": "“Nonparametric estimation of population average dose-response curves using entropy balancing weights for continuous exposures,” Health Serv. Outcomes Res. Method., vol. 21, no. 1, pp. 69– 110, Mar. 2021.",
+          "page_span": [
+            18,
+            18
+          ]
+        }
+      ]
+    },
+    {
+      "id": "59-p-virtanen-r-gommers-t-e-oliphant-m-haberland-t-reddy-d-cournapeau-e-burovski",
+      "title": "59. P. Virtanen, R. Gommers, T. E. Oliphant, M. Haberland, T. Reddy, D. Cournapeau, E. Burovski,",
+      "paras": [
+        {
+          "id": "59-p-virtanen-r-gommers-t-e-oliphant-m-haberland-t-reddy-d-cournapeau-e-burovski-p001",
+          "text": "P. Peterson, W. Weckesser, J. Bright, S. J. van der Walt, M. Brett, J. Wilson, K. J. Millman, N. Mayorov, A. R. J. Nelson, E. Jones, R. Kern, E. Larson, C. J. Carey, ̇I. Polat, Y. Feng, E. W. Moore, J. VanderPlas, D. Laxalde, J. Perktold, R. Cimrman, I. Henriksen, E. A. Quintero, C. R. Harris, A. M. Archibald, A. H. Ribeiro, F. Pedregosa, P. van Mulbregt, and SciPy 1.0 Contributors, “SciPy 1.0: Fundamental Algorithms for Scientific Computing in Python,” Nature Methods, vol. 17, pp. 261–272, 2020.",
+          "page_span": [
+            18,
+            18
+          ]
+        }
+      ]
+    },
+    {
+      "id": "60-x-wang-w-pan-w-hu-y-tian-and-h-zhang-conditional-distance-correlation-j-am-stat",
+      "title": "60. X. Wang, W. Pan, W. Hu, Y. Tian, and H. Zhang, “Conditional Distance Correlation,” J. Am. Stat.",
+      "paras": [
+        {
+          "id": "60-x-wang-w-pan-w-hu-y-tian-and-h-zhang-conditional-distance-correlation-j-am-stat-p001",
+          "text": "Assoc., vol. 110, no. 512, p. 1726, 2015. 18 Appendix A. Theoretical Results. Under the restriction that yi(2) and yi(1) differ at most by an offset, the hypothesis in Equation (7) is exactly equivalent to a test of whether there is a CATE: Remark 8. Suppose that if yi(1)|xi = x d∼Fyi(1)|xi=x, then there exists a constant εx s.t. if xi = x, then yi(2) = yi(1) + εx. Then γx ̸= 0 if and only if Fyi(1)|xi=x ̸= Fyi(2)|xi=x. Proof. ⇒) Suppose that γx ̸= 0. Then Fyi(1)|xi=x ̸= Fyi(2)|xi=x, since two random variables differing in expectation implies a difference in distribution. ⇐) Suppose that Fyi(1)|xi=x ̸= Fyi(2)|xi=x, and further for any yi(1)|xi = x d∼Fyi(1)|xi=x, that if given xi = x, yi(2) = yi(1) + εx for some εx. Since Fyi(1)|xi=x ̸= Fyi(2)|xi=x, then ε ̸= 0, as otherwise Fyi(2)|xi=x = Fyi(1)|xi=x. Then: γx = E \u0002 yi(2) −yi(1) xi = x \u0003 = E[εx] = εx ̸= 0, as desired. Note that the forward direction of this proof does not require any of the assumptions that yi(2) is an offset of yi(1), which demonstrates that the 2-sample test shown in Equation (7) is a less-restrictive characterization than a CATE in (6). Proof of Theorem 6. Recall that for Equation (1) and Definition 5, that since",
+          "page_span": [
+            18,
+            18
+          ]
+        },
+        {
+          "id": "60-x-wang-w-pan-w-hu-y-tian-and-h-zhang-conditional-distance-correlation-j-am-stat-p002",
+          "text": "the density fully deter-",
+          "page_span": [
+            18,
+            18
+          ]
+        },
+        {
+          "id": "60-x-wang-w-pan-w-hu-y-tian-and-h-zhang-conditional-distance-correlation-j-am-stat-p003",
+          "text": "mines a distribution, that a difference in distribution exists ⇐⇒a difference in the densities exists. For any k, l ∈[K] and x ∈X , note that Equation 5 can be expressed in terms of the relevant densities from Equation (1): fyi(k)|xi=x(y) −fyi(l)|xi=x(y) = \u0000 fyi(k)|t,x(y) −fyi(l)|t,x(y) \u0001 P(ti = t|xi = x). t∈[K] By ignorability and consistency, fyi(k)|t,x = fyi|k,x for all t ∈[K], so: fyi(k)|xi=x(y) −fyi(l)|xi=x(y) = \u0000 fyi|k,x(y) −fyi|l,x(y) \u0001 P(ti = t|xi = x). t∈[K] Positivity gives that this quantity is well-defined for any x ∈X . Removing constants: fyi(k)|xi=x(y) −fyi(l)|xi=x(y) = \u0000 fyi|k,x(y) −fyi|l,x(y) \u0001 X t∈[K] P(ti = t|xi = x) = fyi|k,x(y) −fyi|l,x.(y), t∈[K] P(ti = t|xi = x) = 1 Therefore, fyi(k)|xi=x(y) ̸= fyi(l)|xi=x(y) for some k, l ∈[K] if and only if there exists some x ∈X s.t. fyi|k,x(y) ̸= fyi|l,x(y). Proof of Theorem 7. Note that with ⃗vi = g(ti) as-defined in Remark 2, then direct application of Theorem 6 followed by Remark 2 give that for some k, l ∈[K] and x ∈X , then Fyi(k)|xi=x ̸= Fyi(l)|xi=x ⇐⇒Fyi|k,x ̸= Fyi|l,x ⇐⇒Fyi,vi|xi ̸= Fyi|xiFvi|xi, as-desired. Appendix B. Methods. B.1 Dcorr The distance correlation [56] is implemented using the hyppo package [25].",
+          "page_span": [
+            19,
+            19
+          ]
+        },
+        {
+          "id": "60-x-wang-w-pan-w-hu-y-tian-and-h-zhang-conditional-distance-correlation-j-am-stat-p004",
+          "text": "p-values are",
+          "page_span": [
+            19,
+            19
+          ]
+        },
+        {
+          "id": "60-x-wang-w-pan-w-hu-y-tian-and-h-zhang-conditional-distance-correlation-j-am-stat-p005",
+          "text": "estimated using [49]. 19 B.2 cManova With the hypothesis in Definition 5 in mind, we investigate whether an “alternative model” including, for each dimension in the dataset, an intercept, a slope associate with the covariates, a group-specific intercept, and an interaction term between the group and the covariate is significant against a “null model” which includes only an intercept and a slope associated with the covariates. Conceptually, this corresponds to investigating whether the two groups differ (either conditionally or unconditionally on the covariates). With ΣA,m and Σ0,m the product of model variance for alternative and the null models respectively, under standard assumptions of multivariate least-squares regression (which are violated by the belowdescribed simulations), the test in Definition 5 is equivalent to testing: H0 : ΣA,m = Σ0,m against HA : ΣA,m ̸= ΣA,m. (9) Denote ΣA,E and Σ0,E to be the error of the variance matrix under the alternative model and the null model respectively, and let Bj = Σj,m Σj,E . Note that if D is the number of dimensions of the outcome, the error of the variance matrix is a D × D matrix, and will be non-invertible if D > n −mj, where n is",
+          "page_span": [
+            19,
+            19
+          ]
+        },
+        {
+          "id": "60-x-wang-w-pan-w-hu-y-tian-and-h-zhang-conditional-distance-correlation-j-am-stat-p006",
+          "text": "the",
+          "page_span": [
+            19,
+            19
+          ]
+        },
+        {
+          "id": "60-x-wang-w-pan-w-hu-y-tian-and-h-zhang-conditional-distance-correlation-j-am-stat-p007",
+          "text": "number of samples and mj is the number of parameters in model j. In the simulations described, this occurs for the high dimensional case (where D = 100 = n), so cManova cannot be used. Under this framework, given that the models are nested, the Pillai-Bartlett trace [32–34] is defined: ΛA,0 Pillai = ΛA Pillai −Λ0 Pillai = tr \u0010 BA(ID + BA)−1\u0011 −tr \u0010 B0(ID + B0)−1\u0011 The statistic ΛPillai can be used to test the hypothesis in Equation (9) The statistic ΛPillai can be used to test the hypothesis in Equation (9) by rescaling to a statistic which is approximately F-distributed [32–34]. cManova in this manuscript is performed using the anova.mlmlist (analysis of variance for nested multivariate linear models) function in R, provided by the stats package [9, 35]. B.3 RCIT and RCoT RCIT and RCoT are implemented using the RCIT package [53] in R. p-values for both techniques are estimated using a permutation test, with the number of null replicates N = 1000. All other settings leverage the default values. B.4 GCM GCM is implemented using the GeneralisedCovarianceMeasure package [30, 48]. The regression method leveraged is “xgboost” [5], and p-values are estimated using a permutation test, with",
+          "page_span": [
+            20,
+            20
+          ]
+        },
+        {
+          "id": "60-x-wang-w-pan-w-hu-y-tian-and-h-zhang-conditional-distance-correlation-j-am-stat-p008",
+          "text": "the number of null replicates N = 1000. All other settings leverage the default values.",
+          "page_span": [
+            20,
+            20
+          ]
+        },
+        {
+          "id": "60-x-wang-w-pan-w-hu-y-tian-and-h-zhang-conditional-distance-correlation-j-am-stat-p009",
+          "text": "B.5 kernelCDTest kernelCDTest [27] is implemented using the doDiscover package [20]. pvalues are estimated using a permutation test, with the number of null replicates N = 1000. All other settings leverage the default values. B.6 cDcorr cDcorr [60] is implemented using the hyppo package [25]. The distance metric used is the Euclidean distance, and p-values are estimated using a permutation test, with the number of null replicates N = 1000. All other settings leverage the default values. Appendix C. Unconditional Discrepancies. For the unconditional case, we assume the setup described in 3. Definition 9 (Unconditional k-sample causal discrepancy). Suppose the setup described in 3. An unconditional causal discrepancy exists if for any k, l ∈[K]: Fyi(k) ̸= Fyi(l). 20 and is hereafter referred to as a k-sample causal discrepancy (with no qualifiers about conditionality). This implies a natural hypothesis test for a causal discrepancy of: H0 : Fyi(k) = Fyi(l) for all k, l against HA : Fyi(k) ̸= Fyi(l) for some k, l (10) Consistent tests of Equation (10) and Definition ?? are equivalent if further causal assumptions are satisfied: Lemma 10 (Consistent k-sample conditional discrepancy",
+          "page_span": [
+            20,
+            20
+          ]
+        },
+        {
+          "id": "60-x-wang-w-pan-w-hu-y-tian-and-h-zhang-conditional-distance-correlation-j-am-stat-p010",
+          "text": "tests and k-sample causal discrepan-",
+          "page_span": [
+            20,
+            20
+          ]
+        },
+        {
+          "id": "60-x-wang-w-pan-w-hu-y-tian-and-h-zhang-conditional-distance-correlation-j-am-stat-p011",
+          "text": "cies). Assume the setup described in 3. Further, suppose that:",
+          "page_span": [
+            21,
+            21
+          ]
+        }
+      ]
+    },
+    {
+      "id": "1-the-treatment-assignment-is-ignorable-yi-1-yi-k-ti",
+      "title": "1. The treatment assignment is ignorable: (yi(1), ..., yi(K)) ⊥⊥ti",
+      "paras": [
+        {
+          "id": "1-the-treatment-assignment-is-ignorable-yi-1-yi-k-ti-p001",
+          "text": "xi,",
+          "page_span": [
+            21,
+            21
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2-the-treatment-assignments-are-positive-for-all-levels-of-the-covariates-p",
+      "title": "2. The treatment assignments are positive for all levels of the covariates: P",
+      "paras": [
+        {
+          "id": "2-the-treatment-assignments-are-positive-for-all-levels-of-the-covariates-p-p001",
+          "text": "\u0000 ti = k xi = x \u0001 > 0 for any x ∈X ,",
+          "page_span": [
+            21,
+            21
+          ]
+        }
+      ]
+    },
+    {
+      "id": "3-the-conditional-effect-of-treatment-is-equivalent-in-direction-across-all-covariate-levels-e-g",
+      "title": "3. The conditional effect of treatment is equivalent in direction across all covariate levels; e.g.,",
+      "paras": [
+        {
+          "id": "3-the-conditional-effect-of-treatment-is-equivalent-in-direction-across-all-covariate-levels-e-g-p001",
+          "text": "for a given y ∈Y, for all x ∈X : fyi|k,x(y) −fyi|l,x(y) ≥0 or fyi|l,x(y) −fyi|k,x(y) ≥0, and the inequality is strict for some x ∈X where fxi(x) > 0. Then a consistent test of Equation (1) for a conditional discrepancy is equivalent to a consistent test of Equation (10) for an unconditional causal discrepancy. Proof. By definition, fyi(k)(y) can be expressed as a marginalization over the joint density fyi(k),xi,ti(y, t, x) with respect to xi and ti: fyi(k)(y) = X×T fyi(k)|t,x(y)fxi,ti(x, t) d(x, t), Using the definition of conditional probability gives: fyi(k)(y) = X×T fyi(k)|t,x(y)P(ti = t|xi = x)fxi(x) d(x, t). That the treatment levels are positive for all levels of the covariates gives that this quantity is welldefined. By Fubini’s theorem, and using that T = [K] is discrete:   fyi(k)(y) = X t∈[K] fyi(k)|t,x(y)P(ti = t|xi = x) fxi(x) dx. By ignorability and consistency, fyi(k)|t,x(y) = fyi|k,x(y), so:   fyi(k)(y) = X t∈[K] fyi|k,x(y)P(ti = t|xi = x) fxi(x) dx. Finally, since fyi|k,x(y) is constant with respect to t:   fyi(k)(y) = X t∈[K] P(ti = t|xi = x) fyi|k,x(y) fxi(x) dx = fyi|k,x(y)fxi(x) dx, t∈[K] P(ti = t|xi = x) = 1. 21 Then: fyi(k)(y) −fyi(l)(y) = \u0002",
+          "page_span": [
+            21,
+            21
+          ]
+        },
+        {
+          "id": "3-the-conditional-effect-of-treatment-is-equivalent-in-direction-across-all-covariate-levels-e-g-p002",
+          "text": "fyi|k,x(y) −fyi|l,x(y)",
+          "page_span": [
+            21,
+            21
+          ]
+        },
+        {
+          "id": "3-the-conditional-effect-of-treatment-is-equivalent-in-direction-across-all-covariate-levels-e-g-p003",
+          "text": "\u0003 fxi(x) dx. (11) By assumption 3., fyi(k) ̸= fyi(l) precisely when fyi|k,x ̸= fyi|l,x for some x where fxi(x) > 0. This implies the following corollary: Corollary 11 (Equivalence of causal conditional discrepancies and unconditional causal discrepancies). Suppose the setup described in Setup 3, and further make the assumptions of Lemma 10. Then a causal conditional discrepancy in equivalent to an unconditional causal discrepancy. Proof. Follows by direct application of Lemma 10 and Lemma 6, by transitivity. In this sense, we can conceptualize a causal discrepancy as smoothing a causal conditional discrepancy (based on the relative contributions of a given x ∈X to the weighted average, weighted by way of fxi(x)). When all of the conditional discrepancies in the distributions of groups k and l are equal in sign (across covariate levels), a test of an unconditional causal discrepancy is equivalent to a causal conditional discrepancy. The k-sample testing problem [26] is given by: H0 : Fyi|k = Fyi|l for all k, l against HA : Fyi|k ̸= Fyi|l for some k, l (12) The results of Lemma 10 coupled with Equation (12) suggest the following corollary, which generalizes the concept of an average",
+          "page_span": [
+            22,
+            22
+          ]
+        },
+        {
+          "id": "3-the-conditional-effect-of-treatment-is-equivalent-in-direction-across-all-covariate-levels-e-g-p004",
+          "text": "treatment effect (ATE) to arbitrary Y when the effect is further identical",
+          "page_span": [
+            22,
+            22
+          ]
+        },
+        {
+          "id": "3-the-conditional-effect-of-treatment-is-equivalent-in-direction-across-all-covariate-levels-e-g-p005",
+          "text": "across covariate levels: Corollary 12 (Consistent k-sample discrepancy testing and k-sample causal discrepancy testing). Make the assumptions of Lemma 10, and further suppose that for all x ∈X , that: fyi|k(y) −fyi|l(y) = fyi|k,x(y) −fyi|l,x(y), Then a consistent test of Equation (12) is equivalent to a test of Equation (10). Proof. Starting at Equation (11) and using the assumption: fyi(k)(y) −fyi(l)(y) = \u0002 fyi|k,x(y) −fyi|l,x(y) \u0003 fxi(x) dx = fyi|k(y) −fyi|l(y), fxi(x) dx = 1. Therefore, fyi(k) ̸= fyi(l) precisely when fyi|k ̸= fyi|l. Conceptually, this result indicates that, so long as the impact of treatment (on the outcome distribution) is identical (in magnitude) across covariate levels, then a k-sample discrepancy test is a consistent test for a k-sample causal discrepancy. Panda et al. [26] gives that a consistent test of Equation (12) can be practically achieved via independence testing (such as through Dcorr) assuming that further assumptions are satisfied about Fyi|k and Fyi|l (such as finite first and second moments). This result is noteworthy in that it would be simple to use the intuition of Lemma 6 to conclude that under causal assumptions k-sample discrepancy tests",
+          "page_span": [
+            22,
+            22
+          ]
+        },
+        {
+          "id": "3-the-conditional-effect-of-treatment-is-equivalent-in-direction-across-all-covariate-levels-e-g-p006",
+          "text": "would be equivalent to k-sample causal",
+          "page_span": [
+            22,
+            22
+          ]
+        },
+        {
+          "id": "3-the-conditional-effect-of-treatment-is-equivalent-in-direction-across-all-covariate-levels-e-g-p007",
+          "text": "discrepancy tests intuitively. However, the fine details of the implications of the ignorability condition reveal this to be incorrect, and we need an additional (stronger) condition (such as the one given in Corollary 12) for this to be the case. Conceptually, under the condition given, the “smoothing” that we noted in Equation (11) need not be relevant (because the effects are all the same) to attain the proper marginal distributions for k-sample discrepancy testing. 22 A weaker, albeit less intuitive, condition that would also give the desired result would be that X fyi|k,x(y)fxi(x) dx = fyi|k. A potentially stronger condition would be unconditional ignorability (yi(1), . . . , yi(K)) ⊥⊥ti, which coupled with positivity, can be practically achieved via randomization. Appendix D. Simulations. D.1 Setup n = 100 samples are generated when balance πb is high or low (πb = 0.8 or πb = 0.4) and dimensionality is high or low (D = 10 or D = 101). Covariate sampling, 2-group The treatment group ti iid ∼Bern(π) for i ∈[n] with π = 0.5. The balance of a sample bi iid ∼Bern(πb) for i ∈[n]. The values zi are sampled independently as:    Beta(10, 10) b = 1 Beta(2, 8) b = 0, t = 0 Beta(8, 2)",
+          "page_span": [
+            22,
+            22
+          ]
+        },
+        {
+          "id": "3-the-conditional-effect-of-treatment-is-equivalent-in-direction-across-all-covariate-levels-e-g-p008",
+          "text": "b = 0, t = 1 zi|bi = b, ti = t d∼ ,   and the covariate xi = 2zi −1. Conceptually, πb of the points (ignoring the group assignments) have the same covariate distribution given by 2Beta(10, 10) −1, and 1 −πb of the points are in the rightand left-skewed distributions given by 2Beta(2, 8)−1 if the point is in group 0 and 2Beta(8, 2)−1 if the point is in group 1 respectively. Note further that by construction, the covariate distributions are symmetric about 0; e.g., f(x|0) = f(−x|1) for all x ∈X = [−1, 1]. Figure 4(A) details the covariate generation procedure. Covariate sampling, K-group The treatment probability vector ⃗π is: ( π k = 1 πk = 1−π K−1 k > 1 . The treatment group ti iid ∼Categorical(⃗π), where Categorical(⃗π) is the categorical distribution (e.g., P(ti = k) = πk for k ∈[K] when ⃗π is in the K-probability simplex). Conceptually, π is the fraction of points in the first group, and 1 −π is the fraction of points that are evenly distributed amongst the remaining K −1 groups. The balance of a sample bi iid ∼Bern(πb) for i ∈[n]. The values zi are sampled independently as:    Beta(10, 10) b = 1 Beta(2, 8) b = 0, t = 1 Beta(8, 2) b = 0, t ̸= 1 zi|bi = b, ti = t d∼ ,  ",
+          "page_span": [
+            23,
+            23
+          ]
+        },
+        {
+          "id": "3-the-conditional-effect-of-treatment-is-equivalent-in-direction-across-all-covariate-levels-e-g-p009",
+          "text": "and the covariate xi = 2zi −1. Conceptually, πb of the points have the same distribution given by",
+          "page_span": [
+            23,
+            23
+          ]
+        },
+        {
+          "id": "3-the-conditional-effect-of-treatment-is-equivalent-in-direction-across-all-covariate-levels-e-g-p010",
+          "text": "2Beta(10, 10)−1, and 1−πb of the points assigned to group 1 are in the right-skewed distribution given by 2Beta(2, 8) −1, with 1 −πb of the points in the groups {2, ..., K} in the left-skewed distribution given by 2Beta(8, 2)−1 (the first group is right-skewed, and the remaining groups have the same left-skewed distribution). Note that by construction, for all t′ ∈{2, ..., K}, that f(x|1) = f(−x|t′), by a similar argument to above. Common characteristics and the signal to noise ratio Several of the below simulations use the nonlinear (but monotonic) sigmoid function, which is defined for x ∈R as: sigmoid(x) = 1 1 + exp(−x) = exp(x) exp(x) + 1 ∈[0, 1] 23 Figure 4: Covariate Generation and Vector Matching. (A) indicates the covariate distribution, with πb = 0.4 (the low balance regime). Simulations are conducted with n = 100 samples, but n = 10000 are employed here for visualization purposes. Bar heights correspond to the proportion of samples which correspond to a particular covariate range for each of the two treatment groups. The center “hump” is indicative of the fact that πb of the points have the same covariate value. Note that the two groups have distributions which are",
+          "page_span": [
+            23,
+            23
+          ]
+        },
+        {
+          "id": "3-the-conditional-effect-of-treatment-is-equivalent-in-direction-across-all-covariate-levels-e-g-p011",
+          "text": "reflected about the origin x = 0 (black line). Two vertical lines (red)",
+          "page_span": [
+            23,
+            23
+          ]
+        },
+        {
+          "id": "3-the-conditional-effect-of-treatment-is-equivalent-in-direction-across-all-covariate-levels-e-g-p012",
+          "text": "indicate the “cutoffs” corresponding to points in group 1 (left line) with the lowest propensity for group 1 and points in group 1 (right line) with the lowest propensity for group 1. (B) indicates the covariate distribution after vector matching (VM) [22]. The highest/lowest propensity scores (across groups) serve as “cutoffs” to filter samples so that the empirical propensity score distributions have the same support. These filtered samples are then analyzed via “causal” strategies for downstream inference. Further, all of the simulations will control the signal to noise ratio in successive dimensions. Intuitively, if the level of signal is not decreased (per dimension) as the dimensionality increases, the signal to noise ratio of the simulation will increase to infinity. The vector ⃗β ∈RD for a given dimensionality D ∈N is given by: βp = 2 pq where q > 1. Conceptually, βp controls the amount of signal for the outcome in a given dimension p ∈[D], and βp+1 < βp for all p ∈[D] (higher dimensions have less signal). The noise in a given simulation is⃗εi iid ∼ND \u0010 ⃗0, 1 4ID \u0011 unless otherwise indicated. Since the noise ⃗εi has variance 1 for all dimensions p ∈[D], note that the SNR",
+          "page_span": [
+            24,
+            24
+          ]
+        },
+        {
+          "id": "3-the-conditional-effect-of-treatment-is-equivalent-in-direction-across-all-covariate-levels-e-g-p013",
+          "text": "for all contexts except for Heteroskedastic",
+          "page_span": [
+            24,
+            24
+          ]
+        },
+        {
+          "id": "3-the-conditional-effect-of-treatment-is-equivalent-in-direction-across-all-covariate-levels-e-g-p014",
+          "text": "is, where the signal si: SNR = E \u0002 ||si||2 2 \u0003 \u0002 ||εi||2 2 \u0003 ⃗β 2 2 ∥⃗εi∥2 2 , ∆≤1 ≤ = 2 1 px . p=1 The right-most quantity is a p-series, and therefore converges for x > 1. Therefore, the SNR is finite for large D, and converges to 0 as D →∞. That the SNR is finite for the heteroskedastic simulation is discussed in its respective paragraph. 24 Simulations are rotated to ensure tests are incorporating information across dimensions To ensure the flexibility of the described techniques to high dimensional investigations so that no simulations are benefiting from only looking at the first dimension (which contains a much higher quantity of signal than successive dimensions), the outcomes are rotated. For all simulations, the outcome is R⃗yi, where R d∼HaarD is a Haar random orthogonal matrix. Conceptually, realizations R of R are D × D rotation matrices drawn from the Haar distribution, which is the uniform distribution on special orthogonal matrices of dimension D (SO(D)) [52, 59]. D.2 Simulation Settings Sigmoidal Let q = 1.5. Conceptually, consider a plot of the outcome (per dimension) relative the covariate value, as in Figure 5. the outcome distribution (for a given dimension) is",
+          "page_span": [
+            24,
+            24
+          ]
+        },
+        {
+          "id": "3-the-conditional-effect-of-treatment-is-equivalent-in-direction-across-all-covariate-levels-e-g-p015",
+          "text": "rotated by ∆π",
+          "page_span": [
+            24,
+            24
+          ]
+        },
+        {
+          "id": "3-the-conditional-effect-of-treatment-is-equivalent-in-direction-across-all-covariate-levels-e-g-p016",
+          "text": "radians (the effect size, where ∆ranges from a minimum of 0 to a maximum of 1) for one group relative the other about the horizontal line with an intercept at 5 p1.5 . This corresponds to the value attained by the sigmoid at the midpoint x = 0 in the covariate distributions. That the covariate distributions are effectively reflections of one another about the point x = 0 gives that there is no unconditional causal discrepancy when the effect size ∆= 1. The rotation factor r = cos(∆π) rotates the outcomes by ∆π radians about the horizontal line at y = 0. The outcomes are: 2 \u0001 ⃗β +⃗εi, t = 0 5sigmoid(8x)⃗β +⃗εi, t = 1 (\u0000 \u0000 5sigmoid(8x) −5 2 \u0001 + 5 ⃗yi(t)|x = By construction, note that ⃗yi(0)|x D= ⃗yi(1)| −x when ∆= 1, and further, that f(x|1) = f(−x|0). Therefore, Fyi(1) = Fyi(0) unconditionally when ∆= 1, and no unconditional causal discrepancy from Definition 9 exists. Figure 5 illustrates the sigmoidal simulations from ∆= 0.0 to ∆= 1.0. Figure 5: Sigmoidal causal conditional discrepancy simulation across range of effect sizes. The group-specific outcomes at each covariate level, for dimension 1 (D = 10). The horizontal line (red) corresponds to the line 5 2 √",
+          "page_span": [
+            25,
+            25
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2-the-solid",
+      "title": "2. The solid",
+      "paras": [
+        {
+          "id": "2-the-solid-p001",
+          "text": "line (orange) indicates the average outcome for group 1 at a particular covariate level. The average outcome for group 0 at a particular covariate level are rotated about the horizontal line (red) by ∆π radians. At ∆= 1, the outcome distributions are identical unconditional on the covariates because the covariate distribution of Group 0 is a reflection of that of Group 1. n = 100 samples are then generated for each of the two groups (dots) according to the 2-group covariate sampling procedure described by simulating a covariate, identifying the average outcome for the assigned group of the sample at the sample’s covariate level, and then adding sample-specific noise (independent and identically distributed across all samples). Non-monotone Let q = 1.5. Conceptually, There is only a covariate-specific effect for points when xi ∈[−.3, .3]. This effect is ∆⃗β for points that are in group 1, and −∆⃗β for points in group 2 (∆is the effect size ranging from 0 to 1). The outcomes are:    ⃗εi, x ̸∈[−0.3, 0.3] ∆⃗β +⃗εi, −∆⃗β +⃗εi, ⃗yi(t)|x = .   25 For a given x ∈X = [−1, 1], the covariate-specific effect is: ( 0, x ̸∈[−0.3, 0.3] 2∆⃗β, x ∈[−0.3, 0.3] , yi(1) −yi(0)|x = So a causal",
+          "page_span": [
+            25,
+            25
+          ]
+        },
+        {
+          "id": "2-the-solid-p002",
+          "text": "conditional discrepancy exists when ∆> 0. Note that by using ignorability and positivity",
+          "page_span": [
+            25,
+            25
+          ]
+        },
+        {
+          "id": "2-the-solid-p003",
+          "text": "(which are true, by construction) and that the distributions are equal for x ̸∈[−0.3, 0.3]: E[yi(1) −yi(0)] = ∆⃗β \u0014Z 0.3 −0.3 f(x|0)dx + Z 0.3 −0.3 f(x|1)dx \u0015 = 2∆⃗β Z 0.3 −0.3 f(x|0)dx ( > 0, ∆> 0 = 0, ∆= 0 , where the second to last line follows because f(x|0) = f(−x|1) by construction, and the intervals are symmetric of the form [−u, u] (for instance, using the substitution u = −x for the right-most quantity gives the desired result). The last line follows because the interval [−0.3, 0.3] is in the support of xi conditional on the group t. Since the expectations are unequal, the distributions Fyi(1) ̸= Fyi(0). This shows that an unconditional causal discrepancy from Definition 9 also exists when ∆> 0. Figure 6 illustrates the non-monotonic simulations from ∆= 0.0 to ∆= 1.0. Figure 6: Non-monotone causal conditional discrepancy simulation across range of effect sizes. The group-specific outcomes at each covariate level, for dimension 1 (D = 10). Group-specific average outcomes are shown (solid lines). The causal conditional discrepancy can be characterized by the 2∆⃗β difference between the two groups for covariates in [−0.3, 0.3]. n = 100 samples are then generated for each of",
+          "page_span": [
+            26,
+            26
+          ]
+        },
+        {
+          "id": "2-the-solid-p004",
+          "text": "the two groups (dots) according to the 2-group covariate",
+          "page_span": [
+            26,
+            26
+          ]
+        },
+        {
+          "id": "2-the-solid-p005",
+          "text": "sampling procedure described by simulating a covariate, identifying the average outcome for the assigned group of the sample at the sample’s covariate level, and then adding sample-specific noise (independent and identically distributed across all samples). K-group Let q = 1.1. This simulation is conceptually identical to the Sigmoidal simulation. With r = cos(∆π) the rotation factor, the outcomes are: 2 \u0001 ⃗β + ⃗εi, ti = 1 5sigmoid(8xi)⃗β + ⃗εi, ti > 1 . (\u0000 \u0000 5sigmoid(8xi) −5 2 \u0001 + 5 ⃗yi|ti = t, xi = x = Again, when the effect size is at a maximum of ∆= 1, the covariate distribution for group 1 is a reflection of the covariate distribution for groups {2, ..., K} about the point x = 0. Therefore there is no unconditional causal discrepancy. Figure 7 illustrates the K-group simulations from ∆= 0.0 to ∆= 1.0. 26 Figure 7: K-Group causal conditional discrepancy simulation across range of effect sizes. The group-specific outcomes at each covariate level, for dimension 1 (D = 10). As in Figure 5, group 0 is rotated about the line 5 2D−1 4 for increasing ∆. At ∆= 1, the outcome distributions are identical unconditional on the covariates because the covariate distribution of Group 0 is a",
+          "page_span": [
+            26,
+            26
+          ]
+        },
+        {
+          "id": "2-the-solid-p006",
+          "text": "reflection of that of Group 1 or 2. n = 100 samples are then generated for each of the two groups (dots)",
+          "page_span": [
+            26,
+            26
+          ]
+        },
+        {
+          "id": "2-the-solid-p007",
+          "text": "according to the 2-group covariate sampling procedure described by simulating a covariate, identifying the average outcome for the assigned group of the sample at the sample’s covariate level, and then adding sample-specific noise (independent and identically distributed across all samples). Heteroskedastic Let q = 1.5. Conceptually, an unconditional causal discrepancy is present, in that the difference between Fyi(1)|x = Fyi(2)|x can be characterized by yi(1) having a larger covariance than yi(2) (and the difference does not depend on x). The outcome model is: ( 5sigmoid(8xi)⃗β + √ 1 + ∆εi ti = 0 5sigmoid(8xi)⃗β + εi ti = 1 ⃗yi ti = t, xi = x = for all x ∈X , indicating that an unconditional causal discrepancy exists when ∆> 0. Figure 8 illustrates the heteroskedastic simulations from ∆= 0.0 to ∆= 1.0. By construction, for any D, the SNR is ∆PD p=1 2 pq , so the SNR is finite for any D for ∆≤1. Figure 8: Heteroskedastic causal conditional discrepancy simulation across range of effect sizes. The group-specific outcomes at each covariate level, for dimension 1 (D = 10). The group-specific mean outcome at a particular covariate level is identical between groups 0 and 1. The causal",
+          "page_span": [
+            27,
+            27
+          ]
+        },
+        {
+          "id": "2-the-solid-p008",
+          "text": "effect is captured by a heteroskedastic covariance model (shaded boxes",
+          "page_span": [
+            27,
+            27
+          ]
+        },
+        {
+          "id": "2-the-solid-p009",
+          "text": "indicate ±1 standard deviation from the mean). The effect size ∆indicates the order of magnitude that the standard deviation from the mean is larger for group 0 than that of group 1. At ∆= 1.0, the standard deviation from the mean at a particular covariate level for group 0 is double that of group 1. Appendix E. Multinomial Regression Model. For our proposed inferential procedure, we use the baseline-category logit model for vector matching (VM) [22]. With ⃗xi the vector of covariates and group k is arbitrarily the baseline, the model is: log \u0012 r(l, xi) \u0013 = ⃗β⊤ l ⃗xi, r(k, xi) 27 where r(l, xi) is the generalized propensity score of item i in group l. The generalized propensity scores are:    exp(⃗β⊤ l ⃗xi) 1+P t̸=k exp(⃗β⊤ t ⃗xi), l ̸= k r(l, xi) = 1 1+P t̸=k exp(⃗β⊤ t ⃗xi), l = k (13)   The model is fit using the statsmodels package [47] in the python programming language to obtain estimates of the regression coefficients ˆ⃗βl for all l ̸= k. Estimated propensity scores ˆr(l, xi) are obtained for all samples i and for all groups l ∈[K] by plugging in the estimated regression coefficients ˆ⃗βl for l ̸= k to the Equations given in (13). In the univariate regime, VM corresponds",
+          "page_span": [
+            27,
+            27
+          ]
+        },
+        {
+          "id": "2-the-solid-p010",
+          "text": "to identifying the",
+          "page_span": [
+            27,
+            27
+          ]
+        },
+        {
+          "id": "2-the-solid-p011",
+          "text": "highest/lowest propensity samples within a given treatment group for all treatment groups, finding the smallest/largest across all treatment groups for a given treatment group, and finally filtering points using the identified cutoffs, as illustrated in Figure 4(B) and according to Equation (8). 28",
+          "page_span": [
+            28,
+            28
+          ]
+        }
+      ]
+    }
+  ]
+}

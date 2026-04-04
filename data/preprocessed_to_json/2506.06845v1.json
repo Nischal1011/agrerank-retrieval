@@ -1,0 +1,511 @@
+{
+  "id": "2506.06845v1",
+  "title": "Linear Discriminant Analysis with Gradient Optimization on Covariance Inverse",
+  "metadata": {
+    "source_path": "data/pdf_files/2506.06845v1.pdf",
+    "page_count": 10,
+    "hash": "fff9ad4a38fed887437565cc227ff12c805de307b3e74b102fcfb0c0b184ea56"
+  },
+  "sections": [
+    {
+      "id": "front-matter",
+      "title": "Front Matter",
+      "paras": [
+        {
+          "id": "front-matter-p001",
+          "text": "Linear Discriminant Analysis with Gradient Optimization on Covariance Inverse Cencheng Shena,∗, Yuexiao Dongb aDepartment of Applied Economics and Statistics, University of Delaware, Delaware, DE 19716, USA bDepartment of Statistics, Operations, and Data Science, Temple University, Pennsylvania, PA 19122, USA",
+          "page_span": [
+            1,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "id": "abstract",
+      "title": "Abstract",
+      "paras": [
+        {
+          "id": "abstract-p001",
+          "text": "Linear discriminant analysis (LDA) is a fundamental method in statistical pattern recognition and classification, achieving Bayes optimality under Gaussian assumptions. However, it is well-known that classical LDA may struggle in highdimensional settings due to instability in covariance estimation. In this work, we propose LDA with gradient optimization (LDA-GO), a new approach that directly optimizes the inverse covariance matrix via gradient descent. The algorithm parametrizes the inverse covariance matrix through Cholesky factorization, incorporates a low-rank extension to reduce computational complexity, and considers a multiple-initialization strategy, including identity initialization and warmstarting from the classical LDA estimates. The effectiveness of LDA-GO is demonstrated through extensive multivariate simulations and real-data experiments. arXiv:2506.06845v1 [stat.CO] 7 Jun 2025 Keywords: Linear Discriminant Analysis, Gradient Descent, High-Dimensional Data",
+          "page_span": [
+            1,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "id": "1-introduction",
+      "title": "1. Introduction",
+      "paras": [
+        {
+          "id": "1-introduction-p001",
+          "text": "Linear discriminant analysis (LDA) is a classification method first introduced by R. A. Fisher in 1936 [8]. It assumes that data from each class are drawn from a multivariate Gaussian distribution with class-specific means and a shared covariance matrix. Under these Gaussian assumptions, LDA yields a decision boundary that is Bayes optimal [11], making it theoretically appealing. In practice, LDA estimates all parameters of the Gaussian distributions, including the class priors, class-conditional means, and shared covariance matrix, using maximum likelihood estimators. LDA has found broad application in pattern recognition [16, 7, 21, 4], and is a standard benchmark built into nearly all statistical software packages. Because LDA projects data onto a lower-dimensional subspace while preserving class separability, it is also widely used for dimensionality reduction and feature selection, contributing significantly to the early success of image recognition tasks [2, 14, 23, 22, 20]. More recently, it has been shown as an useful tool in deep learning pipelines [6]. Despite its strengths, LDA is known to have two primary limitations. The first arises from its reliance on Gaussian",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "1-introduction-p002",
+          "text": "assumptions: if the sample data deviates substantially from Gaussianity, or if the optimal decision boundary is nonlinear,",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "1-introduction-p003",
+          "text": "LDA’s performance can suffer. The second issue concerns parameter estimation, particularly the estimation of the covariance matrix in high-dimensional settings. When the number of dimensions p is large relative to the number of observations n, the sample covariance matrix can exhibit high estimation variance, often becoming ill-conditioned or even non-invertible. This can lead to suboptimal performance, even when the Gaussian assumptions hold approximately. To mitigate these issues, several extensions of LDA have been proposed. A common approach is regularized LDA, which stabilizes covariance estimation by shrinking the sample covariance matrix toward the identity matrix [9]. Another strategy involves introducing sparsity-inducing penalties, as in sparse LDA [5], although such methods typically incur higher computational costs. While regularized or penalized versions of LDA can improve performance under certain conditions, they often require careful parameter tuning and may risk underfitting in some scenarios. Beyond these, numerous studies have explored alternative regularization techniques, sparsity structures, and factorization-based methods to better estimate high-dimensional",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "1-introduction-p004",
+          "text": "covariance matrices [17, 12, 3, 18, 13].",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "1-introduction-p005",
+          "text": "In this work, we propose LDA with gradient optimization (LDA-GO), a new approach that learns the inverse covariance matrix through training. We treat the inverse covariance matrix as a learnable parameter and optimize it via gradient descent, ∗Corresponding author. Email: shenc@udel.edu Preprint submitted to Elsevier June 10, 2025 following the principles of backpropagation used in neural networks. Unlike standard network weights, the covariance matrix must remain symmetric, positive definite, and requires a matrix inversion within the discriminant function. To overcome these issues, we parametrize the learnable matrix as Σ−1 = LL⊤, where L ∈Rp×d is a trainable matrix. This Cholesky-like factorization guarantees that Σ−1 remains symmetric and positive semi-definite throughout training, while also enabling a low-rank extension that significantly reduces the number of free parameters when d ≪p. To reduce the risk of local minima, we consider a multiple-initialization strategy, including random symmetric matrices near the identity and warm-starting from the classical LDA estimates. Among multiple initializations, the solution achieving the lowest training loss is selected as the final",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "1-introduction-p006",
+          "text": "model.",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "1-introduction-p007",
+          "text": "We evaluate LDA-GO through a comprehensive series of experiments. On synthetic datasets, we demonstrate its superiority over classical and regularized LDA in structured and high-dimensional settings. We also benchmark LDA-GO against other classifiers such as random forest and two-layer neural networks. All experiments are conducted in MATLAB 2024a on a standard Windows 10 computer with a six-core CPU and 64GB of memory. The MATLAB code and experiment scripts are provided as supplementary material to ensure full reproducibility.",
+          "page_span": [
+            2,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2-background-on-lda",
+      "title": "2. Background on LDA",
+      "paras": [
+        {
+          "id": "2-background-on-lda-p001",
+          "text": "We first review the classical LDA formulation and the regularized version. Assuming each class conditional distribution is Gaussian with a shared covariance matrix Σ ∈Rp×p and class-specific means μk ∈Rp, the LDA decision function is then derived from Bayes’ rule: δk(x) = x⊤Σ−1μk −1 2μ⊤ k Σ−1μk + log πk, where πk is the prior probability of class k, and x is any sample observation in Rp. Given training data {(xi, yi)}n i=1, the class prior πk is typically estimated as the empirical frequency of class k in the training data: πk = nk n , where nk is the number of training samples in class k, and n is the total number of samples. The class mean μk is estimated as the sample average in class k: yi=k μk = 1 xi. nk Finally, the shared covariance matrix Σ is estimated using the pooled within-class covariance: yi=k ˆΣ = 1 n −K (xi −μk)(xi −μk)⊤, k=1 where K is the number of classes. Given any testing observation x ∈Rp, the LDA decision function for class k is computed using those plug-in estimates: δk(x) = x⊤ˆΣ−1μk −1 2μ⊤ k ˆΣ−1μk + log πk. These scores are then converted to posterior class probabilities via the softmax function: P(y = k | x) = exp(δk(x)) PK j=1 exp(δj(x)) , and the",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "2-background-on-lda-p002",
+          "text": "predicted label is the class with the highest posterior probability:",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "2-background-on-lda-p003",
+          "text": "ˆy = arg max δk(x). 2 Note that we use ˆΣ to denote the classical sample-based estimate of the covariance matrix, which can suffer from significant estimation variance in high-dimensional settings when p ≈n or p > n. This covariance estimate serves as the main learnable component in our method. For notational simplicity, we do not apply the ˆ· symbol to the estimates of prior probabilities or class means, as these quantities are not treated as learnable parameters within our framework. Among many attempts to mitigate the estimation variance of ˆΣ, a simple approach is to consider diagonal LDA, which assumes that Σ is diagonal. While this assumption drastically reduces the number of parameters, it introduces substantial estimation bias when the true covariance structure is not diagonal. A more effective strategy is regularized LDA, which apply shrinkage to the sample covariance matrix toward a multiple of the identity matrix [9]: Σreg = (1 −γ)Σ + γI This regularized version reduces estimation variance by introducing small bias and can outperform classical LDA in settings where the bias-variance trade-off is favorable. Moreover, when using a default value of γ = 0.1, regularized LDA",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "2-background-on-lda-p004",
+          "text": "is",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "2-background-on-lda-p005",
+          "text": "typically very fast compared to other complicated extensions such as sparse LDA, which often requires iterative algorithms and parameter tuning.",
+          "page_span": [
+            3,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "id": "3-main-method",
+      "title": "3. Main Method",
+      "paras": [
+        {
+          "id": "3-main-method-p001",
+          "text": "In this section, we present the main components of the proposed method, along with all necessary implementation details. Given a dataset {(xi, yi)}n i=1 with xi ∈Rp and yi ∈{1, . . . , K}, the class means μk and class priors πk are estimated using classical sample-based methods and remain fixed throughout the model. Our method focuses exclusively on optimizing the inverse covariance matrix Σ−1, leveraging a combination of cross-entropy loss formulated from the LDA decision rule, gradient descent with respect to Σ−1, backpropagation through Cholesky factorization, and a low-rank extension to further enhance computational efficiency.",
+          "page_span": [
+            3,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "id": "3-1-softmax-and-cross-entropy-loss",
+      "title": "3.1. Softmax and Cross-entropy Loss:",
+      "paras": [
+        {
+          "id": "3-1-softmax-and-cross-entropy-loss-p001",
+          "text": "Recall the class discriminant function is defined as: δk(x) = x⊤Σ−1μk −1 2μ⊤ k Σ−1μk + log πk. and the output probability of LDA exactly coincides with the softmax function: Pik = exp(δk(xi)) PK j=1 exp(δj(xi)) , where Pik is the predicted probability that xi belongs to class k. Let Yik = 1 if yi = k and 0 otherwise (i.e., one-hot encoded labels). The cross-entropy loss is: L = −1 k=1 Yik log Pik. i=1",
+          "page_span": [
+            3,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "id": "3-2-gradient-with-respect-to-covariance-inverse",
+      "title": "3.2. Gradient with Respect to Covariance Inverse:",
+      "paras": [
+        {
+          "id": "3-2-gradient-with-respect-to-covariance-inverse-p001",
+          "text": "To compute the gradient ∂L ∂Σ−1 , we first observe that the discriminant function depends linearly on Σ−1: 2μkμ⊤ k ) ! + log πk. δk(xi) = tr Σ−1(xiμ⊤ k −1 Taking derivatives through the softmax and loss, we immediately obtain: ∂L ∂Σ−1 = −1 k=1 (Yik −Pik) \u0010 xiμ⊤ k + μkx⊤ i −μkμ⊤ \u0011 . i=1 This gives the direction in which changing Σ−1 increases the loss the most. 3",
+          "page_span": [
+            3,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "id": "3-3-backpropagation-through-cholesky-factorization",
+      "title": "3.3. Backpropagation through Cholesky Factorization:",
+      "paras": [
+        {
+          "id": "3-3-backpropagation-through-cholesky-factorization-p001",
+          "text": "To reduce the number of free parameters while maintaining the symmetric and positive semi-definiteness of the covariance inverse, we further parametrize: Σ−1 = LL⊤, where L ∈Rp×p is a lower triangular matrix (Cholesky factor). Using the chain rule, the gradient of the loss with respect to L is: ∂L = 2 · tril ∂L ∂Σ−1 · L ! , ∂L where tril(·) denotes extracting the lower-triangular part to maintain the Cholesky structure.",
+          "page_span": [
+            4,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "id": "3-4-low-rank-extension",
+      "title": "3.4. Low-Rank Extension:",
+      "paras": [
+        {
+          "id": "3-4-low-rank-extension-p001",
+          "text": "Based on the above factorization, where L is a lower-triangular matrix of size p × p, the full-rank model has p(p + 1)/2 free parameters. This can lead to a big model when p is large. To reduce the computational burden, we allow an additional input d ∈[1, p], in which case we define L ∈Rp×d and set Σ−1 = LL⊤. This results in a low-rank approximation to the inverse covariance matrix, with rank at most d. The loss function and discriminant functions remain unchanged, and the gradient with respect to L is computed as: ∂L ∂L = 2 · ∂L ! L. ∂Σ−1 The model now has p × d free parameters, which can lead to significant savings in storage and runtime when d is small relative to p. Moreover, the low-rank extension acts as an implicit form of regularization by constraining the discriminant projection to lie within a d-dimensional subspace, thereby reducing the risk of overfitting in high-dimensional settings. As the matrix L defines a low-dimensional embedding — analogous to projections used in PCA or classical LDA — it can outperform the full-rank model in scenarios where class separation occurs within a low-dimensional structure. Since the low-rank variant generalizes the full-rank setting,",
+          "page_span": [
+            4,
+            4
+          ]
+        },
+        {
+          "id": "3-4-low-rank-extension-p002",
+          "text": "for ease of presentation, we proceed by always assuming L has size p × d",
+          "page_span": [
+            4,
+            4
+          ]
+        },
+        {
+          "id": "3-4-low-rank-extension-p003",
+          "text": "for some d. In the experiments, we systematically compare both the full-rank and low-rank models.",
+          "page_span": [
+            4,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "id": "3-5-covariance-initialization",
+      "title": "3.5. Covariance Initialization:",
+      "paras": [
+        {
+          "id": "3-5-covariance-initialization-p001",
+          "text": "We consider three different initializations for the matrix L, where Σ−1 = LL⊤, and select the best result based on the training loss. Let ε denote a p × d random perturbation matrix with entries εi j ∼N(0, σ2), where we set σ = 0.01. The initialization schemes are as follows: • Identity Start: Initialize L ∈Rp×d as a perturbation of the identity matrix: L(0) where I(1 : p, 1 : d) denotes the first d columns of the p-dimensional identity matrix. • Diagonal Start: Extract the diagonal of the classical LDA covariance estimate ˆΣ, compute its elementwise square root inverse, and add perturbation: L(0) 2 = diag(ˆΣ)−0.5(1 : p, 1 : d) + ε, where diag(ˆΣ) denotes the diagonal matrix formed from the diagonal entries of ˆΣ. • Classical Start: Use the classical LDA covariance estimate ˆΣ, perform eigen-decomposition on its inverse ˆΣ−1 = US U⊤, and set: L(0) where U contains the eigenvectors and S contains the eigenvalues along the diagonal. If the covariance estimate is not invertible, use pseudo-inverse instead. 4",
+          "page_span": [
+            4,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "id": "3-6-parameter-update",
+      "title": "3.6. Parameter Update:",
+      "paras": [
+        {
+          "id": "3-6-parameter-update-p001",
+          "text": "We use full-batch gradient descent for training, with a fixed learning rate η. The optimization proceeds by updating L at each iteration: L(t+1) ←L(t) −η · ∂L ∂L , where η > 0 is the learning rate. After each update, we recompute Σ−1 = LL⊤and use the updated Σ−1 to evaluate the discriminant function in the next iteration. We impose a stopping criterion based on the Frobenius norm of the gradient: ∂L < τ, ∂L or a maximum number of iterations is reached.",
+          "page_span": [
+            5,
+            5
+          ]
+        }
+      ]
+    },
+    {
+      "id": "3-7-default-hyperparameters",
+      "title": "3.7. Default Hyperparameters",
+      "paras": [
+        {
+          "id": "3-7-default-hyperparameters-p001",
+          "text": "Throughout the experiments, we considered the following default parameters: • Learning rate: η = 0.1 or 1; • Stopping gradient norm threshold: τ = 10−3; • Maximum number of iterations: 30; • Low-Rank option: d = p or d = 20; Our results are reported for both the full-rank model (LDA-GO) and the low-rank model (LDA-GO-d) with d = 20. Within each method, we validate a better learning rate between 0.1 and 1. As is well known in neural network architectures, the choice of learning rate is critical: a rate that is too small may lead to excessively slow convergence, while a rate that is too large may cause instability or divergence during training. In our case, a learning rate of either 0.1 or 1 performed well throughout the experiments.",
+          "page_span": [
+            5,
+            5
+          ]
+        }
+      ]
+    },
+    {
+      "id": "4-runtime-analysis",
+      "title": "4. Runtime Analysis",
+      "paras": [
+        {
+          "id": "4-runtime-analysis-p001",
+          "text": "The runtime complexity of each major step is summarized below: • Loss Computation: For each sample xi and class k, we compute x⊤ i Σ−1μk and μ⊤ k Σ−1μk. Computing x⊤ i (LL⊤)μk requires two matrix-vector products: (L⊤μk) and (L⊤xi), each costing O(pd), followed by an inner product costing O(d). Therefore, the total cost per sample per class is O(pd). Across n samples and K classes, the overall cost is O(nKpd). • Gradient Accumulation: For each sample and class, we compute terms involving xiμ⊤ k , μkx⊤ i , and μkμ⊤ k , followed by projection through L. Computing and accumulating these gradients has cost O(nKpd). • Backpropagation to L: After obtaining ∂L/∂Σ−1, we compute the matrix product ∂L/∂Σ−1 · L, where ∂L/∂Σ−1 ∈ Rp×p and L ∈Rp×d. This costs O(p2d). • Update Step: Updating L by subtracting the gradient has cost O(pd), as it is a simple element-wise operation. • Total Cost per Iteration: The dominant terms are the score computation and backpropagation, leading to an overall per-iteration complexity of: O(nKpd + p2d). This scales linearly with n, K, d and quadratically with p. 5",
+          "page_span": [
+            5,
+            5
+          ]
+        }
+      ]
+    },
+    {
+      "id": "5-simulations",
+      "title": "5. Simulations",
+      "paras": [
+        {
+          "id": "5-simulations-p001",
+          "text": "To evaluate the performance of the proposed LDA-GO algorithm, we conduct a comprehensive set of simulations designed to probe both the strengths and weaknesses of the method. Throughout the simulations, we set the number of training samples ntrain = 200, the number of test samples ntest = 10000, and the number of classes K = 2 with equal prior. The feature dimension p varies across simulations, ranging from 20 to 500. The function details are as follows, with a summary presented in Table 1. Simulation 1: Multivariate Gaussian without Class Separation Let p = 20, drawn samples from a standard multivariate normal distribution independently of class labels: X ∼N(0, I), Y ∼Bernoulli(0.5). This serves as a sanity check where no actual class signal exists. Any classifier should essentially be random guessing. Simulation 2-4: Separable Classes with Varying Covariance Structure Let p = 20, each class is drawn from a multivariate normal distribution: X | Y = 1 ∼N(0, Σ), X | Y = 2 ∼N(1, Σ), where Σ is identity matrix for simulation 2; is diagonal with Σ(1, 1) = 100, Σ(2, 2) = 10, and 1 on other diagonals for simulation 3; and is randomly generated with Σ = AA′, where A is p-dimensional",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "5-simulations-p002",
+          "text": "random standard Gaussian, for simulation",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "5-simulations-p003",
+          "text": "4. This provides some standard, multivariate, Gaussian setting where classical LDA should handle well. Simulation 5-6: Separable Classes with Toeplitz-Correlated Structure Let p = 200, generate samples via strongly correlated dimensions, where class separation is dense and uniform across all dimensions. • Class Means: μ1 = 0200, μ2 = 1200. The signal is distributed equally across all dimensions. • Covariance Structure: Σi j = ρ|i−j|, ρ = 0.8, a Toeplitz matrix inducing strong correlations across nearby dimensions. • Data Generation: Training and test sets are sampled from the following: X | Y = 1 ∼N(μ1, Σ), X | Y = 2 ∼N(μ2, Σ). Class labels are assigned uniformly at random. For simulation 6, we additionally set Σ(1, 1) = 100 and Σ(2, 2) = 10 to dominate all other diagonals. These two simulations are designed to challenge classical LDA with a high-dimensional setting with correlated covariance structure. Simulation 7: Sparse Signal Shift with Identity Covariance Let p = 500, but only the first 5 contribute to class separation: X | Y = 2 has + 1 shift in first 5 entries, X | Y = 1 ∼N(0, I). 6 Simulation 8: Sparse Separation Signal with Toeplitz-Correlated Structure Let p = 500, and",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "5-simulations-p004",
+          "text": "generate a data where only the last 10 dimensions contain class-separating information:",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "5-simulations-p005",
+          "text": "μ1 = 0, μ2 = [0, . . . , 0 | {z } 490 , 1, . . . , 1 | {z } 10 ], and Σ = Toeplitz(0.9|i−j|). Then X | Y = 1 ∼N(μ1, Σ), X | Y = 2 ∼N(μ2, Σ), This is designed to evaluate performance under high correlation and sparse signal, where covariance estimation is critical. Simulation 9: Opposing Directions with Shared Covariance Let p = 500, and for k = 1, 2 set X | Y = k ∼N((−1)k+1v, I + 0.9vv⊤), where v is a randomly generated length p vector of unit-norm. Simulation 10: Sparse Signal Separation with Heterogeneous Dimension Blocks Let p = 500, and generate dimensions via three blocks: • Informative Signal Block (Dimension 1–20): Each class has a distinct mean vector in this block: μ(1) 1 = 0, μ(1) 2 = 120, and covariance Σ(1) = I20. Then X(1) | Y = 1 ∼N(μ(1) 1 , Σ(1)), X(3) | Y = 2 ∼N(μ(2) 1 , Σ(1)), This block carries all the meaningful class-discriminative information. • Correlated Noise Block (Dimension 21–40): Both classes share the same distribution in this block: X(2) ∼N(0, Σ(2)), Σ(2) i j = 0.8|i−j|. This is a high-correlation Toeplitz structure, contributing no discriminative power. • Heteroscedastic Noise Block (Dimension 41–500): Both classes have zero mean, but differing",
+          "page_span": [
+            7,
+            7
+          ]
+        },
+        {
+          "id": "5-simulations-p006",
+          "text": "diagonal covari-",
+          "page_span": [
+            7,
+            7
+          ]
+        },
+        {
+          "id": "5-simulations-p007",
+          "text": "ances: 1 ), 2 ), where: Σ(3) 1 = diag(0.5 + Uniform(0, 1)), Σ(3) 2 = diag(1.5 + Uniform(0, 1)). This block introduces class-dependent noise but no signal in the mean. Then X = [X(1); X(2); X(3)] is the final concenated training data. This setting has a mixed covariance structure that do not fit LDA assumption, but nevertheless still a linear decision boundary. 7",
+          "page_span": [
+            7,
+            7
+          ]
+        }
+      ]
+    },
+    {
+      "id": "results",
+      "title": "Results",
+      "paras": [
+        {
+          "id": "results-p001",
+          "text": "We apply both the full-rank LDA-GO and its low-rank variant, LDA-GO-d with d = 20, and compare them against several baselines: classical LDA, regularized LDA (R-LDA) using default γ = 0.1, 5-nearest neighbor classifier (5NN), random forest (RF) implemented via MATLAB’s TreeBagger function with 50 trees, and a two-layer neural network (NN) using MATLAB’s fitcnet function with 30 hidden neurons and input standardization. For each simulation, we conduct 50 Monte Carlo replicates and report the mean and standard deviation of classification error across methods, as shown in Table 2. As expected, in Simulation 1, where no true class signal exists, all methods perform close to random guessing. In Simulations 2–4, where the data are low-dimensional and well-separated, both LDA-GO and LDA-GO-d (d = 20) perform similarly to classical LDA. The advantages of LDA-GO become more evident in the remaining high-dimensional simulations, where covariance estimation becomes more challenging. In all settings, LDA-GO or LDA-GO-d consistently performs the best or among the best classifiers across all methods evaluated. Notably, LDA-GO-d generally performs comparably to the full-rank LDA-GO, although in",
+          "page_span": [
+            8,
+            8
+          ]
+        },
+        {
+          "id": "results-p002",
+          "text": "certain cases one outper-",
+          "page_span": [
+            8,
+            8
+          ]
+        },
+        {
+          "id": "results-p003",
+          "text": "forms the other. In particular, in simulations involving sparse signal structures, such as Simulations 7 and 10, LDA-GO-d achieves significantly lower classification errors. This suggests that when a low-dimensional discriminative structure is present, the low-rank version is preferable, as it reduces the number of parameters and mitigates estimation variance compared to the full-rank LDA-GO. Table 1: Brief Description of Each Simulation Setting ID Description 1 20D No Class Separation. 2 20D Separable Class with identity covariance. 3 20D Separable Class with diagonal covariance. 4 20D Separable Class with full-rank random dense covariance. 5 200D Separable Classes with Toeplitz-Correlated Structure. 6 200D Separable Classes with Correlated Structure and Dominating Diagonals. 7 500D Sparse Signal Shift with Identity Covariance. 8 500D Sparse Separation Signal with Toeplitz-Correlated Structure. 9 500D Opposing Directions with Shared Covariance. 10 500D Sparse Signal Separation with Heterogeneous Dimension Blocks. ID LDA-GO LDA-GO-d LDA R-LDA 5NN RF NN 1 50.0 ± 0.5 50.0 ± 0.5 50.0 ± 0.5 50.0 ± 0.5 50.0 ± 0.5 50.0 ± 0.5 50.0 ± 0.5 2 1.6 ± 0.3 1.6 ± 0.3 1.8 ± 0.2 1.7 ± 0.2 2.3 ± 0.2",
+          "page_span": [
+            8,
+            8
+          ]
+        },
+        {
+          "id": "results-p004",
+          "text": "3.4 ± 0.6 2.1 ± 0.4 3 2.6 ± 0.4 2.6 ± 0.4 2.6 ± 0.3 2.5 ± 0.3 31.8 ± 1.6 4.5 ± 0.7 3.2 ± 0.5 4 2.1 ± 5.0 2.1 ± 5.0 2.1 ± 6.0 3.4 ± 6.7 40.3 ± 1.9 35.0 ± 2.4 15.2 ± 7.7 5 1.4 ± 0.1 1.2 ± 0.3 38.9 ± 5.0 3.1 ± 0.5 1.4 ± 0.2 2.4 ± 0.4 1.3 ± 0.1 6 1.5 ± 0.3 38.6 ± 4.5 37.8 ± 4.5 3.3 ± 0.5 5.5 ± 6.2 2.3 ± 0.3 1.5 ± 0.2 7 27.3 ± 1.8 17.6 ± 0.9 37.6 ± 1.5 30.3 ± 1.6 40.5 ± 1.3 26.4 ± 2.2 32.4 ± 1.3 8 29.5 ± 3.7 34.4 ± 1.9 34.21 ± 1.7 31.0 ± 1.5 43.3 ± 1.2 30.2 ± 1.4 33.0 ± 1.7 9 33.7 ± 1.3 37.5 ± 1.3 39.9 ± 1.4 37.3 ± 1.1 42.8 ± 1.3 42.0 ± 1.5 35.3 ± 1.2 10 8.9 ± 1.3 1.9 ± 0.2 17.6 ± 2.1 10.9 ± 1.3 50.1 ± 0.5 1.6 ± 0.6 9.6 ± 1.5 Table 2: Average classification error rates (in percentage) with standard deviations across all simulations. For each simulation, the best-performing method is highlighted in red. In cases of ties, only the first occurrence is highlighted.",
+          "page_span": [
+            8,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "id": "6-real-data-experiments",
+      "title": "6. Real Data Experiments",
+      "paras": [
+        {
+          "id": "6-real-data-experiments-p001",
+          "text": "We evaluate the performance of LDA-GO and its low-rank extension on a collection of six multivariate datasets, from MATLAB built-in (the first three) with low-dimensional features, to academic paper database and gene expression data with high-dimensional features. 8 • Fisher Iris Dataset: Contains 150 samples with 4 features per instance (sepal length, sepal width, petal length, petal width). Labels correspond to three species of iris flowers: setosa, versicolor, and virginica [8]. • Breast Cancer Wisconsin Dataset: Consists of 699 instances, each with 9 features extracted from digitized images of fine needle aspirates. The binary class label denotes benign versus malignant tumors [19]. • Wine Dataset: Comprises 178 samples with 13 chemical analysis features, describing wines derived from three different cultivars. • Cora Dataset: Includes 2708 scientific papers categorized into 7 classes [15]. Each paper is represented by a 1433- dimensional binary word presence vector. • Colon Cancer Dataset: Comprises 62 samples with gene expression profiles measured across 2000 genes. The dataset contains 40 tumor samples and 22 normal tissue samples [1]. • Golub Leukemia Dataset: Consists of",
+          "page_span": [
+            8,
+            8
+          ]
+        },
+        {
+          "id": "6-real-data-experiments-p002",
+          "text": "72 samples, each with expression levels measured across 7129 genes [10].",
+          "page_span": [
+            8,
+            8
+          ]
+        },
+        {
+          "id": "6-real-data-experiments-p003",
+          "text": "Five label vectors are available, including tissue origin, gender, source institution, tissue subtype, and cancer type. We carry out the experiment against each label type. For each dataset, we assess classification performance using 5-fold cross-validation, repeated across 5 random replicates to compute the mean and standard deviation of the classification error. The results are presented in Table 3. Overall, both LDA-GO and its low-rank variant exhibit strong performance, often matching or surpassing classical LDA, particularly on high-dimensional, low-sample-size datasets such as Golub. Notably, LDA-GO-d performs comparably to the full-rank version despite using only d = 20, suggesting that this extension is effective and that a smaller model may suffice in many scenarios. Data LDA-GO LDA-GO-d LDA R-LDA 5NN RF NN Iris 2.3 ± 0.6 2.3 ± 0.6 2.2 ± 0.2 3.6 ± 0.6 3.6 ± 0.7 5.1 ± 0.8 5.8 ± 1.2 Breast 3.9 ± 0.2 3.9 ± 0.2 4.2 ± 0.2 4.8 ± 0.1 3.2 ± 0.3 3.2 ± 0.3 4.9 ± 0.4 Wine 1.3 ± 0.5 1.3 ± 0.5 1.3 ± 0.5 3.5 ± 0.6 30.0 ± 1.7 2.1 ± 0.5 2.4 ± 0.8 Cora 38.5 ± 0.6 30.0 ± 0.5 40.1 ± 0.6 28.7 ± 0.3 55.1 ± 0.5 25.0 ± 0.3 26.8 ± 0.4 Colon 22.5 ± 2.5 22.5 ± 2.5 23.0 ± 3.5 21.8 ± 3.2 19.5 ± 1.8",
+          "page_span": [
+            9,
+            9
+          ]
+        },
+        {
+          "id": "6-real-data-experiments-p004",
+          "text": "22.7 ± 2.9",
+          "page_span": [
+            9,
+            9
+          ]
+        },
+        {
+          "id": "6-real-data-experiments-p005",
+          "text": "18.3 ± 2.5 Golub 1 13.0 ± 2.2 13.0 ± 2.2 14.3 ± 1.0 12.1 ± 1.5 13.7 ± 0.8 14.5 ± 0.7 12.7 ± 2.5 Golub 2 40.6 ± 4.6 40.6 ± 4.6 46.6 ± 3.9 40.6 ± 3.5 46.5 ± 2.2 47.5 ± 2.6 47.5 ± 3.0 Golub 3 11.5 ± 1.3 11.5 ± 1.3 16.0 ± 2.0 10.5 ± 1.6 16.8 ± 2.4 20.4 ± 1.9 14.3 ± 0.0 Golub 4 43.6 ± 2.1 43.6 ± 2.1 47.9 ± 2.9 47.0 ± 1.3 54.4 ± 2.9 49.8 ± 2.2 48.6 ± 2.7 Golub 5 6.0 ± 2.1 6.6 ± 2.3 10.5 ± 3.9 6.1 ± 1.2 11.3 ± 2.0 6.3 ± 2.2 7.9 ± 2.7 Table 3: Average classification error rates (in percentage) with standard deviations across all real data experiments. For each experiment, the bestperforming method is highlighted in red. In cases of ties, only the first occurrence is highlighted.",
+          "page_span": [
+            9,
+            9
+          ]
+        }
+      ]
+    },
+    {
+      "id": "7-conclusion",
+      "title": "7. Conclusion",
+      "paras": [
+        {
+          "id": "7-conclusion-p001",
+          "text": "In this paper, we proposed a new approach to estimate the inverse covariance matrix in linear discriminant analysis, based on a combination of multiple initializations, gradient-based optimization on covariance inverse, Cholesky factorization, and low-rank extension. Through extensive simulations and real-data experiments under settings where a linear decision boundary is expected, our method consistently achieved satisfactory results. This study demonstrates that traditional statistical frameworks and modern machine learning techniques can be seamlessly integrated to create more powerful and flexible classifiers. Looking forward, several promising future directions can be considered. One immediate extension is to apply this framework to a broader range of downstream tasks. In this paper, we primarily focused on classification error and crossentropy loss; however, the same methodology can naturally be adapted to alternative loss functions. For example, one could treat LDA as a pure dimension reduction technique followed by regression, or extend the framework to any task that 9 leverages the covariance matrix, provided that the objective function remains differentiable with respect",
+          "page_span": [
+            9,
+            9
+          ]
+        },
+        {
+          "id": "7-conclusion-p002",
+          "text": "to the covariance",
+          "page_span": [
+            9,
+            9
+          ]
+        },
+        {
+          "id": "7-conclusion-p003",
+          "text": "matrix or its inverse. Another possible direction is to incorporate a simple dimension reduction step prior to applying LDA-GO, in an effort to further reduce the number of model parameters and speed up the learning process. When the feature dimension p is very large, such a two-stage strategy could significantly reduce computational cost. This is important because, even with the low-rank extension, the current method still involves operations on covariance matrices of size p × p, which can be a bottleneck for very large p. Another interesting extension is to adapt the gradient-based optimization framework to quadratic discriminant analysis (QDA), where each class is modeled with its own covariance matrix rather than a shared one. However, this direction presents substantial computational challenges: not only does the derivative structure become more complex, but the number of parameters to optimize increases from O(pd) in LDA to O(Kpd) in QDA, where K is the number of classes. In this case as well, dimensionality reduction would likely be a beneficial preprocessing step to ease the computational burden.",
+          "page_span": [
+            10,
+            10
+          ]
+        }
+      ]
+    },
+    {
+      "id": "references",
+      "title": "References",
+      "paras": [
+        {
+          "id": "references-p001",
+          "text": "[1] Alon, U., Barkai, N., Notterman, D.A., Gish, K., Ybarra, S., Mack, D., Levine, A.J., 1999. Broad patterns of gene expression revealed by clustering analysis of tumor and normal colon tissues probed by oligonucleotide arrays. Proceedings of the National Academy of Sciences 96, 6745–6750. [2] Belhumeur, P.N., Hespanha, J.P., Kriegman, D.J., 1997. Eigenfaces vs. fisherfaces: Recognition using class specific linear projection. IEEE Transactions on Pattern Analysis and Machine Intelligence 19, 711–720. [3] Bickel, P.J., Levina, E., 2008. Covariance regularization by thresholding. The Annals of Statistics 36, 2577–2604. [4] Blankertz, B., Lemm, S., Treder, M., Haufe, S., Muller, K.R., 2011. Single-trial analysis and classification of erp components—a tutorial. NeuroImage 56, 814–825. [5] Clemmensen, L., Hastie, T., Witten, D., Ersbøll, B., 2011. Sparse discriminant analysis. Technometrics 53, 406–413. [6] Dorfer, M., Kelz, R., Widmer, G., 2015. Deep linear discriminant analysis, in: arXiv preprint:1511.04707. [7] Duda, R.O., Hart, P.E., Stork, D.G., 2001. Pattern classification. John Wiley & Sons. [8] Fisher, R.A., 1936. The use of multiple measurements in taxonomic problems. Annals",
+          "page_span": [
+            10,
+            10
+          ]
+        },
+        {
+          "id": "references-p002",
+          "text": "of Eugenics 7, 179–188.",
+          "page_span": [
+            10,
+            10
+          ]
+        },
+        {
+          "id": "references-p003",
+          "text": "[9] Friedman, J.H., 1989. Regularized discriminant analysis. Journal of the American Statistical Association 84, 165–175. [10] Golub, T.R., Slonim, D.K., Tamayo, P., Huard, C., Gaasenbeek, M., Mesirov, J.P., Coller, H., Loh, M.L., Downing, J.R., Caligiuri, M.A., Bloomfield, C.D., Lander, E.S., 1999. Molecular classification of cancer: class discovery and class prediction by gene expression monitoring. Science 286, 531–537. [11] Hastie, T., Tibshirani, R., Friedman, J., 2009. The Elements of Statistical Learning: Data Mining, Inference, and Prediction. Springer Science & Business Media. [12] Ledoit, O., Wolf, M., 2004. A well-conditioned estimator for large-dimensional covariance matrices. Journal of Multivariate Analysis 88, 365–411. [13] Levina, E., Vershynin, R., 2012. Partial estimation of covariance matrices. Probability Theory and Related Fields 153, 405–419. [14] Martinez, A.M., Kak, A.C., 2001. Pca versus lda. IEEE Transactions on Pattern Analysis and Machine Intelligence 23, 228–233. [15] McCallum, A.K., Nigam, K., Rennie, J., Seymore, K., 2000. Automating the construction of internet portals with machine learning. Information Retrieval 3, 127–163. [16] Mika, S., Ratsch,",
+          "page_span": [
+            10,
+            10
+          ]
+        },
+        {
+          "id": "references-p004",
+          "text": "G., Weston, J., Scholkopf, B., Mullers, K.R., 1999. Fisher discriminant analysis with kernels, in: Proceedings of the 1999 IEEE",
+          "page_span": [
+            10,
+            10
+          ]
+        },
+        {
+          "id": "references-p005",
+          "text": "Signal Processing Society Workshop. [17] Pourahmadi, M., 1999. Joint mean-covariance models with applications to longitudinal data: Unconstrained parameterization. Biometrika 86, 677–690. [18] Rothman, A.J., Levina, E., Zhu, J., 2010. Sparse multivariate regression with covariance estimation. Journal of Computational and Graphical Statistics 19, 947–962. [19] Street, W., Wolberg, W., Mangasarian, O., 1993. Nuclear feature extraction for breast tumor diagnosis. [20] Sugiyama, M., 2007. Dimensionality reduction of multimodal labeled data by local fisher discriminant analysis. Journal of Machine Learning Research 8, 1027–1061. [21] Witten, D.M., Tibshirani, R., 2011. Penalized classification using fisher’s linear discriminant. Journal of the Royal Statistical Society: Series B (Statistical Methodology) 73, 753–772. [22] Ye, J., Li, Q., 2005. Two-dimensional linear discriminant analysis. Advances in Neural Information Processing Systems 17, 1569–1576. [23] Yu, S., Yang, J., 2001. A face recognition algorithm based on two-dimensional pca, in: Proceedings Fourth IEEE International Conference on Multimedia and Expo, pp. 41–44. 10",
+          "page_span": [
+            10,
+            10
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,727 @@
+{
+  "id": "2501.14932v1",
+  "title": "Explaining Categorical Feature Interactions Using Graph Covariance and LLMs",
+  "metadata": {
+    "source_path": "data/pdf_files/2501.14932v1.pdf",
+    "page_count": 24,
+    "hash": "3a1e5d41d4117370ab5a141488ef02c8bbe1edbf8a0d1c17b6c13394fa7f60e2"
+  },
+  "sections": [
+    {
+      "id": "front-matter",
+      "title": "Front Matter",
+      "paras": [
+        {
+          "id": "front-matter-p001",
+          "text": "Explaining Categorical Feature Interactions Using Graph Covariance and LLMs Cencheng Shena,∗, Darren Edgeb, Jonathan Larsonc, Carey E. Priebed aUniversity of Delaware, 19716, Newark, United States bMicrosoft Research, CB1 2FB, Cambridge, United Kingdom cMicrosoft Research, 98052, Redmond, United States dJohns Hopkins University, 21218, Baltimore, United States arXiv:2501.14932v1 [stat.ML] 24 Jan 2025",
+          "page_span": [
+            1,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "id": "abstract",
+      "title": "Abstract",
+      "paras": [
+        {
+          "id": "abstract-p001",
+          "text": "Modern datasets often consist of numerous samples with abundant features and associated timestamps. Analyzing such datasets to uncover underlying events typically requires complex statistical methods and substantial domain expertise. A notable example, and the primary data focus of this paper, is the global synthetic dataset from the Counter Trafficking Data Collaborative (CTDC) — a global hub of human trafficking data containing over 200,000 anonymized records spanning from 2002 to 2022, with numerous categorical features for each record. In this paper, we propose a fast and scalable method for analyzing and extracting significant categorical feature interactions, and querying large language models (LLMs) to generate datadriven insights that explain these interactions. Our approach begins with a binarization step for categorical features using one-hot encoding, followed by the computation of graph covariance at each time. This graph covariance quantifies temporal changes in dependence structures within categorical data and is established as a consistent dependence measure under the Bernoulli distribution. We use this measure to identify significant feature pairs, such as those",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "abstract-p002",
+          "text": "with the most frequent trends over time or those exhibiting sudden spikes in de-",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "abstract-p003",
+          "text": "pendence at specific moments. These extracted feature pairs, along with their timestamps, are subsequently passed to an LLM tasked with generating potential explanations of the underlying events driving these dependence changes. The effectiveness of our method is demonstrated through extensive simulations, and its application to the CTDC dataset reveals meaningful feature pairs and potential data stories underlying the observed feature interactions. Keywords: Feature Dependence, Categorical Data, Temporal Data, Large Language Models",
+          "page_span": [
+            1,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "id": "1-introduction",
+      "title": "1. Introduction",
+      "paras": [
+        {
+          "id": "1-introduction-p001",
+          "text": "Modern datasets often contain numerous samples with abundant features (also called attributes or dimensions), each associated with a timestamp. For example, the publicly available Counter-Trafficking Data ∗Corresponding author (Jonathan Larson), cep@jhu.edu (Carey E. Priebe) Preprint submitted to Elsevier January 28, 2025 Collaborative (CTDC) dataset1 - a global hub of human trafficking data compiled from counter-trafficking organizations worldwide - contains over 200, 000 anonymized records spanning 2002 to 2022. Each record represents an individual trafficking case and includes 26 categorical features, such as gender, age group, citizenship, country of exploitation, and means of exploitation. Most records also include a timestamp indicating the year of registration. While the importance of analyzing human trafficking cases and the CTDC dataset has garnered significant attention [8, 28, 10, 1, 16], data exploration in this domain often depends on complex statistical methods, requires substantial manual inspection and visualization, typically addresses only a limited set of features or major events, and is often time-consuming. This type of dataset can be viewed as temporal",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "1-introduction-p002",
+          "text": "categorical data, which are common in practice and a",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "1-introduction-p003",
+          "text": "subject of academic interest [25, 13, 14]. Traditional time-series analysis assumes paired features (X1, Y1), (X2, Y2), . . ., (XT , YT ), where Xt and Yt are univariate time series indexed by t. However, CTDC and many real-world datasets deviate from this framework. Instead, they involve multivariate temporal data of the form (Xiu, τi), where i = 1, . . . , n indexes samples, u = 1, . . . , p represents the p-dimensional categorical features, and τi ∈{1, . . . , T} denotes the timestamp of the i-th observation. Unlike classical time-series data, multiple observations may share the same timestamp, introducing irregularity in the sampling structure. This broader setting is common in modern data collection, where each sample is tagged with a timestamp rather than observed at regular intervals. To identify feature interactions in temporal data, traditional time-series techniques, such as crosscovariance and cross-correlation, are typically used to examine linear relationships [9, 24, 3]. However, these methods are limited to evenly-spaced time-series data and are designed only to detect linear relationships. Detecting more general forms of dependence requires universal consistent",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "1-introduction-p004",
+          "text": "dependence measures. Two",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "1-introduction-p005",
+          "text": "landmark approaches in this domain are distance correlation [26] and the Hilbert-Schmidt independence criterion [11], followed by many others [12, 20, 4] and time-series adaptations [31, 29, 23]. One key challenge lies in adapting dependence measures to accommodate irregular temporal samples, rather than being restricted to evenly-sampled time-series data. Another important hurdle is the computational burden, as universal consistent dependence measures typically involve O(n2) time complexity. Recent advancements in simplifying dependence measures for standard categorical data [7, 17, 30] suggest the potential for more efficient methods specifically for temporal categorical data. In this paper, we propose a fast and scalable statistical analysis tool for temporal categorical data, combining a graph covariance approach to efficiently detect feature dependence with the power of large language models (LLMs) to generate immediate data insights. Our method transforms categorical features into binary variables via one-hot encoding and computes a graph covariance matrix for feature pairs at each 1https://www.ctdatacollaborative.org/page/global-synthetic-dataset. All materials of CTDC are",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "1-introduction-p006",
+          "text": "copyright of the",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "1-introduction-p007",
+          "text": "International Organization for Migration. 2 timestamp. We derive a significance level to extract feature pairs with notable interactions over time or sudden spikes at specific timestamps. Extracted features, along with their timestamps, are then passed to an LLM to uncover potential events or contexts driving these interactions. Theoretically, we prove that graph covariance is a consistent dependence measure between Bernoulli random variables. It converges asymptotically to zero if and only if two binary features are independent, enabling non-negative values to quantify the strength of their relationship. Computationally, the method is highly efficient, processing the CTDC global synthetic dataset in under 2 seconds, compared to hours required by other dependence measures. This efficiency facilitates dynamic analysis of large datasets. The integration of LLMs [27, 6, 19, 18] further enhances the workflow, providing context-rich insights into temporal feature interactions. While LLM explanations may not always be fully accurate and require validation from domain experts, they offer a valuable starting point for practitioners to interpret data narratives with minimal effort. We",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "1-introduction-p008",
+          "text": "validate our method through simulation studies, demonstrating its capability to detect temporal",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "1-introduction-p009",
+          "text": "dependence changes under various scenarios. Its application to the CTDC global synthetic dataset showcases the method’s efficiency in analyzing large datasets, identifying feature pairs with significant interactions either across all time points or at specific timestamps, and uncovering the underlying events driving these dependence changes. All experiments were conducted on a local desktop running MATLAB 2024a and Python, on Windows 10, with an Intel 16-core CPU and 64GB of memory. A preliminary experimental tool utilizing OpenAI’s API is available on GitHub2. The appendix includes theorem proofs, additional simulation figures, and further details on the LLM queries conducted for the CTDC data.",
+          "page_span": [
+            3,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2-main-method",
+      "title": "2. Main Method",
+      "paras": [
+        {
+          "id": "2-main-method-p001",
+          "text": "Given a dataset represented as (Xiu, τi), where i = 1, . . . , n indexes the samples, u = 1, . . . , p indexes the features, and τi ∈{1, . . . , T} denotes the timestamp of the i-th sample. Suppose the u-th feature has values in the range [0, Ku], where Ku is a positive integer, and the feature is binary if and only if Ku = 1. Let m represent the desired number of feature pairs to be extracted and analyzed. The method proceeds as follows: • Step 1 (Transform Categorical to Binary): For each categorical feature u that is not binary, we transform the feature into binary format using one-hot encoding. Specifically, compute Zu ∈ [0, 1]n×(Ku+1) as: Zu(i, k + 1) = 1 if and only if Xiu = k 2https://github.com/microsoft/intelligence-toolkit 3 for each i. This transformation ensures that each row of Zu contains all zeros except for a single element. After this step, the u-th column is removed from X, and Zu is appended. This process is repeated for all categorical features, resulting in a transformed X with p1 binary features, where p1 ≥p. Additionally, a label vector Y ∈Rp1 is created to track the transformation, where Yi = u indicates that the i-th binary feature originated from the u-th",
+          "page_span": [
+            3,
+            3
+          ]
+        },
+        {
+          "id": "2-main-method-p002",
+          "text": "categorical feature.",
+          "page_span": [
+            3,
+            3
+          ]
+        },
+        {
+          "id": "2-main-method-p003",
+          "text": "• Step 2 (Compute Temporal Graphs Per Timestamp): For each timestamp t = 1, . . . , T, calculate the total number of samples at t as: nt = i=1,...,n 1(τi = t). Next, compute the graph At for each timestamp t, defined as: Pτi=t i=1,...,n 1(Xiu = Xiv = 1) nt ∈[0, 1], At(u, v) = where u, v = 1, . . . , p1. In this graph, At(u, v) represents the normalized co-occurrence frequency of binary features u and v at timestamp t. • Step 3 (Compute Graph Covariance): For each timestamp t, calculate the p1 × p1 covariance matrix as: Σt(u, v) = At(u, v) −At(u, u)At(v, v) ∈[−1, 1] for all (u, v) such that Yu ̸= Yv. Each Σt(u, v) quantifies the dependence between features u and v at timestamp t. • Step 4 (Determine 95% Significance Level): For each timestamp t, compute a significance level εt using: 0.025 = 2Prob(Normal(0, 0.25) ≤εt √nt). This can be efficiently computed using the inverse cumulative distribution function. • Step 5.1 (Detect Common Interactions): For each pair (u, v), calculate: t=1 |Σt(u, v)|1(|Σt(u, v)| > εt)/T δ1(u, v) = and identify the timestamps where the interaction is significant, along with the trend information (positive or negative), into the set: ts(u, v) = {t · 1(Σt(u,",
+          "page_span": [
+            4,
+            4
+          ]
+        },
+        {
+          "id": "2-main-method-p004",
+          "text": "v) > εt) −t · 1(Σt(u, v) < −εt)}.",
+          "page_span": [
+            4,
+            4
+          ]
+        },
+        {
+          "id": "2-main-method-p005",
+          "text": "Select the top m pairs with the largest δ1(u, v) and store them in the set ∆1 = {(u, v, ts(u, v))}. 4 • Step 5.2 (Detect Spiked Interactions): For each pair (u, v), calculate: t=1 |Σt(u, v)|1(|Σt(u, v)| > εt)/|ts(u, v)|. δ2(u, v) = Select the top m pairs with the largest δ2(u, v) and store them in the set ∆2 = {(u, v, ts(u, v))}. • Step 6 (LLM Query on Set Information): For each element in ∆1 and ∆2, query an LLM with the following details: basic dataset information, the feature pair (u, v) along with their respective textual descriptions, the time range ts(u, v) during which the pair (u, v) is significant, and the positive or negative trend information. Then, prompt the LLM to identify potential underlying events or contexts that could explain the significant relationship between u and v within the specified time range. Detailed Discussions Step 1 employs the one-hot encoding scheme, transforming all categorical features into binary features. After this step, X contains only binary features, with n samples and p1 binary columns. This transformation preserves the categorical information by expanding each category into its own column, a technique fundamental in neural networks and",
+          "page_span": [
+            4,
+            4
+          ]
+        },
+        {
+          "id": "2-main-method-p006",
+          "text": "machine learning [2, 15]. More recently, it has also been applied in hypothesis",
+          "page_span": [
+            4,
+            4
+          ]
+        },
+        {
+          "id": "2-main-method-p007",
+          "text": "testing [17] and graph embedding [22]. In Step 2, At measures how often two features are both equal to 1, forming a graph of size p1 × p1. Numerically, this computation is highly efficient due to the binary nature of the features. Specifically, for timestamp t, extracting X(t) = {Xiu|τi = t} ∈Rnt×p1 allows the matrix At to be computed using matrix multiplication as: At = X T (t)X(t) ∈[0, 1]p1×p1. Step 3 centers the weighted graph computed in Step 2, resulting in the graph covariance matrix Σt ∈ [−1, 1]p1×p1. While Σt can still be interpreted as a weighted graph, it also serves as a quantitative measure of dependence between binary features. Importantly, when both features u and v originate from the same categorical variable, Σt(u, v) is set to 0 by default. This adjustment is necessary because one-hot encoding makes features from the same categorical variable mutually exclusive. As a result, computing the graph covariance for such pairs would always yield At(u, v) = 0 and Σt(u, v) as negative. Including these pairs would cause the algorithm to detect spurious negative trends arising solely from the binarization process. In Step 4, we use a 95% significance level based on the",
+          "page_span": [
+            5,
+            5
+          ]
+        },
+        {
+          "id": "2-main-method-p008",
+          "text": "asymptotic null distribution derived in Theorem 1,",
+          "page_span": [
+            5,
+            5
+          ]
+        },
+        {
+          "id": "2-main-method-p009",
+          "text": "which assumes the largest possible variance. This level can be adjusted for different levels of sensitivity. For instance, a 99% significance level would increase εt, while a 90% significance level would reduce it, allowing for more or less extreme level on the detected interactions. Step 5 introduces two thresholding schemes to identify significant feature pairs: one for detecting the most common interactions (δ1) and another for capturing spikes in dependence (δ2). The distinction lies 5 in the denominator: δ1(u, v) averages over all timestamps, while δ2(u, v) averages only over the timestamps where the interaction is significant. These two sets are not mutually exclusive; feature pairs exhibiting strong relationships over multiple years can appear in both sets. Additionally, the directional trend information, indicating whether the interaction is positive or negative, is stored in the sets to facilitate the LLM query in Step 6. Alternative schemes for graph covariance can be designed to meet specific analytical needs, such as detecting exclusively positive or negative trends, identifying transition points where trends change, or highlighting pairs with consistently minimal",
+          "page_span": [
+            5,
+            5
+          ]
+        },
+        {
+          "id": "2-main-method-p010",
+          "text": "relationships. For the purpose of this paper and the CTDC dataset, the",
+          "page_span": [
+            5,
+            5
+          ]
+        },
+        {
+          "id": "2-main-method-p011",
+          "text": "focus is on the most common interactions and sudden spikes in feature dependence. However, the method’s flexibility allows for modifications tailored to specific datasets or user objectives, enabling enriched analysis and deeper insights through LLM-powered interpretation. Computational Complexity and Method Applicability Excluding the LLM query step, the entire algorithm has a computational complexity of O(np1), which scales linearly with the total number of samples. In contrast, substituting the graph covariance with a universal consistent dependence measure, while potentially producing comparable results, would be computationally prohibitive. Such measures typically require O(n2) complexity for each feature pair, rendering them impractical for large datasets. Even the fastest algorithm, such as the univariate distance correlation [5, 21], requires O(n log n) complexity and falls short in speed compared to the proposed method. Detailed comparisons of actual running times are provided in the simulation and real data sections. Step 6, which involves querying LLMs, is independent of the dataset size. Generating insights for each extracted feature pair typically requires only a few",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "2-main-method-p012",
+          "text": "seconds when using popular LLM engines.",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "2-main-method-p013",
+          "text": "Although this method is designed for temporal categorical data, it can easily be applied to datasets without timestamps by treating all records as occurring at the same time. For datasets with continuous timestamps, users can define time ranges, such as yearly, monthly, or weekly intervals. Additionally, continuous features can be accommodated by discretizing their range into categories, effectively transforming them into categorical features. While these extensions are beyond the scope of this paper, which focuses on temporal categorical data like the CTDC dataset, the method is inherently versatile and applicable to a broader range of data formats.",
+          "page_span": [
+            6,
+            6
+          ]
+        }
+      ]
+    },
+    {
+      "id": "3-mathematical-theory",
+      "title": "3. Mathematical Theory",
+      "paras": [
+        {
+          "id": "3-mathematical-theory-p001",
+          "text": "In this section, we quantify the proposed graph covariance using Bernoulli random variables and prove that the graph covariance is a consistent statistic for measuring dependence between binary features. Without loss of generality, we focus on the graph element At(u, v) and the graph covariance Σt(u, v) between two binary variables. Suppose (Xiu, Xiv) i.i.d. ∼FXt uXt v for each i where τi = t, with each marginal 6 distribution assumed to be Bernoulli. Specifically, we have: Xut ∼Bernoulli(Prob(Xut = 1)), Xvt ∼Bernoulli(Prob(Xvt = 1)). It follows that: 1(Xut = Xvt = 1) ∼Bernoulli(Prob(Xut = Xvt = 1)). The probability can take any value between 0 and 1, depending on the dependence structure between Xut and Xvt. In the special case where Xut and Xvt are independent at time t, we have: Prob(Xut = Xvt = 1) = Prob(Xut = 1)Prob(Xvt = 1). Under this setting, the main theorem (the proof can be found in the appendix) is stated as follows: Theorem 1. At any given timestamp t: • The graph covariance satisfies the law of large numbers such that: Σt(u, v) nt→∞ → μt where μt = Prob(Xut = Xvt = 1) −Prob(Xut = 1)Prob(Xvt = 1)). • The graph covariance satisfies the central limit theorem such that:",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "3-mathematical-theory-p002",
+          "text": "√nt(Σt(u, v) −μt)",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "3-mathematical-theory-p003",
+          "text": "dist →Normal(0, σ2 t ) where the variance σ2 t satisfies: σ2 t ≤1 4 + 1 16√nt . • The graph covariance converges to 0, i.e., μt = 0, if and only if Xut and Xvt are independent. Therefore, when the graph covariance deviates significantly from zero, it indicates the presence of dependence, while values close to zero suggest independence between features. The graph covariance quantifies the difference between the joint probability and the product of the marginal probabilities, allowing its magnitude to detect and measure changes in the strength of dependence over time. 7 Since the mean is 0 under independence and the variance does not exceed 0.25 for large nt, this justifies the significance level εt defined in the main method. Alternatively, an approximate p-value can be derived based on Normal(0, 0.25) as: p-val = 2Prob(√ntΣt(u, v) > Normal(0, 0.25)). Any graph covariance with a p-value exceeding the type 1 error level, e.g., 0.05, can be considered insignificant, indicating that the two features are likely independent. It is worth noting that the variance bound is conservative, as the maximum variance occurs when the Bernoulli probability equals 0.5. In practice, the actual",
+          "page_span": [
+            7,
+            7
+          ]
+        },
+        {
+          "id": "3-mathematical-theory-p004",
+          "text": "variance is typically smaller, making the level εt",
+          "page_span": [
+            7,
+            7
+          ]
+        },
+        {
+          "id": "3-mathematical-theory-p005",
+          "text": "generally conservative as well.",
+          "page_span": [
+            8,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "id": "4-simulation-study",
+      "title": "4. Simulation Study",
+      "paras": [
+        {
+          "id": "4-simulation-study-p001",
+          "text": "In this section, we present a series of simulations to demonstrate the ability of the proposed graph covariance method to detect dependence between features and capture dynamic interactions for both stable and shifting relationships over time. We considered t = 1, 2, . . . , 8 time steps, with nt = 5000 samples generated for each t. Eight binary features were simulated, each exhibiting varying degrees of dependence on a reference feature, X1t. The generation process for these features is defined as follows: • X1t ∼Bernoulli(0.2) for all t, serving as the baseline feature for comparison. • X2t ∼Bernoulli(0.1) for all t, remaining independent of X1t across all time points. • X3t ∼Bernoulli(0.9) ∗X1t for all t, exhibiting strong dependence on X1t throughout time. • X4t ∼Bernoulli(0.1 + 0.1t) ∗X1t for all t, with increasing dependence on X1t as time progresses. • X5t ∼Bernoulli(0.9 −0.1t) ∗X1t for all t, showing decreasing dependence on X1t over time. • X6t ∼Bernoulli(0.1 + 0.2(t −4)) ∗X1t for all t, demonstrating shifting dependence, decreasing from t = 1 to 4 and increasing from t = 4 to 8. • X7t ∼Bernoulli(0.1) for t < 8, and X7t ∼Bernoulli(0.9) · X1t for t = 8, remaining",
+          "page_span": [
+            8,
+            8
+          ]
+        },
+        {
+          "id": "4-simulation-study-p002",
+          "text": "independent of X1t",
+          "page_span": [
+            8,
+            8
+          ]
+        },
+        {
+          "id": "4-simulation-study-p003",
+          "text": "until a dependence spike at t = 8. These configurations simulate various scenarios where pairwise feature dynamics change over time, providing a comprehensive test of the graph covariance method’s capability to capture different types of feature interactions. 8 Figure 1 illustrates the behavior of the graph covariance statistic Σt(1, u) for each pair of features relative to the baseline X1t, alongside the 95% significance level. The results confirm the effectiveness of the proposed method in capturing intended dependence patterns: • Independence: Σt(1, 2) remains near zero across all time points, validating the independence between X1t and X2t. The values consistently fall within the significance level, ensuring this pair is not extracted as either a common or spiked feature pair. • Stable Dependence: Σt(1, 3) is positive and stable over time, reflecting the strong dependence between X1t and X3t. The values remain consistently above the significance level. • Increasing Dependence: Σt(1, 4) steadily increases with time, accurately capturing the growing dependence between X1t and X4t. • Decreasing Dependence: Σt(1, 5) gradually decreases over time, reflecting the weakening dependence",
+          "page_span": [
+            8,
+            8
+          ]
+        },
+        {
+          "id": "4-simulation-study-p004",
+          "text": "between X1t and X5t. • Shifting Dependence: Σt(1, 6) first decreases from t = 1 to 4, then increases from t = 4 to 8, matching the intended shifting dependence between X1t and X6t. • Dependence Spike: Σt(1, 7) stays near zero and insignificant until t = 8, where it shows a sharp spike above the significance level, capturing the sudden increase in dependence between X1t and X7t. These results demonstrate the graph covariance’s effectiveness in detecting various dependence patterns over time. If we apply Step 5.1 and Step 5.2, the feature pair with the most common interaction is (1, 3), while the pair with the strongest spike interaction is (1, 7). In addition to accurately detecting temporal dependence shifts, the graph covariance method is highly computationally efficient. For this simulation, computing all graph covariances takes just 0.01 seconds. By comparison, other dependence measures, such as distance correlation and the Hilbert-Schmidt independence criterion, produce similar results (see Figure E1 in the appendix) but require more time. The O(n log n) distance correlation takes 6 seconds to compute all pairwise correlations across the 8 time steps, while the O(n2)",
+          "page_span": [
+            9,
+            9
+          ]
+        },
+        {
+          "id": "4-simulation-study-p005",
+          "text": "Hilbert-Schmidt independence criterion requires over two minutes.",
+          "page_span": [
+            9,
+            9
+          ]
+        },
+        {
+          "id": "4-simulation-study-p006",
+          "text": "Overall, the simulation results highlight the effectiveness and computational efficiency of the graph covariance method in detecting and quantifying changes in dependence between binary features over time. The proposed method successfully captures a variety of dependence structures - including increasing, decreasing, shifting, and spike relationships - with minimal computational burden. 9 Graph Covariance 0.2 0.2 (1,2) Independent (1,3) Dependent (1,4) Increasing 95% Level (1,5) Decreasing (1,6) Shifting (1,7) Spike 95% Level 0.15 0.15 0.1 0.1 0.05 0.05 0 0 -0.05 -0.05 2 4 6 8 Timestep 2 4 6 8 Timestep Figure 1: This figure shows the graph covariance between the baseline feature and the other simulated binary features across all timestamps.",
+          "page_span": [
+            9,
+            9
+          ]
+        }
+      ]
+    },
+    {
+      "id": "5-exploring-the-ctdc-dataset",
+      "title": "5. Exploring the CTDC Dataset",
+      "paras": [
+        {
+          "id": "5-exploring-the-ctdc-dataset-p001",
+          "text": "We applied the proposed method to the Counter-Trafficking Data Collaborative (CTDC) global synthetic dataset. After excluding approximately 30, 000 records that lacked a recorded year, the dataset comprised n = 206, 582 records, each containing p = 26 categorical features along with the year of registration, and missing features (NaN) for samples were simply set to 0. All categorical features were transformed into binary format using one-hot encoding, resulting in p1 = 158 binary features. The graph covariance matrix, Σt ∈[−1, 1]158×158, was computed for each year from 2002 to 2022, spanning T = 21 time steps. Using m = 10 feature pairs for both ∆1 (most common interactions) and ∆2 (spiked interactions), we identified the top significant pairs. These feature pairs were then passed to an LLM to generate detailed data insights, including information about the feature pairs, their textual descriptions, and their time-specific significance trends (positive or negative). The entire computation, excluding the LLM query, was completed in under 2 seconds.",
+          "page_span": [
+            10,
+            10
+          ]
+        }
+      ]
+    },
+    {
+      "id": "5-1-computing-graph-covariance",
+      "title": "5.1. Computing Graph Covariance",
+      "paras": [
+        {
+          "id": "5-1-computing-graph-covariance-p001",
+          "text": "Figure 2 presents the graph covariance matrices Σt for the years 2003, 2009, 2015, and 2021, illustrating the dependence structures that enable the extraction of significant feature pairs. While certain patterns remain stable, noticeable variations in the dependence structures are observed across different years, particularly between earlier and later time frames. These visualizations emphasize the evolving relationships 10 among features over time. Note that entries between binary pairs within the same categorical variable are set to 0, resulting in a substantial number of zero entries in the matrices. While the proposed method completes its computations in under two seconds, alternative dependence measures are considerably slower. For instance, fast distance correlation requires hours for this dataset due to the need to compute pairwise correlations for thousands of binary pairs, with each pair taking over 5 seconds. Other dependence measures would take days to complete. Even with parallel computation, these methods remain significantly slower than the proposed graph covariance approach. Year 2003 Year 2009 0.01 0.01 150 150 0.005 0.005 100 100 0 0 50 50 -0.005 -0.005 0 50 100",
+          "page_span": [
+            10,
+            10
+          ]
+        },
+        {
+          "id": "5-1-computing-graph-covariance-p002",
+          "text": "150",
+          "page_span": [
+            10,
+            10
+          ]
+        },
+        {
+          "id": "5-1-computing-graph-covariance-p003",
+          "text": "0 0 50 100 150 0 -0.01 -0.01 Year 2015 Year 2021 0.01 0.01 150 150 0.005 0.005 100 100 0 0 50 50 -0.005 -0.005 0 50 100 150 0 0 50 100 150 0 -0.01 -0.01 Figure 2: This figure visualizes the graph covariance matrix for the years 2003, 2009, 2015, and 2021 from the CTDC data.",
+          "page_span": [
+            11,
+            11
+          ]
+        }
+      ]
+    },
+    {
+      "id": "5-2-extracting-significant-feature-pairs",
+      "title": "5.2. Extracting Significant Feature Pairs",
+      "paras": [
+        {
+          "id": "5-2-extracting-significant-feature-pairs-p001",
+          "text": "Table 1 presents the top 10 feature pairs in ∆1, representing the most significant and persistent trends, while Table 2 showcases the top 10 pairs in ∆2, capturing spiked interactions. Although there is some overlap between the sets, ∆1 predominantly includes pairs significant over multiple years, whereas ∆2 includes several noteworthy spiked dependencies. Most relationships exhibit positive trends, with a few negative trends indicated by a negative sign preceding the years. 11 Most feature pairs in ∆1 align with widely recognized patterns in human trafficking. For example, the top pair (isSexualExploit, Woman) is significant across all years, reflecting the prevalence of sexual exploitation among women. Similarly, (meansDenyBasicNeeds, isForcedLabour) highlights the frequent association of forced labor with the denial of basic needs. In contrast, (isSexualExploit, Man) is significantly negative, fitting the gendered nature of sexual exploitation, while (isForcedLabour, Man) shows a positive and significant relationship. Figure 3 visualizes graph covariances for selected feature pairs from ∆1 and ∆2, as well as additional pairs, compared against the 95% significance level (varying",
+          "page_span": [
+            11,
+            11
+          ]
+        },
+        {
+          "id": "5-2-extracting-significant-feature-pairs-p002",
+          "text": "due to sample size differences by year). The",
+          "page_span": [
+            11,
+            11
+          ]
+        },
+        {
+          "id": "5-2-extracting-significant-feature-pairs-p003",
+          "text": "top-left panel shows the positive trend for (isForcedLabour, Man), consistently above the threshold in most years. The top-center panel highlights (isSexualExploit, Woman), with strong significance except for a small dip around 2008–2014. The top-right panel confirms the strong relationship between (isForcedLabour, recruiterRelationOther), unaffected by gender. The bottom-left panel highlights notable country pairs, including (MDA, MDA) from ∆1, consistently significant until 2017, and (GHA, GHA) and (MMR, IDN) from ∆2, which exhibit sudden spikes in 2005 and 2015, respectively. The bottom-center and bottom-right panels examine additional pairs, such as (Woman, UKR), which is slightly significant around 2008, and (Woman, USA), slightly significant in",
+          "page_span": [
+            12,
+            12
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2015-minimal-relationships-are-observed-between-features-such-as-means-of-false-promise-and-citizenship",
+      "title": "2015. Minimal relationships are observed between features such as means of false promise and citizenship,",
+      "paras": [
+        {
+          "id": "2015-minimal-relationships-are-observed-between-features-such-as-means-of-false-promise-and-citizenship-p001",
+          "text": "providing an example of independent feature pairs.",
+          "page_span": [
+            12,
+            12
+          ]
+        }
+      ]
+    },
+    {
+      "id": "5-3-explain-interactions-using-llm-insights",
+      "title": "5.3. Explain Interactions using LLM Insights",
+      "paras": [
+        {
+          "id": "5-3-explain-interactions-using-llm-insights-p001",
+          "text": "While the graph covariance and feature extraction yield intriguing feature pairs and corresponding timestamps, and the visualizations in Figure 3 are valuable for further analysis, understanding and explaining the observed interactions across years often requires significant effort to investigate underlying events, whether global or local. Some pairs, especially those in ∆1, are relatively straightforward to interpret. However, pairs in ∆2, due to their spiked nature, are more challenging to explain without historical context. These spikes could stem from data collection anomalies, such as a surge in records during a particular year, or from local or geopolitical events. Leveraging LLMs, our tool generates immediate data insights for any feature pair, whether from ∆1, ∆2, or user-specified queries. For example, we queried the following into an LLM: ”In the Counter-Trafficking Data Collaborative dataset, after year 2015, there are more reported cases based on SexualExploit and USA Country of Exploitation. Please analyze the potential causes, global and local events, and geopolitical factors that may explain this trend.” This query is straightforward and can be customized by",
+          "page_span": [
+            12,
+            12
+          ]
+        },
+        {
+          "id": "5-3-explain-interactions-using-llm-insights-p002",
+          "text": "replacing the bolded text with any other feature pair.",
+          "page_span": [
+            12,
+            12
+          ]
+        },
+        {
+          "id": "5-3-explain-interactions-using-llm-insights-p003",
+          "text": "The LLM typically produces a detailed analysis spanning 1–2 pages, often concluding with a summary. Here, we report only the final conclusions generated with a GPT-4 LLM instance: 12 Pairs Years (isSexualExploit, Woman) 2002-2022 (MDA,MDA) 2004-2017 (isForcedLabour, recruiterRelationOther) 2006-2022 (isSexualExploit, USA) 2015-2022 (UKR, UKR) 2007-2022 (isSexualExploit, typeOfSexProstitution) 2015-2022 (meansDenyBasicNeeds,isForcedLabour) 2008-2022 (meansDebtBondageEarnings,isForcedLabour) 2009-2022 (isSexualExploit, Man) -2005-2022 (isForcedLabour, Man) 2005-2022 Table 1: This table presents the top 10 feature pairs in the set ∆1 along with their timestamps of significance (for clarity, single insignificant years within a range are omitted). For country-related pairs, ”MDA” represents Moldova, and ”UKR” represents Ukraine. In these pairs, the first country corresponds to the categorical attribute Citizenship, while the second country corresponds to the categorical attribute Country of Exploitation. ”The rise in reported cases of Sexual Exploitation and USA as the Country of Exploitation after 2015 can be attributed to a combination of factors: Increased awareness and reporting of",
+          "page_span": [
+            12,
+            12
+          ]
+        },
+        {
+          "id": "5-3-explain-interactions-using-llm-insights-p004",
+          "text": "trafficking cases post-",
+          "page_span": [
+            12,
+            12
+          ]
+        },
+        {
+          "id": "5-3-explain-interactions-using-llm-insights-p005",
+          "text": "2015; Strengthened laws and victim protections in the U.S.; the role of the U.S. as a major destination for trafficking, particularly for sexual exploitation; increased global migration and refugee crises after 2015, which put vulnerable populations at greater risk; Advances in international cooperation and data-sharing efforts. ” As another example, we queried the negative interaction between (PHL, USA) in 2016 using the following prompt: ”In the Counter-Trafficking Data Collaborative dataset, at year 2016, there are less reported cases based on Philippines Citizen and USA Country of Exploitation. Please analyze the potential causes, global and local events, and geopolitical factors that may explain this trend.” A brief summary of key events provided by ChatGPT-4 includes: ”The reduction in reported trafficking cases involving Philippine citizens and the U.S. as a country of exploitation in 2016 can likely be attributed to a combination of factors: Stronger migration controls, tighter visa regulations, and increased law enforcement efforts in both the Philippines and the U.S. likely curtailed trafficking flows to the U.S. Diversified migration destinations and regional",
+          "page_span": [
+            13,
+            13
+          ]
+        },
+        {
+          "id": "5-3-explain-interactions-using-llm-insights-p006",
+          "text": "geopolitical shifts, such as the",
+          "page_span": [
+            13,
+            13
+          ]
+        },
+        {
+          "id": "5-3-explain-interactions-using-llm-insights-p007",
+          "text": "increased demand for labor in the Middle East and Southeast Asia, may have reduced the flow of Filipino workers to the U.S. Increased awareness, improved victim identification, and better anti-trafficking measures in both the Philippines and the U.S. helped to address trafficking cases before they reached the U.S. Changes 13 Pairs Year (PHL,USA) -2016 (isOtherExploit, PHL) 2016 (isSexualExploit, USA) 2015-2022 (isSexualExploit, PHL) -2016 (isSexualExploit, typeOfSexProstitution) 2015-2022 (isSexualExploit, Woman) 2002-2022 (GHA,GHA) 2005 (MDA,MDA) 2004-2017 (MMR,IDN) 2015 (isForcedLabour, GHA) 2005 Table 2: This table lists the top 10 feature pairs in the set ∆1. For country-related pairs, ”PHL” represents the Philippines, ”GHA” represents Ghana, while ”MMR” and ”IDN” represent Myanmar and Indonesia, respectively. in data reporting or a possible underreporting of cases may have also played a role in this trend.” Additional output summary on a few interesting feature pairs are included in the appendix.",
+          "page_span": [
+            13,
+            13
+          ]
+        }
+      ]
+    },
+    {
+      "id": "6-conclusion",
+      "title": "6. Conclusion",
+      "paras": [
+        {
+          "id": "6-conclusion-p001",
+          "text": "In this paper, we proposed a fast and scalable method for statistical analysis and data insight generation using large language models (LLMs) for large-scale categorical datasets with timestamps, focusing on the CTDC global synthetic dataset as a case study. The method’s primary strengths lie in its scalability, computational efficiency, and ability to construct correlation matrices, detect trends, and identify outliers in temporal data. By integrating graph covariance with LLM queries, the approach enables actionable insights by uncovering potential events and trends from dependence shifts, facilitating real-time analysis and interpretation of complex datasets. Theoretical analysis established that graph covariance is a consistent measure of dependence between binary random variables, effectively quantifying the strength of dependence through probability differences. Simulation studies validated its accuracy in capturing dynamic dependence patterns, and the application to the CTDC dataset demonstrated its capability to deliver rapid, interpretable analysis. By combining graph covariance results with LLM-generated insights, the method sheds light on socio-political and economic",
+          "page_span": [
+            14,
+            14
+          ]
+        },
+        {
+          "id": "6-conclusion-p002",
+          "text": "factors driving observed trends, supporting enhanced decision-making and providing a richer understanding",
+          "page_span": [
+            14,
+            14
+          ]
+        },
+        {
+          "id": "6-conclusion-p003",
+          "text": "of complex interactions. 14 0.2 ForcedLabour vs Sex 0.2 SexualExploit vs Sex 0.2 RelationOther vs Labour 0.1 0.1 0.1 0 0 0 (RelationOther,Woman) (RelationOther,Man) (RelationOther,ForcedLabour) 95% Level -0.1 -0.1 -0.1 (ForcedLabour,Woman) (ForcedLabour,Man) 95% Level (SexualExploit,Woman) (SexualExploit,Man) 95% Level -0.2 -0.2 -0.2 2002 2012 2022 Year 2002 2012 2022 Year 2002 2012 2022 Year 0.2 Citizenship vs Country of Exploitation 0.2 Gender vs Citizenship 0.2 Means vs Citizenship 0.1 0.1 0.1 0 0 0 (GHA,GHA) (MDA,MDA) (MMR,IDN) 95% Level (Women,UKR) (Women,USA) (Women,CHN) 95% Level (False Promise,UKR) (False Promise,USA) (False Promise,CHN) 95% Level -0.1 -0.1 -0.1 -0.2 -0.2 -0.2 2002 2012 2022 Year 2002 2012 2022 Year 2002 2012 2022 Year Figure 3: This figure visualizes the graph covariance and its changes over time for several noteworthy pairs of features. Looking ahead, several avenues for future work present exciting opportunities. Theoretical extensions could explore the relationship between graph covariance and other dependence measures, as well as its adaptation to continuous features by discretizing ranges into quantiles. Methodological advancements might include",
+          "page_span": [
+            14,
+            14
+          ]
+        },
+        {
+          "id": "6-conclusion-p004",
+          "text": "generalizing the approach to handle triplet interactions, offering richer insights and improving the",
+          "page_span": [
+            14,
+            14
+          ]
+        },
+        {
+          "id": "6-conclusion-p005",
+          "text": "accuracy of LLM interpretations. For example, in the CTDC case study, significant triplets such as (PHL, USA, isSexualExploit) in 2016 and (isForcedLabour, GHA, GHA) in 2005 can be manually identified. Incorporating additional features or contextual information into LLM queries can further improve the precision and relevance of LLM outputs. Such extensions present promising opportunities to enhance the method’s versatility and effectiveness in uncovering data insights from complex datasets. Acknowledgment This work was supported in part the National Science Foundation DMS-2113099, and by funding from Microsoft Research. 15",
+          "page_span": [
+            15,
+            15
+          ]
+        }
+      ]
+    },
+    {
+      "id": "references",
+      "title": "References",
+      "paras": [
+        {
+          "id": "references-p001",
+          "text": "[1] A. B. Al-Tammemi, A. Nadeem, L. Kutkut, M. Ali, K. Angawi, M. H. Abdallah, R. Abutaima, R. Shoumar, R. Albakri, and M. Sallam. Are we seeing the unseen of human trafficking? a retrospective analysis of the ctdc k-anonymized global victim of trafficking data pool in the period 2010–2020. PLOS [2] C. M. Bishop. Neural Networks for Pattern Recognition. Oxford University Press, 1995. 5 [3] G. E. P. Box, G. M. Jenkins, G. C. Reinsel, and G. M. Ljung. Time Series Analysis: Forecasting and Control. John Wiley & Sons, 2015. 2 [4] S. Chatterjee. A new coefficient of correlation. Journal of the American Statistical Association, 116 [5] A. Chaudhuri and W. Hu. A fast algorithm for computing distance correlation. Computational Statistics and Data Analysis, 135:15–24, 2019. 6 [6] J. Devlin, M.-W. Chang, K. Lee, and K. Toutanova. Bert: Pre-training of deep bidirectional transformers for language understanding. In North American Chapter of the Association for Computational Linguistics, 2019. 3 [7] D. Edelmann and J. Goeman. A regression perspective on generalized distance covariance and the hilbert–schmidt independence criterion. Statistical Science, 37(4):562–579, 2022. 2 [8] D. Edge, W.",
+          "page_span": [
+            16,
+            16
+          ]
+        },
+        {
+          "id": "references-p002",
+          "text": "Yang, K. Lytvynets, H. Cook, C. Galez-Davis, H. Darnton, and C. M. White.",
+          "page_span": [
+            16,
+            16
+          ]
+        },
+        {
+          "id": "references-p003",
+          "text": "Design of a privacy-preserving data platform for collaboration against human trafficking. arXiv preprint arXiv:2005.05688, 2020. URL https://arxiv.org/abs/2005.05688. 2 [9] W. Enders. Applied Econometric Time Series. John Wiley & Sons, 2010. 2 [10] E. Eryarsoy, K. Topuz, and C. Demiroglu. Disentangling human trafficking types and the identification of pathways to forced labor and sex: an explainable analytics approach. Annals of Operations Research, [11] A. Gretton, R. Herbrich, A. Smola, O. Bousquet, and B. Scholkopf. Kernel methods for measuring independence. Journal of Machine Learning Research, 6:2075–2129, 2005. 2 [12] R. Heller, Y. Heller, and M. Gorfine. A consistent multivariate test of association based on ranks of 16 [13] T. Kunihama and D. B. Dunson. Bayesian modeling of temporal dependence in large sparse contingency tables. Journal of the American Statistical Association, 108(504):741–750, 2013. 2 [14] Z. Li, S. A. Bruce, and T. Cai. Interpretable classification of categorical time series using the spectral envelope and optimal scalings. Journal of Machine Learning Research, 23:1–31, 2022. 2 [15] K. P. Murphy. Machine Learning: A Probabilistic Perspective. MIT Press,",
+          "page_span": [
+            16,
+            16
+          ]
+        },
+        {
+          "id": "references-p004",
+          "text": "2012. 5",
+          "page_span": [
+            16,
+            16
+          ]
+        },
+        {
+          "id": "references-p005",
+          "text": "[16] S. Olisah, C. Odooh, O. Efijemue, E. Obunadike, J. Onwuchekwa, O. Owolabi, S. Akintayo, and C. Obunadike. Unveiling global human trafficking trends: A comprehensive analysis. Journal of Data Analysis and Information Processing, 12:49–75, 2024. 2 [17] S. Panda, C. Shen, R. Perry, J. Zorn, A. Lutz, C. E. Priebe, and J. T. Vogelstein. Universally consistent k-sample tests via dependence measures. Statistics and Probability Letters, 216:110278, 2025. 2, 5 [18] A. Radford, J. Wu, R. Child, D. Luan, D. Amodei, and I. Sutskever. Language models are unsupervised multitask learners. OpenAI Blog, 1(8):1–18, 2019. 3 [19] C. Raffel, N. Shazeer, A. Roberts, K. Lee, S. Narang, M. Matena, Y. Zhou, W. Li, and P. J. Liu. Exploring the limits of transfer learning with a unified text-to-text transformer. Journal of Machine [20] C. Shen, C. E. Priebe, and J. T. Vogelstein. From distance correlation to multiscale graph correlation. Journal of the American Statistical Association, 115(529):280–291, 2020. 2 [21] C. Shen, S. Panda, and J. T. Vogelstein. The chi-square test of distance correlation. Journal of Computational and Graphical Statistics, 31(1):254–262, 2022. 6 [22] C. Shen, Q. Wang, and C.",
+          "page_span": [
+            17,
+            17
+          ]
+        },
+        {
+          "id": "references-p006",
+          "text": "E. Priebe. One-hot graph encoder embedding. IEEE Transactions on Pattern",
+          "page_span": [
+            17,
+            17
+          ]
+        },
+        {
+          "id": "references-p007",
+          "text": "Analysis and Machine Intelligence, 45(6):7933–7938, 2023. 5 [23] C. Shen, J. Chung, R. Mehta, T. Xu, and J. T. Vogelstein. Independence testing for temporal data. Transactions on Machine Learning Research, 2024. ISSN 2835-8856. URL https://openreview.net/ forum?id=jv1aPQINc4. 2 [24] R. H. Shumway and D. S. Stoffer. Time Series Analysis and Its Applications: With R Examples. Springer Science & Business Media, 2010. 2 [25] D. S. Stoffer, D. E. Tyler, and A. J. McDougall. Spectral analysis for categorical time series: Scaling and the spectral envelope. Biometrika, 80(3):611–622, 1993. 2 17 [26] G. Szekely, M. Rizzo, and N. Bakirov. Measuring and testing independence by correlation of distances. Annals of Statistics, 35(6):2769–2794, 2007. 2 [27] A. Vaswani, N. Shazeer, N. Parmar, J. Uszkoreit, L. Jones, A. N. Gomez, L. Kaiser, and I. Polosukhin. Attention is all you need. In Advances in Neural Information Processing Systems, volume 30. Curran Associates, Inc., 2017. 3 [28] S. Walby and B. Francis. Improving the estimate of trafficking in human beings and modern slavery by integrating data from ilo/walk free/iom and unodc. Social Indicators Research, pages 1–25, 2024. 2 [29] G. Wang,",
+          "page_span": [
+            17,
+            17
+          ]
+        },
+        {
+          "id": "references-p008",
+          "text": "W. Li, and K. Zhu. New HSIC-based tests for independence between two stationary multi-",
+          "page_span": [
+            17,
+            17
+          ]
+        },
+        {
+          "id": "references-p009",
+          "text": "variate time series. Statistica Sinica, 31(1):269–300, 2021. 2 [30] Q. Zhang. On the properties of distance covariance for categorical data: Robustness, sure screening, and approximate null distributions. arXiv preprint arXiv:2403.17882, 2024. 2 [31] Z. Zhou. Measuring nonlinear dependence in time-series, a distance correlation approach. Journal of Time Series Analysis, 33(3):438–457, 2012. 2 18",
+          "page_span": [
+            18,
+            18
+          ]
+        }
+      ]
+    },
+    {
+      "id": "appendix",
+      "title": "Appendix",
+      "paras": [
+        {
+          "id": "appendix-p001",
+          "text": "Appendix A. Proofs Theorem 1. At any given timestamp t: • The graph covariance satisfies the law of large numbers such that: Σt(u, v) nt→∞ → μt where μt = Prob(Xut = Xvt = 1) −Prob(Xut = 1)Prob(Xvt = 1)). • The graph covariance satisfies the central limit theorem such that: √nt(Σt(u, v) −μt) dist →Normal(0, σ2 t ) where the variance σ2 t satisfies: σ2 t ≤1 4 + 1 16√nt . • The graph covariance converges to 0, i.e., μt = 0, if and only if Xut and Xvt are independent. Proof. (i): Based on basic probability and the law of large numbers, the normalized graph element At(u, v) satisfies: At(u, v) nt→∞ → Prob(Xut = Xvt = 1). Moreover, we have At(u, u) nt→∞ → Prob(Xut = 1), At(v, v) nt→∞ → Prob(Xvt = 1). It follows that: Σt(u, v) = (At(u, v) −At(u, u)At(v, v)) →Prob(Xut = Xvt = 1) −Prob(Xut = 1)Prob(Xvt = 1) = μt. 1 (ii): Applying the central limit theorem, it is clear that √nt(At(u, v) −Prob(Xut = Xvt = 1)) dist →Normal(0, Prob(Xut = Xvt = 1)(1 −Prob(Xut = Xvt = 1))). Similarly, we have √nt(At(u, u) −Prob(Xut = 1)) dist →Normal(0, Prob(Xut = 1)(1 −Prob(Xut = 1))), √nt(At(v, v) −Prob(Xvt = 1)) dist →Normal(0, Prob(Xvt = 1)(1 −Prob(Xvt = 1))). It follows that: √nt(Σt(u, v) −μt) = √nt(At(u,",
+          "page_span": [
+            19,
+            19
+          ]
+        },
+        {
+          "id": "appendix-p002",
+          "text": "v) −At(u, u)At(v, v) −μt)",
+          "page_span": [
+            19,
+            19
+          ]
+        },
+        {
+          "id": "appendix-p003",
+          "text": "dist →Normal(0, σ2 t ). where σ2 t ≤Prob(Xut = Xvt = 1)(1 −Prob(Xut = Xvt = 1)) + Prob(Xut = 1)(1 −Prob(Xut = 1))Prob(Xvt = 1)(1 −Prob(Xvt = 1))/√nt ≤1 4 + 1 16√nt (iii): It suffices to prove that: Prob(Xut = Xvt = 1) = Prob(Xut = 1)Prob(Xvt = 1) if and only if Xut and Xvt are independent. The if direction is trivial. To prove the only if direction, since Xut and Xvt are binary, their independence is equivalent to proving the following four equalities: Prob(Xut = Xvt = 1) = Prob(Xut = 1)Prob(Xvt = 1) Prob(Xut = 0, Xvt = 1) = Prob(Xut = 0)Prob(Xvt = 1) Prob(Xut = 1, Xvt = 0) = Prob(Xut = 1)Prob(Xvt = 0) Prob(Xut = Xvt = 0) = Prob(Xut = 0)Prob(Xvt = 0). The first equality is given and holds by assumption. The second equality holds because: Prob(Xut = 0, Xvt = 1) = Prob(Xvt = 1) −Prob(Xut = Xvt = 1) = Prob(Xvt = 1) −Prob(Xut = 1)Prob(Xvt = 1) = Prob(Xvt = 1)(1 −Prob(Xut = 1)) = Prob(Xut = 0)Prob(Xvt = 1). 2 By the same argument, but switching Xut and Xvt, we obtain the third equality. The fourth equality follows from: Prob(Xut = Xvt = 0) = Prob(Xvt = 0) −Prob(Xut = 0, Xvt = 0) = Prob(Xvt = 0) −Prob(Xut = 1)Prob(Xvt = 0) = Prob(Xvt = 0)(1 −Prob(Xut = 1)) = Prob(Xut = 0)Prob(Xvt = 0).",
+          "page_span": [
+            20,
+            20
+          ]
+        },
+        {
+          "id": "appendix-p004",
+          "text": "Thus, we have proven the only if direction.",
+          "page_span": [
+            20,
+            20
+          ]
+        },
+        {
+          "id": "appendix-p005",
+          "text": "Appendix B. Additional Simulations Figure E1 replicates the experiment from Figure 1, using distance correlation and the Hilbert-Schmidt Independence Criterion (HSIC). While these methods produce quantitatively similar results to the graph covariance shown in Figure 1, they are significantly slower in computation time: 0.01 seconds for graph covariance, 6 seconds for distance correlation, and 2 minutes for HSIC. Appendix C. LLM Query Details on CTDC Data Here, we present a few LLM-generated data insights for additional feature pairs not included in the main paper. Although any feature pair can be queried, and the LLM outputs are far more detailed than the summaries provided here, these examples are included for illustrative purposes. Appendix C.1. LLM for Feature Pair (MMR, IDN) Query: ”In the Counter-Trafficking Data Collaborative dataset, at year 2015, there are more reported cases based on Myanmar Citizen and Indonesia Country of Exploitation. Please analyze the potential causes, global and local events, and geopolitical factors that may explain this trend.” Output Summary: ”The increase in reported trafficking cases involving Myanmar citizens and Indonesia as the country of",
+          "page_span": [
+            21,
+            21
+          ]
+        },
+        {
+          "id": "appendix-p006",
+          "text": "exploitation in 2015 is likely due to a combination of local, regional, and global factors,",
+          "page_span": [
+            21,
+            21
+          ]
+        },
+        {
+          "id": "appendix-p007",
+          "text": "including: Myanmar’s political and economic instability, which led to increased migration and vulnerability to trafficking. Indonesia’s demand for migrant labor, particularly in the fishing industry, domestic work, and agriculture, where exploitation was rampant. The Rohingya crisis exacerbating migration flows from Myanmar, increasing vulnerability to trafficking. The global focus on human trafficking and increased media attention to exploitative industries in Indonesia, such as fishing. Improved victim identification and better 3 Distance Correlation 1 1 (1,2) Independent (1,3) Dependent (1,4) Increasing (1,5) Decreasing (1,6) Shifting (1,7) Spike 0.8 0.8 0.6 0.6 0.4 0.4 0.2 0.2 0 0 2 4 6 8 Timestep 2 4 6 8 Timestep Normalized HSIC 1 1 (1,2) Independent (1,3) Dependent (1,4) Increasing (1,5) Decreasing (1,6) Shifting (1,7) Spike 0.8 0.8 0.6 0.6 0.4 0.4 0.2 0.2 0 0 2 4 6 8 Timestep 2 4 6 8 Timestep Figure E1: Same experiments as Figure 1 but using distance correlation (top two panels) and Hilbert-Schmidt independence criterion (bottom two panels). 4 reporting mechanisms in the region during this period. These factors, combined with regional migration patterns and geopolitical",
+          "page_span": [
+            21,
+            21
+          ]
+        },
+        {
+          "id": "appendix-p008",
+          "text": "dynamics, likely contributed to the higher number of trafficking cases reported in the",
+          "page_span": [
+            21,
+            21
+          ]
+        },
+        {
+          "id": "appendix-p009",
+          "text": "CTDC dataset for 2015.” Appendix C.2. LLM for Feature Pair (isForcedLabour, GHA) Query: ”In the Counter-Trafficking Data Collaborative dataset, at year 2005, there are more reported cases based on forced Labour and Ghana Country of Exploitation. Please analyze the potential causes, global and local events, and geopolitical factors that may explain this trend.” Output Summary: ”The rise in reported cases of forced labour in Ghana in 2005 can be attributed to a combination of local, regional, and global factors: Local vulnerabilities, particularly in the cocoa industry, where child labour and trafficking were significant issues. Regional migration and trafficking patterns, with people being moved across West Africa and exploited for labour in Ghana. International efforts to combat forced labour and human trafficking, resulting in increased awareness and improved data reporting mechanisms. Geopolitical shifts, such as the attention to Sub-Saharan Africa in international human rights discourses, and Ghana’s involvement in global anti-trafficking initiatives. Together, these factors likely contributed to the noticeable increase in reported forced labour cases in Ghana in 2005.” Appendix",
+          "page_span": [
+            23,
+            23
+          ]
+        },
+        {
+          "id": "appendix-p010",
+          "text": "C.3. LLM for Feature Pair (women, UKR)",
+          "page_span": [
+            23,
+            23
+          ]
+        },
+        {
+          "id": "appendix-p011",
+          "text": "While the feature pair (Woman, UKR) is not included in ∆1 or ∆2, it represents an intriguing case from the bottom center panel of Figure 3, showing a positive relationship before 2010 and a negative relationship after 2015. A two-part LLM query can be constructed to investigate the underlying causes, as follows: Query: ”In the Counter-Trafficking Data Collaborative dataset, before 2010, there are more reported cases based on women and Ukrain Country of Exploitation. However, after 2015, there are less reported cases based on women and Ukrain Country of Exploitation. Please analyze the potential causes, global and local events, and geopolitical factors that may explain this trend.” Output Summary: ”Before 2010, higher reported cases of trafficking involving women in Ukraine as a country of exploitation were driven by economic instability, high unemployment, and widespread poverty following the collapse of the Soviet Union. Weak anti-trafficking laws, coupled with active post-Soviet organized crime networks, made Ukraine a hub for trafficking, particularly for sexual exploitation. Women seeking better opportunities were targeted under false promises of work abroad, while patriarchal",
+          "page_span": [
+            23,
+            23
+          ]
+        },
+        {
+          "id": "appendix-p012",
+          "text": "norms and systemic gender",
+          "page_span": [
+            23,
+            23
+          ]
+        },
+        {
+          "id": "appendix-p013",
+          "text": "inequality exacerbated their vulnerabilities. Increased international attention and reporting by NGOs further 5 highlighted the scale of the issue during this period.” Output Summary: ”After 2015, reported cases declined due to several factors, including geopolitical changes such as the Euromaidan revolution, the annexation of Crimea, and the conflict in eastern Ukraine, which altered trafficking routes and displaced populations. Ukraine’s closer alignment with the EU led to stronger border controls, improved anti-trafficking legislation, and disrupted trafficking networks. However, the ongoing conflict and shifting reporting mechanisms may have masked the full extent of trafficking, as victims from Ukraine were increasingly exploited abroad rather than domestically. Economic stabilization efforts and international aid also contributed to reducing vulnerabilities during this period.” 6",
+          "page_span": [
+            23,
+            23
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,557 @@
+{
+  "id": "1-s2.0-S0167865524001818-am",
+  "title": "Discovering the signal subgraph: An iterative screening approach on graphs",
+  "metadata": {
+    "source_path": "data/pdf_files/1-s2.0-S0167865524001818-am.pdf",
+    "page_count": 7,
+    "hash": "2e86a0ebb2c7749b5d0ac3f8bcdd880d6b3f04b6084408766b62720066f8c71c"
+  },
+  "sections": [
+    {
+      "id": "front-matter",
+      "title": "Front Matter",
+      "paras": [
+        {
+          "id": "front-matter-p001",
+          "text": "Version of Record: https://www.sciencedirect.com/science/article/pii/S0167865524001818 Manuscript_ffc5831d83f9dbea7fb4100d1b7725b9 1 Pattern Recognition Letters journal homepage: www.elsevier.com Discovering the Signal Subgraph: An Iterative Screening Approach on Graphs Cencheng Shena,∗∗, Shangsi Wangb, Alexandra Badeac, Carey E. Priebeb, Joshua T. Vogelsteind aDepartment of Applied Economics and Statistics, University of Delaware bDepartment of Applied Mathematics and Statistics, Johns Hopkins University cCenter for In Vivo Microscopy, Duke University dDepartment of Biomedical Engineering and Institute for Computational Medicine, Johns Hopkins University Article history:",
+          "page_span": [
+            1,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "id": "abstract",
+      "title": "Abstract",
+      "paras": [
+        {
+          "id": "abstract-p001",
+          "text": "Supervised learning on graphs is a challenging task due to the high dimensionality and inherent structural dependencies in the data, where each edge depends on a pair of vertices. Existing conventional methods are designed for standard Euclidean data and do not account for the structural information inherent in graphs. In this paper, we propose an iterative vertex screening method to achieve dimension reduction across multiple graph datasets with matched vertex sets and associated graph attributes. Our method aims to identify a signal subgraph to provide a more concise representation of the full graphs, potentially benefiting subsequent vertex classification tasks. The method screens the rows and columns of the adjacency matrix concurrently and stops when the resulting distance correlation is maximized. We establish the theoretical foundation of our method by proving that it estimates the true signal subgraph with high probability. Additionally, we establish the convergence rate of classification error under the Erdos-Renyi random graph model and prove that the subsequent classification can be asymptotically optimal, outperforming the entire graph under high-dimensional conditions.",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "abstract-p002",
+          "text": "Our method is evalu-",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "abstract-p003",
+          "text": "ated on various simulated datasets and real-world human and murine graphs derived from functional and structural magnetic resonance images. The results demonstrate its excellent performance in estimating the ground-truth signal subgraph and achieving superior classification accuracy. c⃝2024 Elsevier Ltd. All rights reserved. iterative screening, distance correlation, graph classification",
+          "page_span": [
+            1,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "id": "1-introduction",
+      "title": "1. Introduction",
+      "paras": [
+        {
+          "id": "1-introduction-p001",
+          "text": "The statistical problem of feature reduction and dimension selection has been extensively studied, with well-known methods such as Lasso [34], adaptive Lasso [41], Dantzig selector [5], sure independence screening [10, 17], among others. These methods have specific objectives, such as sparsity and the recovery of ground-truth. Among them, the screening method is known for its computational efficiency and model-free nature and are commonly used for high-dimensional data [40], making it a suitable candidate for graph data. The analysis of graph structure is critical in various big data fields, including neuroscience, internet mapping, and social networks [23, 21, 3, 35, 31, 16, 14]. Due to the large size of graphs in practice, such as in social networks and raw neuroimages, it is often necessary to use smaller subgraphs from the observed graphs. Moreover, the selected subgraph should maintain or improve subsequent inference. For example, identifying a subset of brain regions from brain imaging to better predict the phenotype of interest in each subject. However, dimension reduction for graph data presents unique challenges because of its high-dimensionality and the unique structure",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "1-introduction-p002",
+          "text": "of the n × n adjacency matrix. To that end, this",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "1-introduction-p003",
+          "text": "paper proposes an novel iterative screening method on graph data, which utilizes distance-based correlation and independence screening in an iterative manner to estimate the signal subgraph. During each iteration, we define the feature for each ∗∗Corresponding author. Cencheng Shen and Shangsi Wang contributed equally to this work. (Shangsi Wang), alexandra.badea@duke.edu (Alexandra Badea), © 2024 published by Elsevier. This manuscript is made available under the Elsevier user license https://www.elsevier.com/open-access/userlicense/1.0/ 2 A(U−) is independent of Y, that is vertex using the adjacency of the reduced graphs, compute a distance-based correlation between the feature and the label of interest Y, and discard vertices with small correlations. This process is repeated recursively on the reduced graphs from previous iterations, yielding a smaller set of vertices each time until an estimated signal subgraph is selected for output. The proposed method is straightforward to use and implement. We provide theoretical results that demonstrate the method’s ability to identify the true signal vertices with high probability. Additionally, our approach guarantees asymptotically",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "1-introduction-p004",
+          "text": "optimal classification performance under the Erdos-Renyi",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "1-introduction-p005",
+          "text": "random graph model, outperforming the use of the entire graph in specific high-dimensional settings. Simulation results showcase the superior performance of the proposed method, including improved prediction accuracy when compared to conventional non-iterative screening approaches or using the full graph, as well as accurate estimation of the ground-truth signal subgraph. Furthermore, the paper demonstrates the method’s applicability to MRI brain graphs for studying site effects and sex differences in brain imaging analysis. It successfully identifies regions that minimize validation error, thereby pinpointing potential regions of interest for practitioners. S = arg min U |U| , subject to A(U−) ⊥Y, where the notation ⊥means independence between the subgraph and the label. The induced graph on the signal vertices S is called the signal subgraph. If the graph A is independent of Y, there is no signal in the graph, resulting in S = ∅. If all vertices in A are incident on at least one edge which is dependent on Y, then S = V. The signal subgraph from this definition may not be unique, but one such subgraph suffices, because the subsequent classification is always asymptotically optimal",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "1-introduction-p006",
+          "text": "as shown in Section 4.",
+          "page_span": [
+            2,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2-2-distance-correlation",
+      "title": "2.2. Distance Correlation",
+      "paras": [
+        {
+          "id": "2-2-distance-correlation-p001",
+          "text": "The distance correlation is a measure that can detect all types of dependencies between two random variables, given sufficient sample size [33]. To compute the sample distance correlation, two pairwise distance matrices are transformed and multiplied using a Hadamard product. The sample distance correlation is asymptotically 0 if and only if the two underlying random variables are independent. For more detailed mathematical information about the distance correlation and its population definition, see the Appendix. The distance correlation is a computationally efficient method [28], and has been shown to be equivalent to kernel correlation [30]. It has been used for various inference tasks [37, 11, 27, 26] not limited to screening. This paper also utilizes a local version of the distance correlation called the multiscale graph correlation (MGC), which improves testing power against nonlinear dependencies [36, 29].",
+          "page_span": [
+            2,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2-1-setting-and-notations",
+      "title": "2.1. Setting and Notations",
+      "paras": [
+        {
+          "id": "2-1-setting-and-notations-p001",
+          "text": "Given m observed graphs {Ai, i = 1, . . . , m} with a shared vertex set V = [n], we shall slightly abuse the notation and also denote Ai ∈Rn×n as the adjacency matrix of the graph. The graphs can be weighted or unweighted, and directed or undirected. Given any subset of vertices U ⊆V = [n], the reduced adjacency matrix is denoted by Ai(U), which is the subgraph using U. Furthermore, each graph is associated with a label of interest {Yi ∈R, i = 1, . . . , m}. In the classical statistical pattern recognition setting, the pairs of observations {(Ai, Yi)}m i=1 are independent and identically distributed pairs according to a distribution FA,Y [8], that is",
+          "page_span": [
+            2,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "id": "3-main-method",
+      "title": "3. Main Method",
+      "paras": [
+        {
+          "id": "3-main-method-p001",
+          "text": "The proposed iterative vertex screening algorithm consists of three steps: extracting features within each reduced graph, computing distance-based correlation between the feature and the label of interest, then iteratively reducing the graph size by a factor δ ∈(0, 1) through discarding vertices with low correlation. The algorithm outputs a set of vertices ˆS that estimates the true signal vertices S . Algorithm 1 presents the proposed iterative method, while Algorithm 2 describes a conventional screening method used as a benchmark in the simulations. The first step computes a feature vector for each vertex within the reduced graph. At each iteration k, denote the current reduced vertex set as Uk, we use Ai(Uk)[u, ·] as the ith feature of vertex u, i.e., the uth row of adjacency matrix Ai restricted to the vertex set Uk. The second step computes a dependency measure β(u) between {Ai(Uk)[u, ·]}m i=1 and {Yi}m i=1 for each vertex u. Either distance correlation (Dcor) or multiscale graph correlation (MGC) can be used for β(u) (or one could use any other correlation, like the traditional Pearson correlation, kernel correlation), denoted by ∼FA,Y for some true but unknown joint",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "3-main-method-p002",
+          "text": "distribution, where A denotes",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "3-main-method-p003",
+          "text": "the underlying random variable of {Ai} and Y represents the underlying random variable of {Yi}. Moreover, we denote g(·) as a given classifier, and the resulting classification error as L(g) = Prob(g(·) , Y). In addition, we denote the Bayes optimal classifier as g∗(·), so a classifier is asymptotically optimal if and only if L(g) →L(g∗). It is often the case that Y depends only on a small portion of A, which motivates the need for a definition of signal subgraph and signal vertices. Definition 1. For any subset of vertices U ⊂V = [n], denote the induced subgraph of U by A(U), and denote the subgraph removing all edges in A(U) as A(U−). The set of signal vertices S is defined to be the minimal subset of vertices U, such that β(u) =Dcor({(Ai(Uk)[u, ·], Yi)}m i=1), or β(u) =MGC({(Ai(Uk)[u, ·], Yi)}m i=1). 3 • The number of vertices in the ground-truth signal vertices |S | = p is fixed. Then the vertices are sorted based on the magnitude of their β(u) values, and a critical value t is determined via percentile. Vertices with β(u) values below t are discarded, and the remaining vertices form the vertex set Uk+1 for the next iteration, i.e., • ˆS is estimated using Algorithm 1 and",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "3-main-method-p004",
+          "text": "distance correlation,",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "3-main-method-p005",
+          "text": "with the output vertex set satisfies | ˆS | ≥p. Uk+1 = {u ∈Uk|β(u) > t}. • The graph adjacency matrix A follows the Erdos-Renyi random graph model [9] and has a bounded Frobenius norm. The choice of δ is at the discretion of the user and depends on their desired level of conservatism regarding vertex removal. For instance, selecting δ = 0.5 results in the removal of half of the vertices at each iteration, striking a balance between running time and performance, particularly for large datasets. Conversely, when dealing with moderate sample sizes, opting for a smaller δ value, such as δ = 0.05, leads to the removal of only a few vertices in each step. This choice represents a more cautious approach, requiring additional computational time but potentially yielding greater accuracy. The simulations were conducted to compare the performance of both choices. The iteration continues until only one vertex remains, or until the desired size of the output vertex set is reached. The algorithm calculates the distance correlation between the graph feature Ai(Uk) and the label vector for each subgraph produced from each iteration. The final output is the set of vertices that maximizes the",
+          "page_span": [
+            3,
+            3
+          ]
+        },
+        {
+          "id": "3-main-method-p006",
+          "text": "correlation. An alternative approach is to use",
+          "page_span": [
+            3,
+            3
+          ]
+        },
+        {
+          "id": "3-main-method-p007",
+          "text": "cross-validation to select the subgraph with the best leave-oneout prediction error, which is computationally more expensive but has similar empirical performance, as demonstrated in Section 5 and Section 6. • The Bayes plug-in classifier g(·) is used. Under the above assumptions, the estimated signal vertices include the truth with high probability: Theorem 1. There exist two positive constants c1, c2 and some 0 < γ < 1/2 such that Prob(S ⊂ˆS ) > 1 −O(p exp(−c1m1−2γ) + mp exp(−c2mγ)). In particular, Prob(S ⊂ˆS ) →1 as m →∞. Next, we establish the convergence rate of the classification error using the estimated subgraph, where g( ˆS ) represents the plug-in classifier utilizing the estimated signal subgraph. Theorem 2. With high probability, L(g( ˆS )) −L(g∗) is bounded by ε. Specifically, there exist four positive constants c1, c2, c3, c4, such that Algorithm 1 Iterative Vertex Screening Input: {(Ai, Yi)}m i=1 , δ ∈(0, 1) 1: Set k = 1, and Uk = V 2: while |Uk| > 1 do 3: for u ∈Uk do Prob(L(g( ˆS )) −L(g∗) < ε) ≥ 1 −2(E( ˆS ) + 1) exp −mc4ε2 ! (2E( ˆS ) + √2c4)2 −c3(p exp(−c1m 1 3 ) + mp exp(−c2m 1 3 )), 4: Xi = Ai(Uk)[u, ·] 5: β(u) = Dcor({Xi, Yi}m i=1) 6: end for 7: Set t be the",
+          "page_span": [
+            3,
+            3
+          ]
+        },
+        {
+          "id": "3-main-method-p008",
+          "text": "δ quantile among {β(u), u ∈Uk}",
+          "page_span": [
+            3,
+            3
+          ]
+        },
+        {
+          "id": "3-main-method-p009",
+          "text": "8: Set Uk+1 = {u ∈Uk|β(u) > t} 9: Set k = k + 1 where E( ˆS ) denotes the expected number of edges in the estimated signal subgraph. Therefore, the classification performance using the estimated signal subgraph is asymptotically optimal. In contrast, using the whole graph for classification is suboptimal when the size of the graph is as large as the fourth root of the sample size. 10: end while 11: k∗= arg maxk Dcor({(Ai(Uk), Yi)}m i=1) 12: Output the signal vertices ˆS = Uk∗. Theorem 3. As sample size m approaches infinity, it holds that L(g( ˆS )) →L(g∗). Algorithm 2 Conventional Screening Applied to Graphs Input: {(Ai, Yi)}m i=1 and c ∈[0, 1] 1: for u ∈V do 2: Xi = Ai[u, ·] Moreover, when n = O(m 1 4 ), for sufficiently large n and m, it holds that 3: β(u) = Dcor({Xi, Yi}m i=1) 4: end for 5: ˆS = {u ∈V|β(u) > c}. L(g( ˆS )) < L(g(V)) and L(g(V)) > L(g∗). The results suggest that using the estimated signal subgraph via iterative screening can be expected to perform better than using the whole graph, when the size of the signal subgraph is fixed and the number of observed graphs is comparable to the size of the whole graph. This setting is illustrated in the top panel of Figure 2",
+          "page_span": [
+            3,
+            3
+          ]
+        },
+        {
+          "id": "3-main-method-p010",
+          "text": "with n = 200, m = 300, and |S | = 20, and",
+          "page_span": [
+            3,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "id": "4-theoretical-properties",
+      "title": "4. Theoretical Properties",
+      "paras": [
+        {
+          "id": "4-theoretical-properties-p001",
+          "text": "To establish the theoretical properties, we make the following assumptions: 4 is also observed in the experiments in Section 5 where the estimated subgraph yields better classification performance. All proofs and necessary mathematical background are provided in the appendix.",
+          "page_span": [
+            3,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "id": "5-1-signal-subgraph-estimation",
+      "title": "5.1. Signal Subgraph Estimation",
+      "paras": [
+        {
+          "id": "5-1-signal-subgraph-estimation-p001",
+          "text": "We generate 100 Erdos-Renyi graphs (ER) from two classes. The graph is generated by A|Y = y ∼ER(Py) with y ∈{0, 1} and Py = \" Py × 120×20 0.2 × 120×180 0.2 × 1180×20 0.3 × 1180×180 # , Fig. 1. The figure shows the Receiver operating characteristic (ROC) of the iterative vertex screening and conventional screening using MGC. It is evident that the iterative vertex screening performs significantly better. where P0 = 0.3 and P1 = 0.4. Namely, the graph contains 200 vertices, out of which only the first 20 vertices are signal vertices containing information to separate y = 0 from y = 1. More information on the Erdos-Renyi model is provided in the appendix. We estimate the subgraph using various screening methods, including the conventional screening with Dcor and MGC, iterative screening with Dcor and MGC at δ = 0.5 and δ = 0.05 respectively, and screening with canonical correlation analysis (CCA) [13] and RV coefficient (RV) [25]. Since the actual size of the signal subgraph was known to be 20, we output the estimated subgraph at the same size and calculated the true positive rate. The ROC curve is shown in Figure 1, while Table 1 reports the AUC and runtime for each approach. We",
+          "page_span": [
+            4,
+            4
+          ]
+        },
+        {
+          "id": "5-1-signal-subgraph-estimation-p002",
+          "text": "observe that Dcor",
+          "page_span": [
+            4,
+            4
+          ]
+        },
+        {
+          "id": "5-1-signal-subgraph-estimation-p003",
+          "text": "and MGC outperform CCA and RV, and terative screening improves the performance over conventional screening. Furthermore, iterative screening with δ = 0.05 yields better results than iterative screening with δ = 0.5 at the cost of a longer running time. where 0.4 if y = 0, 0.3 if y = 1, 0.5 if y = 2. Py = Each graph has 200 vertices, with the first 20 vertices designated as signal vertices. We consider the Bayes plug-in error L(g( ˆS )) using conventional Dcor and MGC screening as well as iterative vertex screening using Dcor and MGC, respectively. We then compare the results to L(g), L(g∗), and L(g(S )), representing the plug-in error using all vertices, the Bayes optimal error, and the plug-in error using the true signal vertices. Figure 2 illustrates the classification error and false discovery rate in detecting the signal vertices. The results indicate that using the estimated signal subgraph leads to better classification performance compared to using the entire graph. MGC performs better than Dcor, and the iterative approach outperforms the conventional method. Moreover, the screening method accurately recovers the actual signal subgraph after m > 300, and the classification",
+          "page_span": [
+            4,
+            4
+          ]
+        },
+        {
+          "id": "5-1-signal-subgraph-estimation-p004",
+          "text": "error approaches the",
+          "page_span": [
+            4,
+            4
+          ]
+        },
+        {
+          "id": "5-1-signal-subgraph-estimation-p005",
+          "text": "Bayes optimal. Since this experiment has a comparable design to the previous one, CCA or RV are not considered as they have inferior performance. Table 1. This table presents the mean and standard error of the area under the curve (AUC) and running time of the eight methods based on 100 replicates. Iterative vertex screening outperforms conventional screening. The running times were measured using MATLAB R2022a on a standard laptop equipped with a 16-core Intel CPU and 16GB of memory.",
+          "page_span": [
+            4,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "id": "method",
+      "title": "Method",
+      "paras": [
+        {
+          "id": "method-p001",
+          "text": "AUC Time (sec) ItDcor-0.05 0.8705 (0.0113) 18.50 (1.35) ItDcor-0.50 0.8655 (0.0094) 2.03 (0.17) ItMGC-0.05 0.8720 (0.0122) 967.42 (17.73) ItMGC-0.50 0.8625 (0.0106) 120.16 (7.32) Dcor 0.8554 (0.0056) 1.23 (0.22) MGC 0.8555 (0.0057) 38.44 (1.720) RV 0.8506 (0.0077) 2.12 (0.10) CCA 0.5353 (0.0080) 0.92 (0.04) Since the size of S is typically unknown in practice, our next simulation evaluates the stopping criterion in Algorithm 1, which outputs the estimated subgraph that maximizes the distance correlation. Figure 3 illustrates that the criterion performs as expected in this experiment at m = 300: ˆS with 20 vertices indeed maximizes the distance correlation, corresponds to the actual number of true signal vertices, thus effectively minimizes the prediction error.",
+          "page_span": [
+            4,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "id": "5-2-classi-cation-accuracy",
+      "title": "5.2. Classiﬁcation Accuracy",
+      "paras": [
+        {
+          "id": "5-2-classi-cation-accuracy-p001",
+          "text": "Here we investigate the classification performance using the estimated signal subgraph. We consider a 3-class classification problem using the Erdos-Renyi model, and generate A|Y = y ∼ ER(Py) with y ∈{0, 1, 2} and Therefore, this figure showed two points: first, it is important to estimate the signal subgraph, as a smaller graph can leads to significantly better classification performance; second, our iterative screening algorithm worked as intended, which stopped at maximum correlation and successfully estimates the best signal subgraph in this case. Py = \" Py × 120×20 0.2 × 120×180 0.2 × 1180×20 0.3 × 1180×180 # , 5 created using the NeuroData’s MRI Graphs pipeline1, a popular tool for processing and representing brain images. We perform a leave-one-subject-out signal subgraph estimation and prediction process. We use the site information as the label vector and apply iterative vertex screening via distance correlation to all graphs, except for one that is left out. Next, we utilize 9-nearest-neighbor to predict the site of the left-out subject. We repeat this process for each subject, calculate the leave-one-out classification error, and repeat it for the sex information as the",
+          "page_span": [
+            4,
+            4
+          ]
+        },
+        {
+          "id": "5-2-classi-cation-accuracy-p002",
+          "text": "label vector. Note that the performance is robust",
+          "page_span": [
+            4,
+            4
+          ]
+        },
+        {
+          "id": "5-2-classi-cation-accuracy-p003",
+          "text": "against different nearest-neighbor parameters, and in this case, we selected the nearest odd integer to log2 of the sample size, which resulted in choosing a 9-nearest-neighbor. Figure 4 illustrates the prediction error and distance correlation in relation to the varying size of the estimated subgraph produced by Algorithm 1. The red lines represent site classification, while the blue lines denote sex classification. In terms of sex differences, we observe that there is no prominent signal in the data, as neither the distance correlation nor the classification error are notably superior. For site classification, the iterative screening algorithm produces a subgraph containing 30 vertices, which maximizes the distance correlation and also minimizes the classification error. Fig. 2. In the top panel, we compare seven classifiers: the Bayes optimal classifier, Bayes plug-in using S , Bayes plug-in using ˆS estimated by iterative Dcor or MGC, Bayes plug-in using ˆS estimated by Dcor or MGC, and Bayes plug-in using G. The bottom panel displays the false discovery rate in estimating the signal vertices. The mean results are reported using 100 independent simulations, and the error bars",
+          "page_span": [
+            5,
+            5
+          ]
+        },
+        {
+          "id": "5-2-classi-cation-accuracy-p004",
+          "text": "represent two times the stan-",
+          "page_span": [
+            5,
+            5
+          ]
+        },
+        {
+          "id": "5-2-classi-cation-accuracy-p005",
+          "text": "dard deviation. Note that the bottom panel only considers four methods that estimate the signal vertices, omitting the Bayes classifier, the Bayes plug-in using S , and the Bayes plug-in using G. These three methods do not involve the estimation of the signal subgraph and are not applicable to the bottom panel. Fig. 4. The figure shows the leave-one-subject-out prediction error and distance correlation at various sizes of estimated subgraph. The data set combines two studies, SWU4 and HNU1, and we perform a leave-one-subjectout screening and classification to identify brain regions that are significant for differentiating sex or site. Fig. 3. The figure shows the prediction error and distance correlation for subgraphs of varying sizes produced by the iterative Dcor screening algorithm. The algorithm produces a subgraph with 20 vertices, which matches the actual size of the signal subgraph and also results in the lowest prediction error. The mean results are reported using 100 independent simulations, and the error bars represent two times the standard deviation. The estimated signal vertices provide additional insight into the graph structure. Specifically, the vertices chosen for",
+          "page_span": [
+            5,
+            5
+          ]
+        },
+        {
+          "id": "5-2-classi-cation-accuracy-p006",
+          "text": "site",
+          "page_span": [
+            5,
+            5
+          ]
+        },
+        {
+          "id": "5-2-classi-cation-accuracy-p007",
+          "text": "difference are exactly matched across the left and right hemispheres. If we consider the 35 paired regions in the Desikan atlas, we can categorize the pairs based on whether both regions are among the 30 estimated signal vertices or not. The outcome is presented in Table 2. The regions with large distancebased correlations are significantly matched. based on a chisquare test yielding a p-value of 0.002. The 11 left-right hemisphere matched regions include caudal anterior cingulate, corpus callosum, cuneus, fusiform, lateral occipital, lingual, parsorbitalis, precuneus, rostral anterior cingulate, rostral middle frontal gyrus, and superior frontal gyrus, as shown in Figure 5.",
+          "page_span": [
+            5,
+            5
+          ]
+        }
+      ]
+    },
+    {
+      "id": "6-1-site-and-sex-prediction-with-human-brain",
+      "title": "6.1. Site and Sex Prediction With Human Brain",
+      "paras": [
+        {
+          "id": "6-1-site-and-sex-prediction-with-human-brain-p001",
+          "text": "Our objective is to predict the sex and site of each individual based on functional magnetic resonance image (fMRI) graphs [22]. We utilized two datasets, SWU4 [18] and HNU1 [6], which include 467 and 300 subjects, respectively. Each individual’s fMRI scan is registered to the MNI152 template using the Desikan atlas, which has 70 regions [7]. The graphs are 1https://github.com/neurodata/ndmg 6 Table 2. The number of left-right hemisphere matched regions with large or small distance-based correlations. Number of Pairs Right-Large Right-Small Left-Large 11 1 Left-Small 7 16 Fig. 6. The figure depicts the prediction error and distance correlation from various sizes of the estimated signal subgraph for mouse sex classification. This demonstrates that a smaller signal subgraph (with a size of 10) yields a better classification error compared to the full graph. Additionally, our designed iterative screening algorithm successfully identifies the signal subgraph, which maximizes the correlation.",
+          "page_span": [
+            5,
+            5
+          ]
+        }
+      ]
+    },
+    {
+      "id": "7-conclusion",
+      "title": "7. Conclusion",
+      "paras": [
+        {
+          "id": "7-conclusion-p001",
+          "text": "In summary, we developed an iterative vertex screening methodology to estimate the signal subgraph of interest and successfully applied the method in simulations and real data. Utilizing distance correlation and multiscale graph correlation lends strong interpretability to our methods. Given the existence of signal vertices where each vertex is dependent on the graph-level attributes (while non-signal vertices are independent), Theorem 1 suggests that the signal subgraph can be recovered with probability converging to 1 as the number of graphs increases. Furthermore, Theorems 2 and 3 suggest that subsequent classification using the signal vertices can be asymptotically Bayes optimal, and in certain cases (depending on the relationship between n and m), better than utilizing the full graph. We shall emphasize that the proposed method is essentially a dimension reduction technique, and one could use any subsequent classifier, not just Bayes plug-in. Therefore, Theorems 2 and 3 should be viewed as providing theoretical guarantees under a simple classifier case. Nevertheless, Theorem 1 is a very general result that focuses solely on dimension reduction. Intuitively, excluding",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "7-conclusion-p002",
+          "text": "independent vertices is expected to benefit",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "7-conclusion-p003",
+          "text": "many subsequent tasks beyond classification. Previous research has demonstrated that dependence measures can lead to better interpretability and improvements in complex machine learning architectures [12, 39]. The experiments and theories provide strong evidence that the iterative approach effectively and accurately estimates the signal subgraph, resulting in better performance for subsequent classification compared to conventional screening methods. It is important to emphasize once again that our method requires multiple graph datasets with a common set of vertices, and the more graphs the better. If there are multiple graphs available but the vertices are not matched, then our method is not applicable. However, if part of the vertex set is matched across graphs, our method can still be applied to the matched vertex subset. In cases where the vertices are matched but the actual correspondence is unknown, graph matching techniques may be applied first [20, 19]. Fig. 5. The figure displays the Desikan atlas, with highlighted brain regions that are substantially associated with site. The 11 matched brain regions identified in Table 2 are shown in red and are spatially adjacent to",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "7-conclusion-p004",
+          "text": "each other.",
+          "page_span": [
+            6,
+            6
+          ]
+        }
+      ]
+    },
+    {
+      "id": "6-2-sex-di-erence-in-mouse-brain",
+      "title": "6.2. Sex Diﬀerence in Mouse Brain",
+      "paras": [
+        {
+          "id": "6-2-sex-di-erence-in-mouse-brain-p001",
+          "text": "Structural magnetic resonance imaging has provided insight into the genetic basis of mouse brain variability by examining the relationship between volume covariance and genotypes [2]. With high-resolution diffusion tensor imaging and tractography, we can now investigate the underlying bases for structural connectivity patterns [4], in relationship with genotype and sex. Based on MRI and conventional Nissl histology, we scanned and registered 55 mouse brains (pooled genotypes) into the space of a minimum deformation template, aligned to Waxholm space [15]. The atlas labels were propagated onto the template and, subsequently, onto each individual brain using ANTs [1]. We employed DSI Studio [38] to estimate tract-based structural connectivity for each brain, which was then represented as a graph with 332 vertices, 166 per hemisphere. Of the 55 mice, 32 are male, and 23 are female. Similarly, we conduct a leave-one-out evaluation using an iterative vertex screening to estimate the signal subgraph, followed by a 9-nearest-neighbor classifier to predict the leftout sample based on the estimated signal subgraph. Figure 6 demonstrates the prediction error and distance correlation when",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "6-2-sex-di-erence-in-mouse-brain-p002",
+          "text": "using the iterative screening algorithm. Despite the small sample size and fluctuating prediction error, the screening method outputs a signal subgraph of size 10, which results in a nearoptimal classification error of 0.18. The estimated signal vertices include a thalamic component and the periaqueductal gray, which play an important role in driving sexually dimorphic mouse brain development [32, 24]. 7 Acknowledgement [18] Liu, W., Wei, D., Chen, Q., Yang, W., Meng, J., Wu, G., Bi, T., Zhang, Q., Zuo, X.N., Qiu, J., 2017. Longitudinal test-retest neuroimaging data from healthy young adults in southwest china. Scientific Data 4, 170017. [19] Lyzinski, V., Fishkind, D., Fiori, M., Vogelstein, J.T., Priebe, C.E., Sapiro, G., 2016. Graph matching: Relax at your own risk. IEEE Transactions on Pattern Analysis and Machine Intelligence 38, 60–73. [20] Lyzinski, V., Fishkind, D., Priebe, C.E., 2014. Seeded graph matching for correlated Erdos-Renyi graphs. Journal of Machine Learning Research 15, 3513–3540. [21] Newman, M., Watts, D., Strogatz, S., 2002. Random graph models of social networks. PNAS 99, 2566–2672. [22] Ogawa, S., Lee, T.M., Kay, A.R., Tank, D.W., 1990. Brain magnetic",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "6-2-sex-di-erence-in-mouse-brain-p003",
+          "text": "resonance imaging with contrast dependent on blood oxygenation. Pro-",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "6-2-sex-di-erence-in-mouse-brain-p004",
+          "text": "ceedings of the National Academy of Sciences 87, 9868–9872. [23] Otte, E., Rousseau, R., 2002. Social network analysis: a powerful strategy, also for the information sciences. Journal of information Science 28, 441–453. [24] Raznahan, A., Probst, F., Palmert, M.R., Giedd, J.N., Lerch, J.P., 2013. High resolution whole brain imaging of anatomical variation in xo, xx, and xy mice. Neuroimage 83, 962–968. [25] Robert, P., Escoufier, Y., 1976. A unifying tool for linear multivariate statistical methods: the rv-coefficient. Applied statistics , 257–265. [26] Shen, C., Chung, J., Mehta, R., Xu, T., Vogelstein, J.T., 2023. Independence testing for temporal data. https://arxiv.org/abs/1908.06486 . [27] Shen, C., Dong, Y., 2024. High-dimensional independence testing via maximum and average distance correlations. https://arxiv.org/abs/2001.01095 . [28] Shen, C., Panda, S., Vogelstein, J.T., 2022. The chi-square test of distance correlation. Journal of Computational and Graphical Statistics 31, 254– 262. [29] Shen, C., Priebe, C.E., Vogelstein, J.T., 2020. From distance correlation to multiscale graph correlation. Journal of the American Statistical Association 115, 280–291. [30] Shen, C.,",
+          "page_span": [
+            7,
+            7
+          ]
+        },
+        {
+          "id": "6-2-sex-di-erence-in-mouse-brain-p005",
+          "text": "Vogelstein, J.T., 2021. The exact equivalence of distance and",
+          "page_span": [
+            7,
+            7
+          ]
+        },
+        {
+          "id": "6-2-sex-di-erence-in-mouse-brain-p006",
+          "text": "kernel methods in hypothesis testing. AStA Advances in Statistical Analysis 105, 385–403. [31] Shen, C., Vogelstein, J.T., Priebe, C., 2017. Manifold matching using shortest-path distance and joint neighborhood selection. Pattern Recognition Letters 92, 41–48. [32] Spring, S., Lerch, J.P., Henkelman, R.M., 2007. Sexual dimorphism revealed in the structure of the mouse brain using three-dimensional magnetic resonance imaging. Neuroimage 35, 1424–1433. [33] Sz ́ekely, G.J., Rizzo, M.L., Bakirov, N.K., et al., 2007. Measuring and testing dependence by correlation of distances. Annals of Statistics 35, 2769–2794. [34] Tibshirani, R., 1996. Regression shrinkage and selection via the lasso. Journal of the Royal Statistical Society: Series B 58, 267–288. [35] Vogelstein, J.T., Roncal, W.G., Vogelstein, R.J., Priebe, C.E., 2013. Graph classification using signal-subgraphs: Applications in statistical connectomics. IEEE transactions on pattern analysis and machine intelligence 35, 1539–1551. [36] Vogelstein, J.T., Wang, Q., Bridgeford, E., Priebe, C.E., Maggioni, M., Shen, C., 2019. Discovering and deciphering relationships across disparate data modalities. eLife 8, e41690. [37] Wang, X.,",
+          "page_span": [
+            7,
+            7
+          ]
+        },
+        {
+          "id": "6-2-sex-di-erence-in-mouse-brain-p007",
+          "text": "Pan, W., Hu, W., Tian, Y., Zhang, H., 2015. Conditional Dis-",
+          "page_span": [
+            7,
+            7
+          ]
+        },
+        {
+          "id": "6-2-sex-di-erence-in-mouse-brain-p008",
+          "text": "tance Correlation. Journal of the American Statistical Association 110, 1726–1734. [38] Yeh, F.C., Verstynen, T.D., Wang, Y., Fern ́andez-Miranda, J.C., Tseng, W.Y.I., 2013. Deterministic diffusion fiber tracking improved by quantitative anisotropy. PloS one 8, e80713. [39] Zhen, X., Meng, Z., Chakraborty, R., Singh, V., 2022. On the versatile uses of partial distance correlation in deep learning, in: European Conference on Computer Vision, pp. 327–346. [40] Zhu, L.P., Li, L., Li, R., Zhu, L.X., 2011. Model-free feature screening for ultrahigh-dimensional data. Journal of the American Statistical Association 106, 1464–1475. [41] Zou, H., Hastie, T., 2006. Sparse principal component analysis. Journal of Computational and Graphical Statistics 15, 262–286. The authors gratefully acknowledge support from the Defense Advanced Research Projects Agency’s (DARPA) GRAPHS program through contract N66001-14-1-4028, the DARPA SIMPLEX program through contract N66001-15-C- 4041, the DARPA D3M program through contract FA8750- 17-2-0112, the DARPA Lifelong Learning Machines program through contract FA8650-18-2-7834, the National Science Foundation awards DMS-1921310 and DMS-2113099, and the",
+          "page_span": [
+            7,
+            7
+          ]
+        },
+        {
+          "id": "6-2-sex-di-erence-in-mouse-brain-p009",
+          "text": "National Institutes of Health through R01 MH120482,",
+          "page_span": [
+            7,
+            7
+          ]
+        },
+        {
+          "id": "6-2-sex-di-erence-in-mouse-brain-p010",
+          "text": "K01 AG041211, R56 AG057895, P41 EB015897 and S10 OD010683. The authors would like to thank Dr. Daniel S. Margulies for useful feedback, and Dr. Carol Colton for her advice on the mouse experiments.",
+          "page_span": [
+            7,
+            7
+          ]
+        }
+      ]
+    },
+    {
+      "id": "references",
+      "title": "References",
+      "paras": [
+        {
+          "id": "references-p001",
+          "text": "[1] Avants, B.B., Tustison, N.J., Song, G., Cook, P.A., Klein, A., Gee, J.C.,",
+          "page_span": [
+            7,
+            7
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2011-a-reproducible-evaluation-of-ants-similarity-metric-performance-in",
+      "title": "2011. A reproducible evaluation of ants similarity metric performance in",
+      "paras": [
+        {
+          "id": "2011-a-reproducible-evaluation-of-ants-similarity-metric-performance-in-p001",
+          "text": "brain image registration. Neuroimage 54, 2033–2044. [2] Badea, A., Johnson, G.A., Williams, R., 2009. Genetic dissection of the mouse brain using high-field magnetic resonance microscopy. Neuroimage 45, 1067–1079. [3] Bullmore, E.T., Bassett, D.S., 2011. Brain graphs: graphical models of the human brain connectome. Annual review of clinical psychology 7, 113–140. [4] Calabrese, E., Badea, A., Cofer, G., Qi, Y., Johnson, G.A., 2015. A diffusion mri tractography connectome of the mouse brain and comparison with neuronal tracer data. Cerebral Cortex 25, 4628–4637. [5] Candes, E., Tao, T., 2007. The dantzig selector: Statistical estimation when p is much larger than n. Annals of Statistics 35, 2313–2351. [6] Chen, B., Xu, T., Zhou, C., Wang, L., Yang, N., Wang, Z., Dong, H.M., Yang, Z., Zang, Y.F., Zuo, X.N., Weng, X.C., 2015. Individual variability and test-retest reliability revealed by ten repeated resting-state brain scans over one month. PloS One 10, e0144963. [7] Desikan, R.S., S ́egonne, F., Fischl, B., Quinn, B.T., Dickerson, B.C., Blacker, D., Buckner, R.L., Dale, A.M., Maguire, R.P., Hyman, B.T., et al., 2006. An automated labeling system for subdividing the human cerebral",
+          "page_span": [
+            7,
+            7
+          ]
+        },
+        {
+          "id": "2011-a-reproducible-evaluation-of-ants-similarity-metric-performance-in-p002",
+          "text": "cortex on mri scans into gyral based regions of interest. Neu-",
+          "page_span": [
+            7,
+            7
+          ]
+        },
+        {
+          "id": "2011-a-reproducible-evaluation-of-ants-similarity-metric-performance-in-p003",
+          "text": "roimage 31, 968–980. [8] Devroye, L., Gy ̈orfi, L., Lugosi, G., 2013. A probabilistic theory of pattern recognition. volume 31. Springer Science & Business Media. [9] Erdos, P., Renyi, A., 1959. On random graphs i. Publ. Math. Debrecen 6, 290–297. [10] Fan, J., Lv, J., 2008. Sure independence screening for ultrahigh dimensional feature space. Journal of the Royal Statistical Society: Series B (Statistical Methodology) 70, 849–911. [11] Fokianos, K., Pitsillou, M., 2018. Testing independence for multivariate time series via the auto-distance correlation matrix. Biometrika 105, 337– 352. [12] Guo, D., Wang, C., Wang, B., Zha, H., 2024. Learning fair representations via distance correlation minimization. IEEE Transactions on Neural Networks and Learning Systems 35, 2139 – 2152. [13] Hotelling, H., 1936. Relations between two sets of variates. Biometrika 28, 321–377. [14] Hu, W., Fey, M., Zitnik, M., Dong, Y., Ren, H., Liu, B., Catasta, M., Leskovec, J., 2020. Open graph benchmark: Datasets for machine learning on graphs, in: Advances in Neural Information Processing Systems, pp. 22118–22133. [15] Johnson, G.A., Badea, A., Brandenburg, J., Cofer, G., Fubara, B., Liu, S., Nissanov, J.,",
+          "page_span": [
+            7,
+            7
+          ]
+        },
+        {
+          "id": "2011-a-reproducible-evaluation-of-ants-similarity-metric-performance-in-p004",
+          "text": "2010. Waxholm space: an image-based reference for",
+          "page_span": [
+            7,
+            7
+          ]
+        },
+        {
+          "id": "2011-a-reproducible-evaluation-of-ants-similarity-metric-performance-in-p005",
+          "text": "coordinating mouse brain research. Neuroimage 53, 365–372. [16] Lee, Y., Shen, C., Priebe, C.E., Vogelstein, J.T., 2019. Network dependence testing via diffusion maps and distance-based correlations. Biometrika 106, 857–873. [17] Li, R., Zhong, W., Zhu, L., 2012. Feature screening via distance correlation learning. Journal of the American Statistical Association 107, 1129–1139.",
+          "page_span": [
+            7,
+            7
+          ]
+        }
+      ]
+    }
+  ]
+}

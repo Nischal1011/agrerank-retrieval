@@ -1,0 +1,581 @@
+{
+  "id": "1910.08883v5",
+  "title": "Universally Consistent K-Sample Tests via Dependence Measures",
+  "metadata": {
+    "source_path": "data/pdf_files/1910.08883v5.pdf",
+    "page_count": 14,
+    "hash": "3ae1711c62c62078c48498aaa1f4dae7758969dff2a77cd0b4a64dd6e78d47be"
+  },
+  "sections": [
+    {
+      "id": "front-matter",
+      "title": "Front Matter",
+      "paras": [
+        {
+          "id": "front-matter-p001",
+          "text": "Universally Consistent K-Sample Tests via Dependence Measures Sambit Pandaa,∗, Cencheng Shenb,∗, Ronan Perrya, Jelle Zornc, Antoine Lutzc, Carey E. Priebed, Joshua T. Vogelsteina,e,∗∗ aDepartment of Biomedical Engineering, Johns Hopkins University, Maryland, USA bDepartment of Applied Economics and Statistics, University of Delaware, Delaware, USA cLyon Neuroscience Research Centre, Universite Claude Bernard Lyon 1, Lyon, France dDepartment of Applied Mathematics and Statistics, Johns Hopkins University, Maryland, USA eCenter for Imaging Science and Kavli Neuroscience Discovery Institute, Johns Hopkins University, Maryland, USA arXiv:1910.08883v5 [stat.ML] 14 Sep 2024",
+          "page_span": [
+            1,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "id": "abstract",
+      "title": "Abstract",
+      "paras": [
+        {
+          "id": "abstract-p001",
+          "text": "The K-sample testing problem involves determining whether K groups of data points are each drawn from the same distribution. Analysis of variance is arguably the most classical method to test mean differences, along with several recent methods to test distributional differences. In this paper, we demonstrate the existence of a transformation that allows K- sample testing to be carried out using any dependence measure. Consequently, universally consistent K-sample testing can be achieved using a universally consistent dependence measure, such as distance correlation and the Hilbert-Schmidt independence criterion. This enables a wide range of dependence measures to be easily applied to K-sample testing. Keywords: K-Sample Testing, Testing Independence, Dependence Measure",
+          "page_span": [
+            1,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "id": "1-introduction",
+      "title": "1. Introduction",
+      "paras": [
+        {
+          "id": "1-introduction-p001",
+          "text": "Given two datasets {u(1) ∈Rp, i = 1, . . . , n1} and {u(2) ∈Rp, j = 1, . . . , n2}, assume each u(1) is sampled independently and identically (i.i.d.) from FU1, and each u(2) is sampled i.i.d. from FU2. Also, assume that each pair (u(1) i , u(1) j ) is independent for any (i, j). The classical two-sample testing problem tests whether the two datasets were sampled from the same distribution, stated as: H0 : FU1 = FU2, HA : FU1 , FU2. The K-sample testing problem is a generalization of the above. Let {u(k) i.i.d. ∼FUk ∈Rp, i = 1, . . . , nk} for k = 1, . . . , K, and assume (u(s) i , u(t) j ) is independent for any (i, j, s, t). We aim to test: H0 : FU1 = F2 = · · · = FUK, HA : ∃s , t s.t. FUs , FUt. Student’s t-test and its multivariate generalization, Hotelling’s T 2, are traditionally used for two-sample testing, while analysis of variance (Anova) or multivariate analysis of variance (Manova) are conventional choices for K-sample tests. These tests, however, only aim to test mean differences, and do not perform well for non-Gaussian data beyond their parametric assumptions [36]. To address this, several nonparametric statistics have been developed to test distributional",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "1-introduction-p002",
+          "text": "differences, such as Energy [31] and maximal mean discrepancy (Mmd) [5] for two-sample tests, and multivariate Heller-",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "1-introduction-p003",
+          "text": "Heller-Gorfine [9] and distance components (Disco) [18] for K-sample tests. A closely related and popular problem in statistics is testing independence. Given xi ∈Rp and yi ∈Rq, and n samples of (xi, yi) iid∼FXY, the independence hypothesis is stated as: H0 : FXY = FXFY, HA : FXY , FXFY. ∗Sambit Panda and Cencheng Shen contribute equally to this work. ∗∗Corresponding author. Email: jovo@jhu.edu Preprint submitted to Elsevier September 17, 2024 Traditional Pearson’s correlation [17] is popular but limited to detecting linear dependence. Many non-parametric methods have been proposed recently, such as distance covariance (Dcov) [33, 30], Hilbert-Schmidt independence criterion (Hsic) [7, 6, 2], multiscale graph correlation (Mgc) [34, 26], among many others [8, 14, 38, 16]. These recent dependence measures are universally consistent under mild assumptions, such as finite moments. Specifically, the sample statistic converges to a population statistic, which equals 0 if and only if X and Y are independent. Therefore, these measures can detect any type of relationship given a sufficiently large sample size, and the testing power increases to 1 as n increases, regardless of whether the",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "1-introduction-p004",
+          "text": "underlying relationship is linear or nonlinear. These universally con-",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "1-introduction-p005",
+          "text": "sistent dependence measures have found applications for various inference tasks, such as feature screening [11, 37, 29, 22], time-series analysis [39, 21], conditional independence [4, 32, 35], and graph testing [10, 20]. In this manuscript, we establish a fundamental connection between K-sample testing and independence testing: there exists a transformation of the given data such that the K-sample testing problem is converted to the independence testing problem on the transformed data. As a result, any universally consistent dependence measure can be used to achieve universally consistent K-sample testing. Moreover, the proposed sample transformation allows previously established twosample statistics, such as Energy and Mmd, to be equivalent to the corresponding dependence measures, Dcov and Hsic, respectively; and the more general K-sample Disco equals a bootstrap version of Dcov. Finally, we used simulated data to verify the validity, consistency, and finite-sample testing power of several popular dependence measures for K-sample testing. Theorem proofs and additional simulations are provided in the supplementary material. The code is available in the Hyppo statistical package",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "1-introduction-p006",
+          "text": "[15] and on GitHub1.",
+          "page_span": [
+            2,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2-method-and-theory",
+      "title": "2. Method and Theory",
+      "paras": [
+        {
+          "id": "2-method-and-theory-p001",
+          "text": "In this section, we first review Dcov and Hsic, which are the foundational blocks of universally consistent dependence measures. Next, we introduce the population transformation that converts K-sample testing to independence testing in the random variable setting, enabling any consistent dependence measure to achieve consistent K-sample testing. We then proceed to the sample method and prove the sample equivalence between Dcov and Energy, and between Hsic and Mmd. Throughout this section, we assume all distributions have finite moments, and all proofs are provided in the appendix.",
+          "page_span": [
+            2,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2-1-review-of-dependence-measures",
+      "title": "2.1. Review of Dependence Measures",
+      "paras": [
+        {
+          "id": "2-1-review-of-dependence-measures-p001",
+          "text": "Denote the paired sample data as (X, Y) = {(xi, yi) ∈Rp+q, i = 1, . . . , n}, where each sample pair (xi, yi) is assumed to be i.i.d. as FXY with finite moments. Given a distance metric d(·, ·) : Rp × Rq →R, such as the Euclidean metric, denote DX and DY as the n × n distance matrices for X and Y, respectively. Define H = ⃗I −1 n ⃗J as an n × n centering matrix, where ⃗I is the identity matrix and ⃗J is the matrix of ones. Then the sample distance covariance (Dcov) and distance correlation (Dcor) can be computed by: Dcovn(X, Y) = 1 n2 trace(HDXHHDYH), Dcorn(X, Y) = Dcovn(X, Y) √Dcovn(X, X)Dcovn(Y, Y) . By default, distance correlation utilizes the Euclidean distance as its metric, but it can be any metric of strong negative type [12], or a characteristic kernel upon a kernel to metric transformation [19, 27]. Moreover, by replacing the distance metric d(·, ·) with a kernel measure k(·, ·), such that DX and DY become the corresponding kernel matrices, Dcov becomes Hsic.",
+          "page_span": [
+            2,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2-2-population-transformation",
+      "title": "2.2. Population Transformation",
+      "paras": [
+        {
+          "id": "2-2-population-transformation-p001",
+          "text": "Theorem 1. Given K random variables (U1, U2, . . . , UK). Let V ∈RK be the multinomial distribution of probability (π1, π2, . . . , πK), where πk ∈(0, 1) and PK k=1 πk = 1. Let U be the following mixture distribution: U = k=1 1(Vk = 1)Uk, where Vk denotes the kth dimension of V. Then, FUV = FUFV if and only if FU1 = FU2 = · · · = FUK. 1https://hyppo.neurodata.io/ 2 Therefore, the proposed transformation from (U1, U2, . . . , UK) →(U, V) converts K-sample testing on (U1, U2, . . . , UK) to independence testing on (U, V), leading to the consistency of dependence measures for K-sample testing. Corollary 1. Suppose τ(·, ·) is a universally consistent dependence measure such that τ(X, Y) = 0 if and only if X and Y are independent. Then, via the proposed transformation in Theorem 1, τ(U, V) is universally consistent for the K-sample test on Uk, i.e., τ(U, V) = 0 if and only if FU1 = FU2 = · · · = FUK. Note that the probabilities {πk} can be easily chosen based on sample size, as described in the sample method subsection below. However, the transformation and the resulting consistency apply to any {πk}, as long as all probabilities are positive, ensuring that each random variable Uk has a",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "2-2-population-transformation-p002",
+          "text": "positive probability of appearing in the mixture U. For example, if we use",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "2-2-population-transformation-p003",
+          "text": "Dcov as the statistic, the value of Dcov(U, V) may differ for different choices of {πk} when some distributions are different. Nonetheless, Dcov(U, V) = 0 if and only if all distributions are the same, which holds for any choice of {πk}.",
+          "page_span": [
+            3,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2-3-sample-method",
+      "title": "2.3. Sample Method",
+      "paras": [
+        {
+          "id": "2-3-sample-method-p001",
+          "text": "Given the sample data and a sample dependence measure τn(·, ·), we can carry out the K-sample testing as follows: • Input: For each k = 1, . . . , K, the sample data Uk = [u(k) 1 , . . . , u(k) nk ]T ∈Rnk×p; a given sample dependence measure τn(·, ·) : Rn×p × Rn×K →R. • Sample Transformation: Let n = PK k=1 nk, we set U ∈Rn×p as the row-concatenation of all data matrices, and V ∈Rn×K as a one-hot encoding of the data source label. That is, U1 ... UK ∈Rn×p, U = ⃗1n1×1 ⃗0n1×1 . . . ⃗0n1×1 ⃗0n2×1 ⃗1n2×1 . . . ⃗0n2×1 ... ... ... ... ⃗0nK×1 ⃗0nK×1 . . . ⃗1nK×1 ∈Rn×K, V = where ⃗1n1×1 is the vector of ones of length n1. • Dependence Measure: Compute τn(U, V). • Permutation Test: Compute the p-value via a standard permutation test, i.e., pval = 1 r=1 1{τn(U, permr(V)) > τn(U, V)} where permr() represents a random permutation of size n (which is different and randomized for each r), and R is the number of permutations. • Output: The sample statistic τn(U, V) and its p-value. Here, the sample matrix pair (U, V) can be viewed as the sample realization of the population transformation (U, V), where the mixture probability {πk = nk n , k = 1, . . . , K}. The one-hot encoding scheme has been a",
+          "page_span": [
+            3,
+            3
+          ]
+        },
+        {
+          "id": "2-3-sample-method-p002",
+          "text": "fundamental technique in",
+          "page_span": [
+            3,
+            3
+          ]
+        },
+        {
+          "id": "2-3-sample-method-p003",
+          "text": "neural networks and machine learning [1, 13] and has recently been applied in graph embedding [28, 23, 25]. For the choice of dependence measure, τn(U, V) can be any aforementioned sample dependence measure, such as Dcov, Hsic, Mgc, etc. While the permutation test is used here, one could use a faster testing procedure, such as the chi-square test via an unbiased test statistic [24]. Because V is categorical, the distance between any two rows of V can only take two values. Specifically, d(V(i, :), V( j, : )) is either 0 when V(i, :) = V( j, :) or √ 2 when V(i, :) , V( j, :) under Euclidean distance. The former occurs when the ith and jth sample data come from the same group, and the latter occurs when they come from different groups. We use β to denote the maximum distance minus the minimum distance within the distance matrix of V. As the first and last observations in V always come from different groups based on our construction, we can conveniently let β = d(V(1, :), V(n, :)) in this case, where V(1, :) represents the first row and V(n, :) represents the last row of the matrix. 3",
+          "page_span": [
+            3,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2-4-sample-properties",
+      "title": "2.4. Sample Properties",
+      "paras": [
+        {
+          "id": "2-4-sample-properties-p001",
+          "text": "Given the above sample transformation, the sample distance covariance for (U, V) can be proved to be exactly the same as the sample energy statistic for (U1, U2), up to a scalar constant. Theorem 2. Assume a translation-invariant metric d(·, ·) is used, and denote β = d(V(1, :), V(n, :)). It follows that Dcovn(U, V) = 2n2 1n2 2β n4 · Energyn1,n2(U1, U2), Under the permutation test, distance covariance, distance correlation, and energy statistic have the same testing p-value. By default, both Dcov and Energy use Euclidean distance, which is translation-invariant. Moreover, due to the existing transformation between distance and kernel, Hsic is also equivalent to Mmd. Theorem 3. Assume a translation-invariant kernel k(·, ·) is used, and denote β = k(V(1, :), V(n, :)) −k(V(1, :), V(1, :)). It follows that Hsicn(U, V) = 2n2 1n2 2β n4 · Mmdn1,n2(U1, U2), Under the permutation test, Hilbert-Schmidt independence criterion and maximum mean discrepancy have the same testing p-value. Lastly, in the case of general K-sample testing, the sample distance covariance for (U, V) is a weighted summation of pairwise two-sample energy statistics. This coincides with the K-sample Disco statistic if",
+          "page_span": [
+            4,
+            4
+          ]
+        },
+        {
+          "id": "2-4-sample-properties-p002",
+          "text": "the data sources are equally",
+          "page_span": [
+            4,
+            4
+          ]
+        },
+        {
+          "id": "2-4-sample-properties-p003",
+          "text": "weighted. Theorem 4. Assume a translation-invariant metric d(·, ·) is used, and denote β = d(V(1, :), V(n, :)). It follows that .  n(ns + nt) −PK l=1 n2 n4 · nsntEnergyns,nt(Us, Ut) Dcovn(U, V) = β 1≤s<t≤K Moreover, sample distance covariance is equivalent to the sample Disco statistic when n1 = n2 = . . . = nk, in which case Dcovn(U, V) = 2β nK Disco({Uk}). Therefore, if we consider a bootstrap resampling of the given data {Uk}, such that the bootstrap samples consist of the same number of observations per data source, and let U and V be the concatenated bootstrap samples, this will enforce n1 = n2 = . . . = nK. Thus, distance covariance for K-sample testing is equivalent to Disco on equally-weighted bootstrap samples. It is worth noting that Proposition 6 and Corollary 5 of [3] also establish the equivalence between Hsic and Mmd, which aligns with our Theorem 3 for a kernel choice where β = 1. Their work focused on discrete kernels for categorical data and found that Hsic coincides with Mmd in this context. In contrast, our paper employs one-hot encoding to transform the K-sample problem into an independence test, with V always being discrete. Interestingly, despite",
+          "page_span": [
+            4,
+            4
+          ]
+        },
+        {
+          "id": "2-4-sample-properties-p004",
+          "text": "starting from different",
+          "page_span": [
+            4,
+            4
+          ]
+        },
+        {
+          "id": "2-4-sample-properties-p005",
+          "text": "perspectives and following different procedures, we arrived at the same equivalence.",
+          "page_span": [
+            4,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "id": "3-simulations",
+      "title": "3. Simulations",
+      "paras": [
+        {
+          "id": "3-simulations-p001",
+          "text": "We aim to verify the validity and consistency of using dependence measures for two-sample tests. Specifically, we consider three univariate settings and compare Anova, distance correlation, and Hsic in each case. Note that more numerical comparisons involving other dependence measures and non-Gaussian simulations are provided in appendix Figure F1. We set up two random variables U1 and U2 and the corresponding parameters as follows:",
+          "page_span": [
+            4,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2-mean-difference-u1-is-standard-normal-and-u2-normal-c-1-where-c-0-0-05-0-1-0-5-n1-100-and",
+      "title": "2. Mean Difference: U1 is standard normal, and U2 ∼Normal(c, 1), where c = 0, 0.05, 0.1, . . . , 0.5. n1 = 100, and",
+      "paras": [
+        {
+          "id": "2-mean-difference-u1-is-standard-normal-and-u2-normal-c-1-where-c-0-0-05-0-1-0-5-n1-100-and-p001",
+          "text": "n2 = 200.",
+          "page_span": [
+            4,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "id": "3-variance-difference-u1-is-standard-normal-and-u2-normal-0-1-c-where-c-0-0-1-1-n1-100-and",
+      "title": "3. Variance Difference: U1 is standard normal, and U2 ∼Normal(0, 1 + c), where c = 0, 0.1, . . . , 1. n1 = 100, and",
+      "paras": [
+        {
+          "id": "3-variance-difference-u1-is-standard-normal-and-u2-normal-0-1-c-where-c-0-0-1-1-n1-100-and-p001",
+          "text": "n2 = 200. 4 1 1 1 ANOVA Dcov Hsic 0.8 0.8 0.8 Testing Power 0.6 0.6 0.6 0.4 0.4 0.4 0.2 0.2 0.2 0 0 0 20 100 200 Size Difference 0 0.25 0.5 Mean Difference 0 0.5 1 Variance Difference Figure 1: The figure compares the testing power of Anova, Dcov, and Hsic for three different Gaussian-simulated sample datasets. We generate sample data U1 and U2 accordingly, and compute the p-value for each method. This is repeated for 1000 replicates, and we compute the testing power of each method by checking how often the p-value is lower than at the type 1 error level 0.05. Figure 1 shows the testing power for each simulation. In the first simulation (left panel), there is no distribution difference; only the sample sizes are different, and all methods have a testing power of about 0.05. In the second simulation (center panel), the mean difference is detected by all three methods, with Anova and Dcov showing the best power, followed by Hsic. In the last simulation (right panel), Anova has little power, while Hsic performs the best, followed by Dcov. Overall, the first simulation demonstrates the validity of all methods, while the second and third simulations demonstrate the consistency of",
+          "page_span": [
+            4,
+            4
+          ]
+        },
+        {
+          "id": "3-variance-difference-u1-is-standard-normal-and-u2-normal-0-1-c-where-c-0-0-1-1-n1-100-and-p002",
+          "text": "dependence measures in testing distributional differences. As Anova is designed to detect mean",
+          "page_span": [
+            4,
+            4
+          ]
+        },
+        {
+          "id": "3-variance-difference-u1-is-standard-normal-and-u2-normal-0-1-c-where-c-0-0-1-1-n1-100-and-p003",
+          "text": "differences in Gaussian settings, it works for the second simulation but not the third. We also notice that Dcov is better at detecting mean differences, while Hsic is better at detecting variance differences, which can be attributed to the fact that Dcov has better finite-sample power for detecting linear dependence, while Hsic is better at detecting nonlinear dependence. We note that while universally consistent dependence measures are guaranteed to achieve perfect testing power given a sufficiently large sample size, different dependence measures can excel at detecting different distributions, requiring less sample size to achieve power 1.",
+          "page_span": [
+            5,
+            5
+          ]
+        }
+      ]
+    },
+    {
+      "id": "acknowledgments",
+      "title": "Acknowledgments",
+      "paras": [
+        {
+          "id": "acknowledgments-p001",
+          "text": "This work is supported by the Defense Advanced Research Projects Agency (DARPA) Lifelong Learning Machines program through contract FA8650-18-2-7834, the National Institutes of Health awards RO1MH120482 and T32GM119998, and the National Science Foundation award DMS-1921310 and DMS-2113099. The authors would like to thank the editor, two anonymous reviewers, Dr. Russell Lyons, Dr. Minh Tang, Mr. Ronak Mehta, Mr. Eric W. Bridgeford, and the rest of the NeuroData group at Johns Hopkins University for valuable feedback.",
+          "page_span": [
+            5,
+            5
+          ]
+        }
+      ]
+    },
+    {
+      "id": "references",
+      "title": "References",
+      "paras": [
+        {
+          "id": "references-p001",
+          "text": "[1] Bishop, C.M., 1995. Neural Networks for Pattern Recognition. Oxford University Press. [2] Bounliphone, W., Belilovsky, E., Blaschko, M.B., Antonoglou, I., Gretton, A., 2016. A test of relative similarity for model selection in generative models, in: International Conference on Learning Representations. [3] Edelmann, D., Goeman, J., 2022. A regression perspective on generalized distance covariance and the hilbert–schmidt independence criterion. Statistical Science 37, 562–579. [4] Fukumizu, K., Gretton, A., Sun, X., Sch ̈olkopf, B., 2007. Kernel measures of conditional dependence, in: Platt, J., Koller, D., Singer, Y., Roweis, S. (Eds.), Advances in Neural Information Processing Systems, Curran Associates, Inc.. p. 489–496. [5] Gretton, A., Borgwardt, K.M., Rasch, M.J., Sch ̈olkopf, B., Smola, A., 2012. A kernel two-sample test. Journal of Machine Learning Research 13, 723–773. 5 [6] Gretton, A., Gy ̈orfi, L., 2010. Consistent nonparametric tests of independence. Journal of Machine Learning Research 11, 1391–1423. [7] Gretton, A., Herbrich, R., Smola, A., Bousquet, O., Sch ̈olkopf, B., 2005. Kernel methods for measuring independence. Journal of Machine Learning Research 6,",
+          "page_span": [
+            5,
+            5
+          ]
+        },
+        {
+          "id": "references-p002",
+          "text": "2075–2129.",
+          "page_span": [
+            5,
+            5
+          ]
+        },
+        {
+          "id": "references-p003",
+          "text": "[8] Heller, R., Heller, Y., Gorfine, M., 2012. A consistent multivariate test of association based on ranks of distances. Biometrika 100, 503–510. [9] Heller, R., Heller, Y., Kaufman, S., Brill, B., Gorfine, M., 2016. Consistent distribution-free k-sample and independence tests for univariate random variables. The Journal of Machine Learning Research 17, 978–1031. [10] Lee, Y., Shen, C., Priebe, C.E., Vogelstein, J.T., 2019. Network dependence testing via diffusion maps and distance-based correlations. Biometrika 106, 857–873. [11] Li, R., Zhong, W., Zhu, L., 2012. Feature screening via distance correlation learning. Journal of the American Statistical Association 107, 1129– 1139. [12] Lyons, R., 2013. Distance covariance in metric spaces. Annals of Probability 41, 3284–3305. [13] Murphy, K.P., 2012. Machine Learning: A Probabilistic Perspective. MIT Press. [14] Pan, W., Wang, X., Zhang, H., Zhu, H., Zhu, J., 2020. Ball covariance: A generic measure of dependence in banach space. Journal of the American Statistical Association 115, 307–317. [15] Panda, S., Palaniappan, S., Xiong, J., Bridgeford, E.W., Mehta, R., Shen, C., Vogelstein, J., 2024a. hyppo: A multivariate hypothesis",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "references-p004",
+          "text": "testing python",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "references-p005",
+          "text": "package. arXiv preprint arXiv:1907.02088 . [16] Panda, S., Shen, C., Vogelstein, J.T., 2024b. Learning interpretable characteristic kernels via decision forests. arXiv preprint arXiv:1812.00029 . [17] Pearson, K., 1895. Vii. note on regression and inheritance in the case of two parents. proceedings of the royal society of London 58, 240–242. [18] Rizzo, M.L., Sz ́ekely, G.J., 2010. Disco analysis: A nonparametric extension of analysis of variance. Annals of Applied Statistics 4, 1034–1055. [19] Sejdinovic, D., Sriperumbudur, B., Gretton, A., Fukumizu, K., 2013. Equivalence of distance-based and rkhs-based statistics in hypothesis testing. Annals of Statistics 41, 2263–2291. [20] Shen, C., Arroyo, J., Xiong, J., Vogelstein, J.T., 2024a. Community correlations and testing independence between binary graphs. arXiv preprint arXiv:1906.03661 . [21] Shen, C., Chung, J., Mehta, R., Xu, T., Vogelstein, J.T., 2024b. Independence testing for temporal data. Transactions on Machine Learning Research URL: https://openreview.net/forum?id=jv1aPQINc4. [22] Shen, C., Dong, Y., 2024. High-dimensional independence testing via maximum and average distance correlations. arXiv preprint arXiv:2001.01095",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "references-p006",
+          "text": ".",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "references-p007",
+          "text": "[23] Shen, C., Larson, J., Trinh, H., Qin, X., Park, Y., Priebe, C.E., 2024c. Discovering communication pattern shifts in large-scale labeled networks using encoder embedding and vertex dynamics. IEEE Transactions on Network Science and Engineering 11, 2100–2109. [24] Shen, C., Panda, S., Vogelstein, J.T., 2022. The chi-square test of distance correlation. Journal of Computational and Graphical Statistics 31, 254–262. [25] Shen, C., Priebe, C.E., Larson, J., Trinh, H., 2024d. Synergistic graph fusion via encoder embedding. Information Sciences 678, 120912. [26] Shen, C., Priebe, C.E., Vogelstein, J.T., 2020. From distance correlation to multiscale graph correlation. Journal of the American Statistical Association 115, 280–291. [27] Shen, C., Vogelstein, J.T., 2021. The exact equivalence of distance and kernel methods in hypothesis testing. AStA Advances in Statistical Analysis 105, 385–403. [28] Shen, C., Wang, Q., Priebe, C.E., 2023. One-hot graph encoder embedding. IEEE Transactions on Pattern Analysis and Machine Intelligence 45, 7933–7938. [29] Shen, C., Wang, S., Badea, A., Priebe, C.E., Vogelstein, J.T., 2024e. Discovering the signal subgraph: An iterative screening approach",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "references-p008",
+          "text": "on graphs.",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "references-p009",
+          "text": "Pattern Recognition Letters 184, 97–102. [30] Sz ́ekely, G.J., Rizzo, M.L., 2013a. The distance correlation t-test of independence in high dimension. Journal of Multivariate Analysis 117, 193–213. [31] Sz ́ekely, G.J., Rizzo, M.L., 2013b. Energy statistics: A class of statistics based on distances. Journal of statistical planning and inference 143, 1249–1272. [32] Sz ́ekely, G.J., Rizzo, M.L., 2014. Partial distance correlation with methods for dissimilarities. Annals of Statistics 42, 2382–2412. [33] Sz ́ekely, G.J., Rizzo, M.L., Bakirov, N.K., 2007. Measuring and testing dependence by correlation of distances. Annals of statistics 35, 2769–2794. [34] Vogelstein, J.T., Bridgeford, E.W., Wang, Q., Priebe, C.E., Maggioni, M., Shen, C., 2019. Discovering and deciphering relationships across disparate data modalities. eLife 8, e41690. [35] Wang, X., Pan, W., Hu, W., Tian, Y., Zhang, H., 2015. Conditional Distance Correlation. Journal of the American Statistical Association 110, 1726–1734. [36] Warne, R., 2014. A primer on multivariate analysis of variance (manova) for behavioral scientists. Practical Assessment, Research, and Evaluation 19, 17. [37] Zhong, W., Zhu, L., 2015. An",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "references-p010",
+          "text": "iterative approach to distance correlation-based sure independence screening. Journal of Statistical Computation and",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "references-p011",
+          "text": "Simulation 85, 2331–2345. [38] Zhou, Y., Xu, K., Zhu, L., Li, R., 2024. Rank-based indices for testing independence between two high-dimensional vectors. Annals of Statistics 52, 184–206. [39] Zhou, Z., 2012. Measuring nonlinear dependence in time-series, a distance correlation approach. Journal of Time Series Analysis 33, 438–457. 6",
+          "page_span": [
+            6,
+            6
+          ]
+        }
+      ]
+    },
+    {
+      "id": "appendix",
+      "title": "Appendix",
+      "paras": [
+        {
+          "id": "appendix-p001",
+          "text": "Appendix A. Theorem Proofs Theorem 1. Given K random variables (U1, U2, . . . , UK). Let V ∈RK be the multinomial distribution of probability (π1, π2, . . . , πK), where πk ∈(0, 1) and PK k=1 πk = 1. Let U be the following mixture distribution: k=1 1(Vk = 1)Uk, U = where Vk denotes the kth dimension of V. Then, FUV = FUFV if and only if FU1 = FU2 = · · · = FUK. Proof. When FU1 = FU2 = · · · = FUK, it is immediate that the mixture distribution satisfies: U = k=1 1(Vk = 1)Uk = U1. Namely, regardless of V, U always has the same distribution. Therefore, U and V are independent and FUV = FUFV. Next, suppose U and V are independent, and FUV = FUFV. Then FU|Vk=1 = FU for any k, such that U1 = U2 = · · · = UK = U. Therefore, FU1 = FU2 = · · · = FUK. For Corollary 1: by Theorem 1, when FU1 = FU2 = · · · = FUK, we have FUV = FUFV and thus τ(U, V) = 0. On the other hand, when τ(U, V) = 0, it holds that FUV = FUFV, leading to FU1 = FU2 = · · · = FUK. Theorem 2. Assume a translation-invariant metric d(·, ·) is used, and denote β = d(V(1, :), V(n, :)). It follows that Dcovn(U, V) = 2n2 1n2 2β n4 · Energyn1,n2(U1, U2), Under the permutation test, distance covariance, distance correlation, and",
+          "page_span": [
+            7,
+            7
+          ]
+        },
+        {
+          "id": "appendix-p002",
+          "text": "energy statistic have the same testing p-value.",
+          "page_span": [
+            7,
+            7
+          ]
+        },
+        {
+          "id": "appendix-p003",
+          "text": "Proof. Given any two sample data matrices U1 ∈Rn1×p and U2 ∈Rn2×p, the two-sample energy statistic is defined as 2n1n2 n2 n1 n1 n2 Energyn1,n2(U1, U2) = 1 n2 1n2 2 i,j=1 d(u(2) i , u(2) j ) i,j=1 d(u(1) i , u(1) j ) −n2 1 j=1 d(u(1) i , u(2) j ) −n2 2 i=1 Using the proposed sample transformation to yield U ∈Rn×p and V ∈Rn×K, and let DU and DV be their n × n distance matrices, respectively. Recall H = ⃗I −1 n ⃗J is the n × n centering matrix, and the sample distance covariance follows as: Dcovn(U, V) = 1 n2 trace(HDUHHDVH) = 1 n2 trace(DUHDVH) = 1 i,j=1 DU i j · (HDVH)i j n2 by the property of matrix trace and the idempotent property of the centering matrix H. The two distance matrices satisfy d(u(1) i , u(1) j ) if 1 ≤i, j ≤n1, d(u(2) i , u(2) j ) if n1 < i, j ≤n, d(u(1) i , u(2) j ) otherwise, DU ij = d(U(i, :), U( j, :)) =  0 if 1 ≤i, j ≤n1 or n1 < i, j ≤n, β otherwise. DV ij = d(V(i, :), V( j, :)) = 1 It follows that −2n2 2 n2 β if 1 ≤i, j ≤n1, −2n2 1 n2 β if n1 < i, j ≤n, 2n1n2 (HDVH)i j = n2 β otherwise. Therefore, up to a scaling factor, the centering scheme via distance covariance matches the weight of the energy statistic for each term. Expanding all terms",
+          "page_span": [
+            7,
+            7
+          ]
+        },
+        {
+          "id": "appendix-p004",
+          "text": "leads to",
+          "page_span": [
+            7,
+            7
+          ]
+        },
+        {
+          "id": "appendix-p005",
+          "text": "4n1n2 n2 n1 n1 n2 Dcovn(U, V) = β i,j=1 d(u(2) i , u(2) j ) i,j=1 d(u(1) i , u(1) j ) −2n2 1 j=1 d(u(1) i , u(2) j ) −2n2 2 n4 i=1 = 2n2 1n2 2β n4 Energyn1,n2(U1, U2). As the scalar 2n2 1n2 2β n4 is invariant under any permutation of the given sample data, distance covariance and energy statistic have the same testing p-value via a permutation test. Note that the above result holds for any translation-invariant metric d(·, ·). Theorem 3. Assume a translation-invariant kernel k(·, ·) is used, and denote β = k(V(1, :), V(n, :)) −k(V(1, :), V(1, :)). It follows that Hsicn(U, V) = 2n2 1n2 2β n4 · Mmdn1,n2(U1, U2), Under the permutation test, Hilbert-Schmidt independence criterion and maximum mean discrepancy have the same testing p-value. Proof. The equivalence between Hilbert-Schmidt independence criterion and maximum mean discrepancy can be established via the exact same proof as above, through the distance to kernel equivalence in [27]: Assuming d(·, ·) is replaced by a translation-invariant kernel k(·, ·), and the distance matrices DU and DV are now kernel matrices, we have Energyn1,n2(U1, U2) becomes −Mmdn1,n2(U1, U2) and Dcovn(U, V) becomes −Hsicn(U, V). Every other step",
+          "page_span": [
+            8,
+            8
+          ]
+        },
+        {
+          "id": "appendix-p006",
+          "text": "in the proof of Theorem 2 carries over. There is only a minor notation difference, because when d(·, ·)",
+          "page_span": [
+            8,
+            8
+          ]
+        },
+        {
+          "id": "appendix-p007",
+          "text": "becomes a kernel k(·, ·), we have  k(V(1, :), V(1, :)) if 1 ≤i, j ≤n1 or n1 < i, j ≤n, k(V(1, :), V(n, :)) otherwise. DV ij = k(V(i, :), V( j, :)) = Then −2n2 2 n2 β if 1 ≤i, j ≤n1, −2n2 1 n2 β if n1 < i, j ≤n, 2n1n2 (HDVH)i j = n2 β otherwise, where β = k(V(1, :), V(n, :))−k(V(1, :), V(1, :)). This is because d(V(1, :), V(1, :)) is always 0 for a valid translation-invariant metric, in which case it was reduced to β = d(V(1, :), V(n, :)) in the proof of Theorem 2. But in case of kernels, the kernel k(V(1, :), V(1, :)) is not necessarily 0. Theorem 4. Assume a translation-invariant metric d(·, ·) is used, and denote β = d(V(1, :), V(n, :)). It follows that  n(ns + nt) −PK l=1 n2 n4 · nsntEnergyns,nt(Us, Ut) . Dcovn(U, V) = β 1≤s<t≤K Moreover, sample distance covariance is equivalent to the sample Disco statistic when n1 = n2 = . . . = nk, in which case Dcovn(U, V) = 2β nK Disco({Uk}). 2 Proof. The K-sample Disco equals: \u001ansnt 2n Energyns,nt(Us, Ul) \u001b , Disco({Uk}) = 1≤s<t≤K where each pairwise energy statistic equals ns nt na nt i,j=1 d(u(s) i , u(s) j ) −1 j=1 d(u(s) i , u(t) j ) −1 Energyns,nt(Us, Ut) = 2 nsnt i,j=1 d(u(t) i , u(t) j ). n2s n2 i=1 From the",
+          "page_span": [
+            8,
+            8
+          ]
+        },
+        {
+          "id": "appendix-p008",
+          "text": "proof of Theorem 2, the sample distance covariance equals",
+          "page_span": [
+            8,
+            8
+          ]
+        },
+        {
+          "id": "appendix-p009",
+          "text": "Dcovn(U, V) = 1 i, j=1 DU i j · (HDVH)i j. n2 Assuming observation i comes from sth data and observation j comes from tth data source, we have DU i j = d(u(s) i , u(t) j ), and DV equals  0 if s = t, β if s , t. DV i j = We then check the centering effect: (HDVH)ij = DV i j −1 t=1 DV it −1 t=1 DV t j + 1 s,t=1 DV st, n2 where the whole matrix mean can be computed as i,j=1 DV i j = β(1 − PK t=1 n2 n2 ), 1 n2 and the mean of each row can be computed as t=1 DV it = β(1 −ns 1 n ) assuming the ith point belongs to group s. It follows that β \u0012 2nns−PK t=1 n2 n2 −1 \u0013 if s = t, (HDVH)i j = β \u0012 n(ns+nt)−PK t=1 n2 n2 \u0013 if s , t, for each group s and t. Next, we would like to establish the following equality for the within group entries: 1,··· ,K n(ns + nt) −PK l=1 n2 n2 · nt 2nns −PK t=1 n2 n2 −1 = − ns (E1) s,t for each group s. Without loss of generality, assume s = 1 and multiply n2 to it. Thus, proving Equation E1 is equivalent to prove l=2 n(n1 + nt) nt nt n1 = 0 t=1 n2 t −n2 + t=1 n2 2nn1 − n1 − l=2 l=2 nn2 n1 = 0 nt n1 + ⇔2nn1 −n2 + t=1 n2 t − t=1 n2 l=2 nnt − l=2 = 0 t=1 n2 n −n1 n1 + n ⇔2nn1 −n2 + n(n −n1) − t=1 n2 t − t=1 n2 t −n2 1 n1 ! −nn1 = 0. 1 + n −n1 n1 −n t=1",
+          "page_span": [
+            9,
+            9
+          ]
+        },
+        {
+          "id": "appendix-p010",
+          "text": "n2",
+          "page_span": [
+            9,
+            9
+          ]
+        },
+        {
+          "id": "appendix-p011",
+          "text": "⇔nn1 − n1 3 All terms cancel out at the last step, ensuring the equality of Equation E1. Therefore, Equation E1 guarantees the weight in each term of Energyns+nt(Us, Ut) matches the corresponding weight in HDVH, and it follows that Dcovn(U, V) = 1 i, j=1 DU i j · (HDVH)i j n2 ns nt n(ns + nt) −PK l=1 n2 n2 = β \u001a 2 n2 j=1 d(us i , ut j) 1≤s<t≤k i=1 ns nt −nt i, j=1 d(us i , us j) −ns i,j=1 d(ut i, ut j) \u001b ns nt n(ns + nt) −PK l=1 n2 n4 nsnt · Energyns,nt(Us, Ut). = β 1≤s<t≤k Finally, comparing the distance covariance:   n(ns + nt) −PK l=1 n2 n4 nsnt · Energyns,nt(Us, Ut) Dcovn(U, V) = 1≤s<t≤k β to Disco: Disco({Uk}) = \u001ansnt 2n Energyns,nt(Us, Ul) \u001b , 1≤s<t≤K We observe that they are simply different weightings of the same pairwise energy statistics, and they are the same up to scaling if and only if n(ns + nt) −PK l=1 n2 l is a fixed constant for all possible s , t, or equivalently, ns + nt is fixed. This is true when either k = 2 (the trivial case), or n1 = n2 = . . . = nk = n k, in which case Dcovn(U, V) = β n2k 1≤s<t≤k {n2 · Energyns,nt(Us, Ut)} = 2β nk Disco({Uk}). This confirms that distance covariance (Dcov) and the distance components (Disco) are equivalent up",
+          "page_span": [
+            9,
+            9
+          ]
+        },
+        {
+          "id": "appendix-p012",
+          "text": "to a scaling factor",
+          "page_span": [
+            9,
+            9
+          ]
+        },
+        {
+          "id": "appendix-p013",
+          "text": "when the sample sizes nk are equal across all groups, which can be achieved via bootstrap sampling on given sample data. Appendix B. Additional Simulations In this section, we consider 20 additional multivariate simulations, including polynomial (linear, quadratic, cubic), trigonometric (sinusoidal, circular, ellipsoidal, spiral), geometric (square, diamond, W-shaped), and other relationships, based on the same settings as in [34]. In each case, we draw n samples from a two-dimensional distribution FU1. Then, FU2 is generated via FU1 but rotated 60 degrees counterclockwise, and FU3 is rotated 60 degrees clockwise relative to FU1. We then test the 3-sample hypothesis that FU1 = FU2 = FU3. For the test statistics, we used Dcov, Hsic, Mgc, and random-forest induced measure (Kmerf), which are dependence measures, as well as two linear correlations, canonical correlation analysis (Cca) and RV coefficient (Rv), and the classical Manova test. Figure F1 shows the testing power of each method in each case, as sample size increases. Since different dependence measures are built on different kernels, metrics, or formulations, they exhibit different finite-sample testing power. However, all",
+          "page_span": [
+            10,
+            10
+          ]
+        },
+        {
+          "id": "appendix-p014",
+          "text": "four dependence measures show their testing power converging to 1 as the sample size increases in every panel (except",
+          "page_span": [
+            10,
+            10
+          ]
+        },
+        {
+          "id": "appendix-p015",
+          "text": "for square, diamond, and independence). This indicates that they successfully detect the distributional difference in every case, matching the universal consistency property. In comparison, the standard Manova test, as well as the two linear correlations, Cca and Rv, do not have their power increasing to 1 in many settings, such as the cases of linear and joint 4 normal. This is expected, as Manova only detects mean differences, while the distributions have the same mean in those cases. Note that the last panel represents independence, which is rotationally invariant such that FU1 = FU2 = FU3. This serves to verify the validity of all tests, and all dependence measures have the testing power equal to the designated type 1 error level α = 0.05, verifying the validity of using dependence measures for K-sample tests. Moreover, all tests have low power in the square and diamond cases because these distributions are very close to rotation-invariant, though not exactly, making these cases very similar to independence and thus difficult to detect at small sample sizes. Multivariate Three-Sample Testing Increasing Sample Size Linear Exponential Cubic Joint Normal Step 1 0 Quadratic",
+          "page_span": [
+            10,
+            10
+          ]
+        },
+        {
+          "id": "appendix-p016",
+          "text": "W-Shaped",
+          "page_span": [
+            10,
+            10
+          ]
+        },
+        {
+          "id": "appendix-p017",
+          "text": "Spiral Bernoulli Logarithmic 1 Statistical Power Relative to Manova 0 Fourth Root Sine 4 Sine 16 Square Two Parabolas 1 0 Circle Ellipse Diamond Multiplicative Independence 1 5 100 0 5 100 5 100 5 100 5 100 Sample Size KMERF MGC Dcorr Hsic Manova HHG CCA RV Figure F1: This figure presents the K-sample testing power at a type-1 error level of 0.05, using several universally consistent dependence measures, two linear correlations, and Manova, as the sample size increases, for 20 different distribution settings.. Appendix C. Function Details In this section, we details the simulation functions used in Figure F1. In each case, we generate two-dimensional sample data U1 based on the given distribution FU1. Then, FU2 is generated via FU1 but rotated 60 degrees counterclockwise, and FU3 is rotated 60 degrees clockwise relative to FU1. 5 In the following, U1(1) and U1(2) denote the first and second dimension of the random variable U1, and ε is a white noise from independent standard normal distribution unless mentioned otherwise. • Linear: U1(1) ∼Uniform(−1, 1), U1(2) = U1(1) + ε. • Exponential: U1(1) ∼Uniform(0, 3), U1(2) = exp(U1(1)) + 10ε. • Cubic: U1(1) ∼Uniform(−1, 1), 3) + 80ε. •",
+          "page_span": [
+            11,
+            11
+          ]
+        },
+        {
+          "id": "appendix-p018",
+          "text": "Joint normal: Let Σ =",
+          "page_span": [
+            11,
+            11
+          ]
+        },
+        {
+          "id": "appendix-p019",
+          "text": "\" 1 0.5 0.5 1.5 # , then (U1(1), U1(2)) ∼Normal(0, Σ). • Step Function: U1(1) ∼Uniform(−1, 1), • Quadratic: U1(1) ∼Uniform(−1, 1), • W Shape: W ∼Uniform(−1, 1), U1(1) ∼Uniform(−1, 1), 2 \u00112 + W/500 \u0015 + 0.5ε. U1(2) = 4 \u0014\u0010 (U1(1))2 −1 • Spiral: W ∼Uniform(0, 5), U1(1) = W cos(πW), U1(2) = W sin(πW) + 0.4ε. • Uncorrelated Bernoulli: W ∼Bernoulli(0.5), ε1 ∼Normal(0, 1), U1(1) ∼Bernoulli(0.5) + 0.5ε, • Logarithmic: U1(1) ∼Normal(0, 1), 6 • Fourth Root: U1(1) ∼Uniform(−1, 1), U1(2) = |U1(1)| 1 4 + 1 4ε. • Sine Period 4π: θ = 4π, U1(1) ∼Uniform(−1, 1), U1(2) = sin(θU1(1)) + 0.02ε. • Sine Period 16π: Same as above except θ = 16π and the noise on U1(2) is changed to 0.5ε. • Square: Let W1 ∼Uniform(−1, 1), W2 ∼Uniform(−1, 1), θ = −π",
+          "page_span": [
+            12,
+            12
+          ]
+        }
+      ]
+    },
+    {
+      "id": "8-then",
+      "title": "8. Then",
+      "paras": [
+        {
+          "id": "8-then-p001",
+          "text": "U1(1) = W1 cos θ + W2 sin θ + 0.05ε, U1(2) = −W1 sin θ + W2 cos θ. • Two Parabolas: W ∼Bernoulli(0.5), U1(1) ∼Uniform(−1, 1), U1(2) = \u0010 (U1(1))2 + 2ε \u0011 · (W −1 2). • Circle: W ∼Uniform(−1, 1), r = 1, U1(1) = r (cos(πW) + 0.4ε) , U1(2) = sin(πW). • Ellipse: Same as above except r = 5. • Diamond: Same as “Square” except θ = −π 4. • Multiplicative Noise: U1(1) ∼Normal(0, 1), U1(2) = εU1(1). • Independence: Let W1 ∼Normal(0, 1), W2 ∼Normal(0, 1), W3 ∼Bernoulli(0.5), W4 ∼Bernoulli(0.5). Then The sample data visualizations are then provided in Figure F2. It is clear that the 3-sample tests for each panel should be significant, except in the independence case where rotations do not change the distribution, and in the square/diamond cases, which are very difficult as most of the points appear to stay similar to the original distribution. Moreover, cases like linear, joint normal, and ellipse have different distributions but the same mean, such that Manova is expected to underperform and be unable to detect the distributional differences. 7 Linear Exponential Cubic Joint Normal Step Quadratic W-Shaped Spiral Bernoulli Logarithmic Fourth Root Sine 4 Sine 16 Square Two Parabolas Circle",
+          "page_span": [
+            13,
+            13
+          ]
+        },
+        {
+          "id": "8-then-p002",
+          "text": "Ellipse",
+          "page_span": [
+            13,
+            13
+          ]
+        },
+        {
+          "id": "8-then-p003",
+          "text": "Diamond Multiplicative Independence Sample 1 Sample 2 Sample 3 Figure F2: This figure visualizes the 2-dimensional distributions used in Figure F1. We sample 500 points from the first distribution FU1 (black dots), then rotate 60 degrees clockwise to produce FU2 and 60 degrees counter-clockwise to produce FU3, marked by lighter dots in each case. 8",
+          "page_span": [
+            14,
+            14
+          ]
+        }
+      ]
+    }
+  ]
+}

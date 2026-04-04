@@ -1,0 +1,511 @@
+{
+  "id": "2406.02189v2",
+  "title": "Scalable Multi-Kernel Encoder Classifier",
+  "metadata": {
+    "source_path": "data/pdf_files/2406.02189v2.pdf",
+    "page_count": 15,
+    "hash": "412b7feeb395d822a63cbd2dcdf47819787c5e13ab2b0a1dd22e8c86de6fa635"
+  },
+  "sections": [
+    {
+      "id": "front-matter",
+      "title": "Front Matter",
+      "paras": [
+        {
+          "id": "front-matter-p001",
+          "text": "Fast and Scalable Multi-Kernel Encoder Classifier Cencheng Shen University of Delaware, Newark, DE 19716, USA Abstract. This paper introduces a new kernel-based classifier by viewing kernel matrices as generalized graphs and leveraging recent progress in graph embedding techniques. The proposed method facilitates fast and scalable kernel matrix embedding, and seamlessly integrates multiple kernels to enhance the learning process. Our theoretical analysis offers a population-level characterization of this approach using random variables. Empirically, our method demonstrates superior running time compared to standard approaches such as support vector machines and two-layer neural network, while achieving comparable classification accuracy across various simulated and real datasets. arXiv:2406.02189v2 [cs.LG] 11 Nov 2024 Keywords: kernel classifier, encoder embedding, multiple kernels 1",
+          "page_span": [
+            1,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "id": "introduction",
+      "title": "Introduction",
+      "paras": [
+        {
+          "id": "introduction-p001",
+          "text": "The kernel-based methods have long been an important tool in machine learning. In the realm of supervised learning, the support vector machine (SVM) is a renowned method using kernels [5, 26, 27, 39]. The core objective of SVM is to maximize the margin of separation between distinct classes through the utilization of a kernel function, rendering it a suitable tool for classification. Assuming Y ∈{1, 2}n and the corresponding sample data is X ∈Rn×p, let δ(·, ·) : Rp × Rp be the kernel function, and A ∈Rn×n be the sample kernel matrix, where A(i, j) = δ(X(i, :), X(j, :)). SVM attempts to find a bounded and non-negative vector C ∈R1×n, such that C = arg max 1 2(C ⊗Y)A(C ⊗Y)T − i=1,...,n C(i) subject to CYT = 0. Excluding the intercept, SVM constructs a decision boundary based on Z = A(C ⊗Y) ∈Rn×1. From a dimension reduction perspective, one can interpret (C ⊗Y) as a projection matrix, and Z as a one-dimensional representation of the kernel matrix A. Although the steps involved are relatively straightforward, the computational bottlenecks of SVM primarily arise from kernel computation and solving the objective function. Additionally, in the case of multi-class classification where Y",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "introduction-p002",
+          "text": "∈{1, 2, . . . , K}n, SVM",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "introduction-p003",
+          "text": "requires the construction of K(K −1)/2 binary classifiers to separate each pair of classes, significantly slowing down the process for multi-class data. Furthermore, the kernel choices in SVM are typically limited to the inner product for a linear decision boundary or the Gaussian kernel for a nonlinear decision boundary. Ideally, one would like to compare different kernel choices, but that would require cross-validation, rendering it computationally intensive. From an alternative perspective, a kernel matrix can be viewed as a similarity matrix or a weighted graph. Graph data has become increasingly prevalent in capturing relationships between entities, including but not limited to social networks, communication networks, webpage hyperlinks, and biological systems [2, 3, 10, 20, 29, 36, 40]. Given n vertices, a graph can be represented by an adjacency matrix A ∈Rn×n, which coincides with the kernel matrix. 2 Cencheng Shen As graph adjacency matrices are high-dimensional, an important approach to explore graph structure is through graph embedding, which aims to provide a low-dimensional Euclidean representation for each vertex. Some common methods include spectral embedding [22,",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "introduction-p004",
+          "text": "24, 38], node2vec [12, 17], graph convolutional",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "introduction-p005",
+          "text": "neural network [15, 41, 42], etc. To the best of our knowledge, there has been no existing investigation into using graph embedding approaches for kernel matrices. This is partly because most graph embedding approaches are relatively slow, and the theoretical properties usually focus on binary graphs, where entries of A are either 0 or 1. Notably, a recent graph-encoder embedding was proposed [32, 35], which has linear complexity for graph data [18, 23], works well for weighted graphs [28], and can be used for latent community recovery [30] or in multiple-graph settings [31, 33]. Motivated by the concept of graph encoder embedding, this paper introduces a new approach for kernelbased classification. We begin by introducing an intermediate algorithm, which directly applies graph encoder embedding to a given kernel matrix. Subsequently, we present a faster version that streamlines matrix multiplication steps, reduces kernel computation complexity from O(n2) to O(nK), and facilitates multi-kernel comparison through cross-entropy. From a theoretical standpoint, we explore the proposed method from a probabilistic perspective, offering insights into why and how it performs effectively.",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "introduction-p006",
+          "text": "In",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "introduction-p007",
+          "text": "the numerical experiments, we provide simulations and real-world examples using text and image data to demonstrate the performance of the proposed method, which achieves comparable classification accuracy in a fraction of the time compared to standard methods such as SVM and two-layer neural network. All proofs are in the appendix. 2 Graph Encoder Embedding for Kernel This intermediate algorithm directly applies graph encoder embedding to a given kernel matrix, followed by linear discriminant analysis. Input: The raw data X ∈Rn×p and a label vector Y ∈{0, 1, . . . , K}n, where values from 1 to K represent known labels, and 0 for testing samples with unknown labels. Step 1: Form the n × n kernel matrix from X, where A(i, j) = δ(X(i, :), X(j, :)) ∈Rn×n. Step 2: Calculate the number of known observations per class, i.e., nk = i=1 1(Yi = k) (1) for k = 1, . . . , K. Additionally, identify the set of training indices with positive labels as trn. Step 3: Compute the matrix W ∈[0, 1]n×K as follow: for each vertex i = 1, . . . , n, set W(i, k) = 1/nk (2) if and only if Yi = k, and 0 otherwise. Note that samples with unknown labels are effectively assigned zero values, meaning W(i, :) is a",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "introduction-p008",
+          "text": "zero row-vector if and only if Yi = 0.",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "introduction-p009",
+          "text": "Step 4: Compute the kernel embedding: Z = AW ∈Rn×K. Step 5: Train a linear discriminant model g(·) on (Z(trn, :), Y(trn)). Output: The final embedding Z and the classification model g(·). The algorithm is essentially the same as the one-hot graph encoder embedding in [28, 35]. The matrix A is a kernel matrix transformed from standard data, which can be viewed as a general graph structure. Note that the matrix W plays a similar role as the SVM transformation matrix (C ⊗Y). Specifically, the matrix (C ⊗Y) assign 0 weights to samples out of the margin, and similarly W only assigns weights in the dimension same as the sample classes. Subsequently, both matrices are multiplied with A. Multi-Kernel Encoder Classifier 3 Nevertheless, W offers distinct advantages. It is considerably faster to construct than solving the SVM objective function, creates margin of separation in a multivariate space, and adeptly handles multi-class (i.e., K > 2) data without necessitating pairwise classification models as in SVM. It is important to emphasize that testing labels were not utilized in the embedding process; instead, the testing data were embedded using the same W constructed exclusively from the",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "introduction-p010",
+          "text": "training labels.",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "introduction-p011",
+          "text": "From a time complexity perspective, the kernel matrix computation in Step 1 costs O(n2p). Step 2 and 3 construct the embedding matrix W directly using training labels, which has a complexity of O(n). Step 4 is a standard matrix multiplication and costs O(n2). Assuming a fixed constant K, linear discriminant analysis in Step 5 costs O(n). Consequently, this intermediate kernel encoder classifier has a time complexity of O(n2p). 3 Fast Multi-Kernel Encoder Classifier Building upon the intermediate algorithm, in this section we propose an optimized multi-kernel encoder classifier. This optimized approach simplifies matrix multiplication and enables the selection of the optimal kernel from multiple choices through the utilization of cross-entropy. Input: The given data (X, Y), and a set of M different kernel choices: Step 1: Compute the number of known observations per class nk, same as in Equation 1. Additionally, identify the set of training indices with positive labels as trn. Step 2: Compute the matrix W ∈[0, 1]n×K, same as in Equation 2. Furthermore, the one-hot encoding matrix V of the label vector is also calculated: V(i, k) = 1 if and only if Yi = k, and 0 otherwise. Note that",
+          "page_span": [
+            3,
+            3
+          ]
+        },
+        {
+          "id": "introduction-p012",
+          "text": "V(i, :) is a zero row-vector if and only if Yi = 0, i.e.,",
+          "page_span": [
+            3,
+            3
+          ]
+        },
+        {
+          "id": "introduction-p013",
+          "text": "labels with zero values are not used. Step 3: Compute the matrix U ∈RK×p as U = WT X Then, for each kernel choice δm(·, ·), compute the embedding Zδm as follows: Zδm(i, j) = δm(X(i, :), U(j, :)) ∈Rn×K for i = 1, . . . , n and j = 1, . . . , K. Step 4: For each m, a linear discriminant model gm(·) is trained on (Zδm(trn, :), Y(trn)), and denote Tm = gm(Zδm) ∈Rn×K. Then, compute the cross-entropy with respect to V: cm = − i=1 V(i, k) log(Tm(i, k)) k=1 for m = 1, . . . , M. Step 5: Select the optimal kernel choice that minimizes cross-entropy, i.e., m∗= arg min m=1,...,M cm. Output: The best multi-kernel embedding Zm∗and the classification model gm∗(·). 4 Cencheng Shen The optimized method utilizes the matrix U as a proxy and only calculates the pairwise kernels between X and U, thereby eliminating the need to compute the full kernel matrix. This improvement substantially reduces the computational burden, and makes multi-kernel comparison more practical. Given M different kernels, both SVM and the intermediate method in Section 2 would require O(Mn2p) in terms of time complexity. In contrast, the optimized method only needs O(MKnp), resulting in linear time complexity with low",
+          "page_span": [
+            3,
+            3
+          ]
+        },
+        {
+          "id": "introduction-p014",
+          "text": "constant overhead.",
+          "page_span": [
+            3,
+            3
+          ]
+        },
+        {
+          "id": "introduction-p015",
+          "text": "Another key insight lies in the fact that the resulting embedding readily facilitates the comparison of kernel choices. As the final embedding is in dimension K and is properly normalized through linear discriminant analysis (meaning that a large value in dimension k indicates class membership in class k), it can be directly used in cross-entropy computation, where a smaller value indicates better class separation. In our experiments, to ensure numerical scalability, we utilize the cross-entropy from the inner product as a benchmark and only switch to another kernel if the resulting cross-entropy is at least 30% smaller. It is worth noting that in the case of M = 1 and the kernel function being the inner product, the optimized method is identical to the intermediate method. In other words, the final embedding and the classifier coincide. For general kernel functions, the resulting classifier may be different, but they still approximate each other, and the numerical results are very similar for all the kernel choices we experimented with. Further explanations regarding U and why it provides a proper approximation are provided in the next section from a probabilistic perspective. 4",
+          "page_span": [
+            4,
+            4
+          ]
+        },
+        {
+          "id": "introduction-p016",
+          "text": "Population Theory",
+          "page_span": [
+            4,
+            4
+          ]
+        },
+        {
+          "id": "introduction-p017",
+          "text": "In this section, we consider the proposed method within the standard probabilistic framework to gain a better understanding of its behavior. We begin with the following standard probabilistic assumptions for the input data. Let K and p be fixed, and consider the random variables (X, Y ) ∈Rp×[K]. Here, Y follows a categorical distribution with prior probabilities: πk ∈(0, 1], k=1 πk = 1, and X has finite moments and follows a K-component mixture distribution: X ∼ k=1 πkfX|Y (aj), j = 1, . . . , m. Then, each sample data point is assumed to be independently and identically distributed: (X(i, :), Y(i)) i.i.d. ∼(X, Y ) for each i = 1, . . . , n. In the probabilistic framework, the transformation matrix U in Section 3 can be understood as follows: Theorem 1. Given the random variable pair (X, Y ) of finite moments. Let U ∈RK×p, where each row satisfies U(k, :) = E(X|Y = k). Under the above probabilistic assumption for the sample data (X, Y), the matrix U in Section 3 satisfies: ∥U −U∥F n→∞ → 0 for the Frobenius matrix norm. Multi-Kernel Encoder Classifier 5 Therefore, the transformation matrix U can be interpreted as a sample estimate of the matrix U, which is a fixed matrix consisting",
+          "page_span": [
+            4,
+            4
+          ]
+        },
+        {
+          "id": "introduction-p018",
+          "text": "of class-wise conditional expectation. Consequently, given a single kernel function",
+          "page_span": [
+            4,
+            4
+          ]
+        },
+        {
+          "id": "introduction-p019",
+          "text": "δ(·, ·), the sample embedding Z(i, j) = δ(X(i, :), U(j, :)) can be considered as a sample realization of the random variable Z ∈RK, where Zj = δ(X, U(j, :)) for j = 1, . . . , K. This characterization explains the main difference between the proposed algorithm in Section 3 and the intermediate version in Section 2: instead of computing the pairwise kernel matrices for all samples of X, the fast algorithm only computes the kernel between samples of X and the estimate of U. Now, if we consider the special case where the kernel function δ(·, ·) is simply inner product, then the embedding random variable satisfies Z = XU T . As U is a fixed matrix, if the random variable X is normally distributed per class, the resulting encoder embedding is also normally distributed. In this scenario, linear discriminant analysis is an ideal choice, because it not only normalizes the embedding variable Z but is also the optimal classifier for the joint distribution of (Z, Y ). Theorem 2. Suppose X is a mixture of normal distribution, with each normal component having the same variance matrix, i.e., X|(Y = y) ∼N(μy, Σ). Then the embedding variable Z = XU T satisfies: Z|(Y = y) ∼N(μyU T , UΣU T ), in",
+          "page_span": [
+            5,
+            5
+          ]
+        },
+        {
+          "id": "introduction-p020",
+          "text": "which case the linear discriminant analysis is the Bayes optimal classifier for (Z, Y ).",
+          "page_span": [
+            5,
+            5
+          ]
+        },
+        {
+          "id": "introduction-p021",
+          "text": "The above theorem provides rationale for using linear discriminant analysis on the embedding Z. While the assumption of a shared variance matrix might appear restrictive, it simplifies the covariance estimation step and often yields better results compared to quadratic discriminant analysis, which assumes different components have distinct variance matrices. Finally, when using the inner product kernel in the proposed method, the resulting encoder embedding variable Z can be viewed as an effective dimension reduction technique that preserves the L2 norm margin between the conditional expectations. This is supported by the following theorem: Theorem 3. Suppose that the conditional expectations in the original space Rp are separated by certain margin, i.e. ∥E(X|Y = k) −E(X|Y = j)∥= αkj for any k ̸= j. When using the inner product kernel, the resulting encoder embedding variable Z in the reduced RK space satisfies ∥E(Z|Y = k) −E(Z|Y = j)∥≥ 1 √ 2α2 kj. For instance, consider an ideal scenario where the variance of the random variable X is sufficiently small, and the conditional means of X are well-separated, leading to perfect separability of different components of X in the original",
+          "page_span": [
+            5,
+            5
+          ]
+        },
+        {
+          "id": "introduction-p022",
+          "text": "p-dimensional space. In such cases, the encoder embedding using the inner product",
+          "page_span": [
+            5,
+            5
+          ]
+        },
+        {
+          "id": "introduction-p023",
+          "text": "shall also exhibit perfect separability in the reduced K-dimensional space. This theorem also highlights a distinction between the proposed method and SVM, despite both utilizing kernel transformations. Theoretically, SVM is designed to identify the optimal margin of separation for a 6 Cencheng Shen given dataset by transforming it into a high-dimensional kernel space and solving an objective function that maximizes this margin. On the other hand, our method does not aim to find the best margin of separation. Instead, it constructs a fast transformation via the training data and the kernel function. The theorem demonstrates that this transformation from the original data space into a K-dimensional space (via the kernel space) readily preserves the margin of separation. In high-dimensional data, estimating the margin of separation can be challenging. As the proposed kernel-based algorithm effectively preserves this margin in a lower-dimensional subspace, it allows subsequent methods (such as linear discriminant analysis in our case) to better estimate this margin of separation. It is worth noting that the margin may actually be improved, as α2/ √ 2 is larger than α when α > √ 2.",
+          "page_span": [
+            5,
+            5
+          ]
+        },
+        {
+          "id": "introduction-p024",
+          "text": "However, the extent of this improvement and whether it actually benefits the eventual classification depend",
+          "page_span": [
+            5,
+            5
+          ]
+        },
+        {
+          "id": "introduction-p025",
+          "text": "on the actual data distribution, making it a topic of future investigation. Since there is no explicit objective function involved to enlarge the margin, the proposed approach trades potential accuracy gains for better computational speed. Our simulations and real data experiments indicate that the proposed method can perform slightly better or worse than SVM, depending on the specific dataset, but it consistently offers significantly faster computation. 5",
+          "page_span": [
+            6,
+            6
+          ]
+        }
+      ]
+    },
+    {
+      "id": "experiments",
+      "title": "Experiments",
+      "paras": [
+        {
+          "id": "experiments-p001",
+          "text": "Throughout both the simulations and real data experiments, we considered four distinct methods for comparison: the linear encoder classifier, the multi-kernel encoder classifier, support vector machine (SVM), and a two-layer neural network. In each simulation, we conducted 5-fold cross-validation, repeated the process for 20 different Monte-Carlo replicates, and reported the average classification error and running time. All experiments were performed using MATLAB 2022a on a standard desktop equipped with a 16-core Intel CPU and 64GB memory. The linear encoder classifier employs the algorithm in Section 3 with the inner product as its sole kernel choice. Te multi-kernel encoder classifier utilizes the same algorithm with three distinct kernel choices: the inner product, the Euclidean distance-induced kernel (based on the distance-to-kernel transformation in [34]), and the Spearman rank correlation [14]. These alternative kernels have been empirically shown to perform effectively and can capture nonlinear decision boundaries. For the support vector machine, we utilized MATLAB’s fitcecoc1 method to fit multiclass models [1, 7]. All parameters were set to their default values, with",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "experiments-p002",
+          "text": "SVM using the Gaussian kernel. The two-layer neural",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "experiments-p003",
+          "text": "network used MATLAB’s fitcnet2 method, with a neuron size of 100 and all other parameters at their default settings [11, 21]. 5.1 Simulations The simulations in this study involve the following six settings, with K = 5, Y = {1, 2, . . . , K} equally likely, p = 5000, and n ranging from 50 to 500: – High-Dimensional Uniform: XY ∼Uniform(1, 3), and Xi ∼Uniform(0, 1) for every i ̸= y. – Uniform + Noise: Same as above, then add uniform noise to each dimension, i.e., Xi = Xi + 0.5 ∗ Uniform(0, 1) for each i. – Uniform Transformed: Same as above, followed by an additional random transformation, i.e., X = X∗Q, where Q ∈Rp×p and each entry of Q is randomly generated from Uniform(0, 1) during each replicate. – High-Dimensional Normal: XY ∼Normal(8, 1), and Xi ∼Normal(1, 1) for every i ̸= y. – Normal + Noise: Same as above, then add uniform noise to each dimension, i.e., Xi = Xi + 2 ∗ Uniform(0, 1) for each i. – Normal Transformed: Same as above, followed by an additional random transformation, i.e., X = X∗Q, where Q ∈Rp×p and each entry of Q is randomly generated from Uniform(0, 1) during each replicate. 1 https://www.mathworks.com/help/stats/fitcecoc.html 2",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "experiments-p004",
+          "text": "https://www.mathworks.com/help/stats/fitcnet.html",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "experiments-p005",
+          "text": "Multi-Kernel Encoder Classifier 7 These simulations are high-dimensional, with the noisy case being more challenging and the transformed case being the most difficult. Nevertheless, the signal to separate the classes is concentrated within a 5- dimensional subspace, specifically in the top K dimensions within the non-transformed models, and in a random subspace in the dimension-transformed scenarios. In all these simulations, the optimal classification error equals to 0. This optimal error can be determined by computing the Bayes error based on the probability model. In each Monte-Carlo replicate, (X, Y) is generated independently from the specified distribution. Evaluation of each method is performed using the same 5-fold split, and the results for average classification error and running time are presented in Figure 1. Across all simulations, it is observed that the linear encoder, multi-kernel encoder, and SVM perform similarly well in terms of classification error, all converging to 0 error as the sample size increases. The twolayer neural network shows slightly worse performance in the non-transformed simulations and significantly worse performance in the dimension-transformed",
+          "page_span": [
+            7,
+            7
+          ]
+        },
+        {
+          "id": "experiments-p006",
+          "text": "simulations. In terms of running time, the linear encoder",
+          "page_span": [
+            7,
+            7
+          ]
+        },
+        {
+          "id": "experiments-p007",
+          "text": "is the most efficient, followed by the multi-encoder. 5.2 Real Data In this section, we assess the classification performance using a diverse range of real-world datasets, including three text datasets and six face image datasets, each with its own characteristics: – Cora dataset [19] is a citation network with 2708 papers and 7 classes. Each paper is represented by a 1433-dimensional binary vector indicating the presence or absence of corresponding words from a dictionary. – Citeseer data [9] is another citation network with 3312 papers and 6 classes, featuring attribute vectors of 3703 dimensions for word presence. – ISOLET spoken data language [4] is a database of spoken English letters, consisting of 7797 spoken letters. The data is represented in a 617-dimensional space, and there are 26 classes. – ORL [25] has 400 face images of 40 subjects. ORL 1 images are of size 32 × 32 pixels, while ORL 2 images are of size 64 × 64 pixels, resulting in dimensionality of 1024 and 4096, respectively. – CMU PIE [13, 37] includes 11554 face images from 68 subjects, each sized at 32 × 32 pixels. – Extended Yale B database [8, 16] contains 2414 face images of 38 individuals under various poses",
+          "page_span": [
+            7,
+            7
+          ]
+        },
+        {
+          "id": "experiments-p008",
+          "text": "and",
+          "page_span": [
+            7,
+            7
+          ]
+        },
+        {
+          "id": "experiments-p009",
+          "text": "lighting conditions. The images are resized to 32 × 32 pixels. Two other versions, Yale 1 and 2, are also experimented, which consist of 15 subjects, 165 images, and are sized at 32 × 32 and 64 × 64 pixels, respectively. Table 1 reports the classification error and running time of each method. We make the following observations: The linear encoder method consistently demonstrates exceptional classification performance across all datasets, often ranking as the best or among the best methods. Notably, it also stands out for its speed, as it exhibits nearly instant processing for the given datasets. The multi-kernel encoder, while slightly more time-consuming than the linear encoder, remains significantly faster than other competing methods. Moreover, its ability to evaluate two additional kernel functions enhances its adaptability to the data, resulting in improved classification performance for specific datasets. For example, it selects the Euclidean distance-induced kernel for the CMU PIE dataset and the Spearman correlation for the Extended Yale dataset, leading to substantial reductions in classification errors compared to the linear encoder. In comparison, SVM and neural network",
+          "page_span": [
+            7,
+            7
+          ]
+        },
+        {
+          "id": "experiments-p010",
+          "text": "consume considerably more time. Between them, the support",
+          "page_span": [
+            7,
+            7
+          ]
+        },
+        {
+          "id": "experiments-p011",
+          "text": "vector machine is the most competitive, with classification performance similar to that of the linear encoder and multi-kernel encoder, in line with the findings from the simulations. However, SVM is also the most computationally expensive method, especially when dealing with image datasets featuring large dimensions and moderate numbers of classes. 8 Cencheng Shen HD Uniform 1 Uniform + Noise 1 Uniform Transformed 1 Classfication Error 0.8 0.8 0.8 0.6 0.6 0.6 0.4 0.4 0.4 0.2 0.2 0.2 0 50 250 500 0 100 500 1000 0 50 250 500 Sample Size HD Normal 1 Normal + Noise 1 Normal Transformed 1 Multi-Encoder Linear Encoder SVM Neural Network Classfication Error 0.8 0.8 0.8 0.6 0.6 0.6 0.4 0.4 0.4 0.2 0.2 0.2 0 50 250 500 0 100 500 1000 0 50 250 500 Sample Size HD Uniform 102 Uniform + Noise 102 Uniform Transformed 102 Running Time 100 100 100 10-2 10-2 10-2 50 250 500 50 250 500 100 500 1000 Sample Size HD Normal 102 Normal + Noise 102 Normal Transformed 102 Multi-Encoder Linear Encoder SVM Neural Network Running Time 100 100 100 10-2 10-2 10-2 50 250 500 50 250 500 100 500 1000 Sample Size Fig. 1. The figure provides a comparison of classification errors and running times across six",
+          "page_span": [
+            7,
+            7
+          ]
+        },
+        {
+          "id": "experiments-p012",
+          "text": "different simulations.",
+          "page_span": [
+            7,
+            7
+          ]
+        },
+        {
+          "id": "experiments-p013",
+          "text": "These comparisons were conducted utilizing 20 Monte-Carlo replicates and a 5-fold evaluation. Multi-Kernel Encoder Classifier 9 Table 1. This table displays the 5-fold classification error and running time for each method. It includes both the average and the standard deviation, with the best error highlighted in bold within each dataset. 5-Fold Error Multi-Encoder Linear Encoder SVM Two-Layer NN Citeseer 29.8% ± 0.2% Cora 28.8% ± 0.6% 28.9% ± 0.2% ISOLET 7.6% ± 0.1% 7.6% ± 0.1% 3.6% ± 0.1% 4.2% ± 0.1% ORL1 2.0% ± 0.4% 2.0% ± 0.4% 4.8% ± 0.3% 78.9% ± 7.2% ORL2 2.6% ± 0.4% 2.6% ± 0.4% 5.1% ± 0.4% 84.6% ± 5.0% PIE 4.7% ± 0.1% 8.9% ± 0.1% 2.5% ± 0.1% 33.7% ± 7.5% Yale Extended 0.9% ± 0.1% 17.0% ± 0.3% 9.7% ± 0.6% 18.6% ± 0.4% Yale1 Yale2 Running Time Multi-Encoder Linear Encoder SVM Two-Layer NN Citeseer 1.25 ± 0.13 0.05 ± 0.01 8.45 ± 0.24 4.53 ± 0.17 Cora 0.43 ± 0.05 0.01 ± 0.00 1.39 ± 0.06 1.56 ± 0.06 ISOLET 1.10 ± 0.01 0.03 ± 0.00 7.95 ± 0.23 6.58 ± 0.29 ORL1 0.13 ± 0.05 0.01 ± 0.00 32.7 ± 2.6 6.87 ± 2.32 ORL2 0.36 ± 0.03 0.01 ± 0.00 139 ± 7.3 24.0 ± 7.3 PIE 3.21 ± 0.07 0.09 ± 0.01 1410 ± 35.1 112 ± 8.1 Yale Extended 0.69 ± 0.02 0.01 ± 0.00 353 ± 7.9 26.3 ± 2.1 Yale1 0.06 ± 0.01",
+          "page_span": [
+            8,
+            8
+          ]
+        },
+        {
+          "id": "experiments-p014",
+          "text": "0.01 ± 0.00",
+          "page_span": [
+            8,
+            8
+          ]
+        },
+        {
+          "id": "experiments-p015",
+          "text": "12.6 ± 1.1 1.22 ± 0.91 Yale2 0.14 ± 0.02 0.01 ± 0.00 29.9 ± 1.8 4.99 ± 2.4 10 Cencheng Shen 6",
+          "page_span": [
+            9,
+            9
+          ]
+        }
+      ]
+    },
+    {
+      "id": "conclusion",
+      "title": "Conclusion",
+      "paras": [
+        {
+          "id": "conclusion-p001",
+          "text": "This paper introduces a new classifier based on kernels and graph embedding. The experimental results presented confirm the advantages of the proposed algorithm, demonstrating excellent classification accuracy comparable to that of SVM. Notably, it achieves this performance with significantly improved runtime, often instantaneous for moderately-sized multivariate data. While other variants of SVM and advanced architectures of neural networks may likely achieve better accuracy on benchmark data, the proposed approach offers a competitive alternative to standard baseline classifiers, enabling rapid classification with arbitrary kernel choices and exceptional scalability for big data analytics. Acknowledgement This work was supported by the National Science Foundation DMS-2113099, and by funding from Microsoft Research.",
+          "page_span": [
+            10,
+            10
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bibliography",
+      "title": "Bibliography",
+      "paras": [
+        {
+          "id": "bibliography-p001",
+          "text": "[1] Allwein, E., Schapire, R., Singer, Y.: Reducing multiclass to binary: A unifying approach for margin classifiers. Journal of Machine Learning Research 1, 113–141 (2000) [2] Barab ́asi, A.L., Oltvai, Z.N.: Network biology: Understanding the cell’s functional organization. Nature Reviews Genetics 5(2), 101–113 (2004) [3] Boccaletti, S., Latora, V., Moreno, Y., Chavez, M., Hwang, D.U.: Complex networks: Structure and dynamics. Physics Reports 424(4-5), 175–308 (2006) [4] Cole, R., Fanty, M.: Spoken letter recognition. In: Proc. Third DARPA Speech and Natural Language Workshop (1990) [5] Cortes, C., Vapnik, V.: Support-vector networks. Machine Learning 20(3), 273–297 (1995) [6] Devroye, L., Gyorfi, L., Lugosi, G.: A Probabilistic Theory of Pattern Recognition. Springer (1996) [7] Escalera, S., Pujol, O., Radeva, P.: Separability of ternary codes for sparse designs of error-correcting output codes. Pattern Recog. Lett. 30(3), 285–297 (2009) [8] Georghiades, A., Buelhumeur, P., Kriegman, D.: From few to many: Illumination cone models for face recognition under variable lighting and pose. IEEE Transactions on Pattern Analysis and Machine Intelligence 23(6), 643–660 (2001) [9] Giles,",
+          "page_span": [
+            11,
+            11
+          ]
+        },
+        {
+          "id": "bibliography-p002",
+          "text": "C.L., Bollacker, K.D., Lawrence, S.: Citeseer: An automatic citation indexing system. In: Pro-",
+          "page_span": [
+            11,
+            11
+          ]
+        },
+        {
+          "id": "bibliography-p003",
+          "text": "ceedings of the Third ACM Conference on Digital Libraries, pp. 89–98 (1998) [10] Girvan, M., Newman, M.E.J.: Community structure in social and biological networks. Proceedings of National Academy of Science 99(12), 7821–7826 (2002) [11] Glorot, X., Bengio, Y.: Understanding the difficulty of training deep feedforward neural networks. In: Proceedings of the thirteenth international conference on artificial intelligence and statistics, pp. 249–256 (2010) [12] Grover, A., Leskovec, J.: node2vec: Scalable feature learning for networks. In: Proceedings of The 22nd ACM SIGKDD international conference on Knowledge discovery and data mining, pp. 855–864 (2016) [13] He, X., Yan, S., Hu, Y., Niyogi, P., Zhang, H.: Face recognition using Laplacianfaces. IEEE Transactions on Pattern Analysis and Machine Intelligence 27(3), 328–340 (2005) [14] Kendall, M.G.: Rank Correlation Methods. London: Griffin (1970) [15] Kipf, T.N., Welling, M.: Semi-supervised classification with graph convolutional networks. In: International Conference on Learning Representations (2017) [16] Lee, K., Ho, J., Kriegman, D.: Acquiring linear subspaces for face recognition under variable lighting. IEEE Transactions on",
+          "page_span": [
+            11,
+            11
+          ]
+        },
+        {
+          "id": "bibliography-p004",
+          "text": "Pattern Analysis and Machine Intelligence 27(5), 684–698 (2005)",
+          "page_span": [
+            11,
+            11
+          ]
+        },
+        {
+          "id": "bibliography-p005",
+          "text": "[17] Liu, R., Krishnan, A.: Pecanpy: a fast, efficient and parallelized python implementation of node2vec. Bioinformatics 37(19), 3377–3379 (2021) [18] Lubonja, A., Shen, C., Priebe, C.E., Burns, R.: Edge-parallel graph encoder embedding. In: 2024 38th IEEE International Parallel and Distributed Processing Symposium, Workshop on Graphs, Architectures, Programming, and Learning (2024) [19] McCallum, A.K., Nigam, K., Rennie, J., Seymore, K.: Automating the construction of internet portals with machine learning. Information Retrieval 3, 127–163 (2000) [20] Newman, M.E.J.: The structure and function of complex networks. SIAM Review 45(2), 167–256 (2003) [21] Nocedal, J., Wright, S.J.: Numerical Optimization, 2nd edn. Springer, New York (2006) [22] Priebe, C., Parker, Y., Vogelstein, J., Conroy, J., Lyzinskic, V., Tang, M., Athreya, A., Cape, J., Bridgeford, E.: On a ’two truths’ phenomenon in spectral graph clustering. Proceedings of the National Academy of Sciences 116(13), 5995–5600 (2019) [23] Qin, X., Shen, C.: Efficient graph encoder embedding for large sparse graphs in python. In: Intelligent Computing 2024, vol. 3, pp. 568–577. Springer Nature (2024) [24] Rohe, K., Chatterjee,",
+          "page_span": [
+            11,
+            11
+          ]
+        },
+        {
+          "id": "bibliography-p006",
+          "text": "S., Yu, B.: Spectral clustering and the high-dimensional stochastic blockmodel.",
+          "page_span": [
+            11,
+            11
+          ]
+        },
+        {
+          "id": "bibliography-p007",
+          "text": "Annals of Statistics 39(4), 1878–1915 (2011) 12 Cencheng Shen [25] Samaria, F., Harter, A.: Parameterisation of a stochastic model for human face identification. In: Proceedings of the Second IEEE Workshop on Applications of Computer Vision, pp. 138–142 (1994) [26] Sch ̈olkopf, B., Smola, A.J.: Learning with kernels: support vector machines, regularization, optimization, and beyond. MIT press (2002) [27] Sch ̈olkopf, B., Smola, A., M ̈uller, K.: Kernel principal component analysis. In: Advances in kernel methods - support vector learning, pp. 327–352. MIT Press (1999) [28] Shen, C.: Encoder embedding for general graph and node classification. arXiv preprint arXiv:2405.15473 (2024) [29] Shen, C., Arroyo, J., Xiong, J., Vogelstein, J.T.: Community correlations and testing independence between binary graphs. arXiv preprint arXiv:1906.03661 (2024) [30] Shen, C., Larson, J., Trinh, H., Priebe, C.E.: Refined graph encoder embedding via self-training and latent community recovery. arXiv preprint arXiv:2405.12797 (2024) [31] Shen, C., Larson, J., Trinh, H., Qin, X., Park, Y., Priebe, C.E.: Discovering communication pattern shifts in large-scale labeled networks using encoder embedding and",
+          "page_span": [
+            11,
+            11
+          ]
+        },
+        {
+          "id": "bibliography-p008",
+          "text": "vertex dynamics. IEEE Transac-",
+          "page_span": [
+            11,
+            11
+          ]
+        },
+        {
+          "id": "bibliography-p009",
+          "text": "tions on Network Science and Engineering 11(2), 2100–2109 (2024) [32] Shen, C., Park, Y., Priebe, C.E.: Graph encoder ensemble for simultaneous vertex embedding and community detection. In: 2023 2nd International Conference on Algorithms, Data Mining, and Information Technology. ACM (2023) [33] Shen, C., Priebe, C.E., Larson, J., Trinh, H.: Synergistic graph fusion via encoder embedding. Information Sciences 678, 120,912 (2024) [34] Shen, C., Vogelstein, J.T.: The exact equivalence of distance and kernel methods in hypothesis testing. AStA Advances in Statistical Analysis 105(3), 385–403 (2021) [35] Shen, C., Wang, Q., Priebe, C.E.: One-hot graph encoder embedding. IEEE Transactions on Pattern Analysis and Machine Intelligence 45(6), 7933–7938 (2023) [36] Shen, C., Wang, S., Badea, A., Priebe, C.E., Vogelstein, J.T.: Discovering the signal subgraph: An iterative screening approach on graphs. Pattern Recognition Letters 184, 97–102 (2024) [37] Sim, T., Baker, S., Bsat, M.: The CMU pose, illumination, and expression database. IEEE Transactions on Pattern Analysis and Machine Intelligence 25(12), 1615–1618 (2003) [38] Sussman, D., Tang, M., Fishkind, D., Priebe, C.: A consistent",
+          "page_span": [
+            12,
+            12
+          ]
+        },
+        {
+          "id": "bibliography-p010",
+          "text": "adjacency spectral embedding for",
+          "page_span": [
+            12,
+            12
+          ]
+        },
+        {
+          "id": "bibliography-p011",
+          "text": "stochastic blockmodel graphs. Journal of the American Statistical Association 107(499), 1119–1128 (2012) [39] Vapnik, V.: The Nature of Statistical Learning Theory, 2nd edn. Springer, New York (1999) [40] Varshney, L., Chen, B., Paniagua, E., Hall, D., Chklovskii, D.: Structural properties of the caenorhabditis elegans neuronal network. PLoS Computational Biology 7(2), e1001,066 (2011) [41] Wang, H., Leskovec, J.: Combining graph convolutional neural networks and label propagation. ACM Transactions on Information Systems 40(4), 1–27 (2022) [42] Wu, Z., Pan, S., Chen, F., Long, G., Zhang, C., Yu, P.S.: A comprehensive survey on graph neural networks. IEEE Transactions on Neural Networks and Learning Systems 32, 4–24 (2019) Multi-Kernel Encoder Classifier 1",
+          "page_span": [
+            12,
+            12
+          ]
+        }
+      ]
+    },
+    {
+      "id": "appendix",
+      "title": "Appendix",
+      "paras": [
+        {
+          "id": "appendix-p001",
+          "text": "Proof Theorem 1. Given the random variable pair (X, Y ) of finite moments. Let U ∈RK×p, where each row satisfies U(k, :) = E(X|Y = k). Under the above probabilistic assumption for the sample data (X, Y), the matrix U in Section 3 satisfies: ∥U −U∥F n→∞ → 0 for the Frobenius matrix norm. Proof. As U = WT X, it follows from basic conditional probability and law of large number that U(k, s) = W(:, k)T X(:, s) = 1 i=1 X(i, s)1(Yi = k) nk n→∞ → E(Xs|Y = k), where Xs denotes the sth dimension of the random variable X. Concatenating all dimensions for s = 1, 2, . . . , p and all k = 1, . . . , K, we can conclude that ∥U −U∥F n→∞ → 0. Theorem 2. Suppose X is a mixture of normal distribution, with each normal component having the same variance matrix, i.e., X|(Y = y) ∼N(μy, Σ). Then the embedding variable Z = XU T satisfies: Z|(Y = y) ∼N(μyU T , UΣU T ), in which case the linear discriminant analysis is the Bayes optimal classifier for (Z, Y ). Proof. When the conditional distribution of X|Y is normally distributed, the distribution of Z|Y is also normally distributed because U is a fixed matrix. Additionally, the mean and variance of Z|Y = k are given by: E(Z|Y = k) = μkU and V ar(Z|Y = k)",
+          "page_span": [
+            13,
+            13
+          ]
+        },
+        {
+          "id": "appendix-p002",
+          "text": "= UΣU T",
+          "page_span": [
+            13,
+            13
+          ]
+        },
+        {
+          "id": "appendix-p003",
+          "text": "In this case, the variance of Z|Y = k is independent of the class label k, and as a result, linear discriminant analysis is the Bayes optimal classifier [6]. 2 Cencheng Shen Theorem 3. Suppose that the conditional expectations in the original space Rp are separated by certain margin, i.e. ∥E(X|Y = k) −E(X|Y = j)∥= αkj for any k ̸= j. When using the inner product kernel, the resulting encoder embedding variable Z in the reduced RK space satisfies ∥E(Z|Y = k) −E(Z|Y = j)∥≥ 1 √ 2α2 kj. Proof. Without loss of generality, it suffices to prove this for k = 1 and j = 2. Denoting μ1 = E(X|Y = 1) and μ2 = E(X|Y = 2), we have 2 = α2 by the margin assumption on X. Next, using the basic property of the L2 norm, we can further deduce: ∥E(Z|Y = 1) −E(Z|Y = 2)∥2 j=1 (E(Zj|Y = 1) −E(Zj|Y = 2))2 = 2 j=1 (E(Zj|Y = 1) −E(Zj|Y = 2))2. ≥ In other words, to prove that Z preserves the margin of separation in terms of the conditional expectation, it suffices to consider the first two dimensions Z1 and Z2, as the remaining dimensions cannot decrease the separation in L2 norm. Under the inner product kernel, we can express the conditional expectations as follows: E(Zj|Y = 1) = μ1U(j, :)T = μ1μT j , E(Zj|Y =",
+          "page_span": [
+            13,
+            13
+          ]
+        },
+        {
+          "id": "appendix-p004",
+          "text": "2) = μ2U(j, :)T = μ2μT",
+          "page_span": [
+            13,
+            13
+          ]
+        },
+        {
+          "id": "appendix-p005",
+          "text": "j . From this, we can derive the following: 2 j=1 (E(Zj|Y = 1) −E(Zj|Y = 2))2 =(μ1μT 1 −μ2μT 1 )2 + (μ2μT 1 −μ2μT 2 )2 =μ1μT 1 μ1μT 1 −2μ2μT 1 μ1μT 1 + μ2μT 1 μ2μT 1 + μ1μT 2 μ1μT 2 −2μ2μT 2 μ1μT 2 + μ2μT 2 μ2μT 2 2 μ1μT 2 −2μ1μT 2 (∥μ1∥2 + ∥μ2∥2) 2 μ1μT 2 −2μ1μT 2 (2μ1μT 2 + α2) 2 μ1μT 2 −2α2μ1μT 2 ≥a4/2. Multi-Kernel Encoder Classifier 3 As a result, we can conclude that: ∥E(Z|Y = 1) −E(Z|Y = 2)∥≥ 1 √ 2α2. Finally, the proof presented here is applicable to any pair of classes (k, j), not limited to (k = 1, j = 2). To extend the proof to other class pairs, one can apply the same logic to Zj and Zk, compute (E(Zj|Y = k) −E(Zj|Y = l))2 + (E(Zk|Y = k) −E(Zk|Y = j))2, and the inequality steps follow in the same manner.",
+          "page_span": [
+            14,
+            14
+          ]
+        }
+      ]
+    }
+  ]
+}

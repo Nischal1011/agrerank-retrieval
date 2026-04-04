@@ -1,0 +1,1187 @@
+{
+  "id": "2507.10215v2",
+  "title": "A Graph Sufficiency Perspective for Neural Networks",
+  "metadata": {
+    "source_path": "data/pdf_files/2507.10215v2.pdf",
+    "page_count": 34,
+    "hash": "0924d1d527060669b56a24f8abdf0c1f736dfc1954ea5a40d5c932964027202c"
+  },
+  "sections": [
+    {
+      "id": "front-matter",
+      "title": "Front Matter",
+      "paras": [
+        {
+          "id": "front-matter-p001",
+          "text": "A Graph Sufficiency Perspective for Neural Networks Cencheng Shen∗1 and Yuexiao Dong2 1Department of Applied Economics and Statistics, University of Delaware, 210 South College Ave, Newark DE 19716, USA 2Department of Statistics, Operations, and Data Science, Temple University, 1801 N Broad St, Philadelphia PA 19122, USA arXiv:2507.10215v2 [cs.LG] 8 Aug 2025 August 11, 2025",
+          "page_span": [
+            1,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "id": "abstract",
+      "title": "Abstract",
+      "paras": [
+        {
+          "id": "abstract-p001",
+          "text": "This paper analyzes neural networks through graph variables and statistical sufficiency. We interpret neural network layers as graph-based transformations, where neurons act as pairwise functions between inputs and learned anchor points. Within this formulation, we establish conditions under which layer outputs are sufficient for the layer inputs, that is, each layer preserves the conditional distribution of the target variable given the input variable. We explore two theoretical paths under this graph-based view. The first path assumes dense anchor points and shows that asymptotic sufficiency holds in the infinite-width limit and is preserved throughout training. The second path, more aligned with practical architectures, proves exact or approximate sufficiency in finite-width networks by assuming region-separated input distributions and constructing appropriate anchor points. This path can ensure the sufficiency property for an infinite number of layers, and provide error bounds on the optimal loss for both regression and classification tasks using standard neural networks. Our framework covers fully connected layers, general pairwise functions, ReLU and sigmoid activations, and",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "abstract-p002",
+          "text": "convolutional neural networks. Overall, this work",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "abstract-p003",
+          "text": "bridges statistical sufficiency, graph-theoretic representations, and deep learning, providing a new statistical understanding of neural networks. Keywords: graph anchor points, sufficient transformation, fully connected layer, convolutional layer, region separation 1",
+          "page_span": [
+            1,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "id": "introduction",
+      "title": "Introduction",
+      "paras": [
+        {
+          "id": "introduction-p001",
+          "text": "Neural networks have become the dominant framework in modern machine learning, powering breakthroughs in vision and language learning. Classical fully connected feedforward networks, composed of layers of affine transformations and nonlinear activations such as ReLU or sigmoid, form the foundational architecture. Moreover, modern layer architectures have significantly pushed the boundary and achieved huge success, such as the convolutional neural networks (CNNs) [23, 24] ∗Corresponding author: shenc@udel.edu 1 for image classification and object recognition, and most recently the multi-head self-attention mechanism [45] for generative AI in large language models [38]. The theoretical understanding of neural networks has largely focused on approximation capabilities of classical fully connected networks. Universal approximation theorems [3, 11, 18] establish that shallow neural networks with sufficient width can approximate any continuous function on compact domains. Recent work has refined these bounds, studying depth-efficiency tradeoffs [16, 30] and providing insights into convergence [19] and generalization [33]. For convolutional networks, theoretical work has investigated",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "introduction-p002",
+          "text": "their compositional properties [9, 31], equivariance to",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "introduction-p003",
+          "text": "group actions [9], and sparse coding [6]. Despite those results, there is a lack of investigations into the statistical property of neural networks. One such foundational question is: Do neural network layers preserve all information of the input data, i.e., the conditional distribution P(Y | X)? Much of the literature on universal approximation theorems focuses on whether neural networks can approximate a target function f(X), not whether the neural networks model retain the full information necessary for loss-optimal prediction, nor how transformations of the input space affect the conditional distribution of the target variable. While preserving the target function means preserving the information, retaining information is a more general notion — namely, the model does not need to approximate the actual functional relationship, as long as all information necessary for loss prediction is retained in the model, then that shall suffice. To that end, in this work, we aim to understand the statistical sufficiency property of neural network layers via a graph variable framework. In classical statistics, a transformation Z = T(X) is sufficient for the random variable X with respect to",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "introduction-p004",
+          "text": "the target variable Y , if P(Y | Z) = P(Y | X)",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "introduction-p005",
+          "text": "almost surely. Therefore, sufficiency ensures that the transformation T(·) preserves all information relevant for predicting Y . Specifically, from classical statistical learning literature [12, 17], when sufficiency holds and conditional density is preserved, the optimal loss in either classification or regression is preserved. As such, it is a desirable property for any general transformation. We start by adopting a graph-theoretic perspective in a classical fully connected layer. Interpreting the output of a fully connected layer as a generalized similarity graph, each layer computes a pairwise function between the input X and a set of anchor points. Under reasonable assumptions, these anchor points become asymptotically dense in the support of X during training and inference. This setup allows us to establish asymptotic sufficiency of the layer output with respect to the number of neurons m. This can be further extended to include special pairwise graph feature including inner products, Euclidean distances, cosine similarity, or kernels. We then include the activation functions into the framework, followed by generalization into multiple fully connected layers. To better",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "introduction-p006",
+          "text": "connect with practical settings, where the number of neurons is inherently finite, we",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "introduction-p007",
+          "text": "extend the analysis to finite-width networks. We begin with the case of discrete random variables, where finite representations are naturally compatible. We then broaden the analysis to regionseparated random variables. For such variables, or those that can be approximated within an error of at most ε, we prove that any region-separating transformation is sufficient (or approximately sufficient with the same error bound ε). Building on this result, we show that a fully connected layer combined with the ReLU activation can serve as a region-separating transformation, thereby achieving sufficiency (or approximately so with error at most ε), provided that each region is convex. Moreover, this sufficiency is preserved as the number of neural network layers increases. We proceed to quantify error bounds on the optimal prediction loss in both regression and classification settings, when the neural network is approximately sufficient. Finally, we extend the graph sufficiency framework to convolutional layers, interpreting their operations as inner products with regularized anchor points. We show that convolutional layers, too, can act as region-separating transformations and are thus",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "introduction-p008",
+          "text": "sufficient.",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "introduction-p009",
+          "text": "2 Paper Structure We begin with related work in Section 2, which summarizes previous papers and highlights how our method differs. Section 3 reviews sufficiency and the classical neural networks in random variables. Section 4 shows the graph framework for neural network, as well as introducing anchor points and prove when those anchor points can be dense in the support of input variable. Section 5 presents the asymptotic sufficiency theorem for fully-connected layer, which is then extended to multi-layer in Section 6. Section 7 shows that a region-separating transformation is sufficient for region-separated random variables, as well as showing any random variables can be viewed as ε-region-separated with possibly infinite regions. In Section 8, we prove that a fully connected layer can act as a region-separating transformation, thus achieving sufficiency using a finite number of neurons. This section also quantifies the optimal loss difference under approximate sufficiency. Section 9 extends the framework to convolutional layers, showing that they too are region-separating, and therefore sufficient, under additional regularity assumptions. Section 10 validates the theoretical",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "introduction-p010",
+          "text": "results via simulations. Section 11 concludes. All mathematical proofs are",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "introduction-p011",
+          "text": "provided in the appendix, and Python simulation code is provided in the supplementary. 2",
+          "page_span": [
+            3,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "id": "related-work",
+      "title": "Related Work",
+      "paras": [
+        {
+          "id": "related-work-p001",
+          "text": "Neural Network Expressivity and Approximation The universal approximation theorem [11, 18] establishes that feedforward networks with a single hidden layer and nonlinear activation can approximate any continuous function on compact subsets of Rp. Subsequent work strengthened this result by quantifying approximation rates [3] and analyzing the benefits of depth [30]. ReLU networks, in particular, are known to partition the input space into linear regions, with the number of such regions growing exponentially with depth [32]. Neural tangent kernel theory [19] provides insights into the training dynamics and approximation behavior of infinitely wide networks. For convolutional architectures, theoretical studies have examined group equivariance [9], multiscale scattering transforms [6, 31], and connections to sparse dictionary learning [35]. Statistical Sufficiency and Information Bottleneck Sufficiency is a classical concept in statistics, foundational to decision theory, causal inference, and sufficient dimension reduction [10, 26–29]. It refers to identifying transformations of the input variable that preserve all information relevant to the prediction of the target. For both",
+          "page_span": [
+            3,
+            3
+          ]
+        },
+        {
+          "id": "related-work-p002",
+          "text": "regression and classification, sufficiency ensures",
+          "page_span": [
+            3,
+            3
+          ]
+        },
+        {
+          "id": "related-work-p003",
+          "text": "that the optimal predictive loss remains unchanged [12, 17], making it a desirable property for feature learning. Several recent works have begun to consider sufficiency in the context of neural networks. It was shown that the first layer of neural networks can estimate the central mean subspace in a regression model under smoothness and rank assumptions [48]. Other approaches consider mutual information–based objectives to learn sufficient representations via variational training [51] or contrastive learning [46]. A related line of work centers on the information bottleneck principle [43], which seeks to compress the input representation while retaining as much predictive information as possible. This framework has been extended with rigorous generalization bounds [13] and risk guarantees under mutual information constraints [21]. Graph-Based Representations and Anchor Methods A key insight of our work is that neural network representations can be interpreted as defining a similarity graph over the input space with anchor points. This connects to classical ideas in manifold learning and semi-supervised learning, where pairwise similarity functions define neighborhood graphs for",
+          "page_span": [
+            3,
+            3
+          ]
+        },
+        {
+          "id": "related-work-p004",
+          "text": "downstream tasks",
+          "page_span": [
+            3,
+            3
+          ]
+        },
+        {
+          "id": "related-work-p005",
+          "text": "[4, 52]. Inner product features correspond to linear graphs, while universal kernels such as the Gaussian kernel yield richer similarity graphs [40]. 3 In graph-structured data, graph embedding has been an important area of research, including node2vec [14, 50], spectral embedding [2, 37], one-hot encoder embedding [41, 42], etc. In particular, graph neural networks have become a widely used architecture [7, 22, 44, 47]. Anchor-based methods have also been proposed to enhance graph representation learning [49]. Contribution of Our Work Our paper introduces a population-level framework for analyzing when and how neural network representations preserve sufficiency of the input with respect to the target variable. Unlike the information bottleneck literature, we do not rely on compression or mutual information constraints. Unlike works that explicitly modify the learning algorithm to enforce sufficiency, we analyze the sufficiency properties of standard neural network architectures, including pairwise feature maps, multi-layer networks, and convolutional layers, without altering their training procedures. And unlike prior investigations of sufficient dimension reduction in neural net-",
+          "page_span": [
+            3,
+            3
+          ]
+        },
+        {
+          "id": "related-work-p006",
+          "text": "works, our framework applies to both regression and classification tasks, does not assume a specific functional form or distribution, and addresses the sufficiency of the entire learned representation, not just the central mean subspace. Our key contribution is a graph-based perspective of neural networks using anchor points, offering two complementary paths to statistical sufficiency: (1) asymptotic injectivity through dense anchor coverage, and (2) exact sufficiency under a region separation condition with appropriately constructed anchors. These results differ significantly from prior works and establish a unique connection between graph-based representations, neural network architectures, and the classical statistical concept of sufficiency. 3",
+          "page_span": [
+            4,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "id": "preliminaries",
+      "title": "Preliminaries",
+      "paras": [
+        {
+          "id": "preliminaries-p001",
+          "text": "This section introduces the mathematical basics for sufficient transformation, as well as architectural components for classical fully connected neural networks. We begin by formalizing conditional distributions and sufficiency, then introduce graph-based similarity structures. Then, we review the classical neural network modules on random variables. 3.1 Conditional Distributions and Sufficiency Let (X, Y ) be random variables defined on a probability space, with X ∈Rp and Y ∈Y (discrete or continuous). The conditional distribution P(Y | X) describes the distribution of Y given X = x. Throughout this paper, all random variables are assumed to be Borel measurable and take values in Euclidean space. Definition 1 (Sufficiency). A transformation T : Rp →Rm is said to be sufficient for X with respect to Y if P(Y | T(X)) = P(Y | X) almost surely with respect to the distribution of X. Equivalently, Y ⊥X | T(X). Sufficiency implies that T(X) retains all information in X relevant to predicting Y . In supervised learning, if a representation Z = T(X) is sufficient, then replacing X with Z does not degrade the optimal loss in either regression or classification. A widely known result is that",
+          "page_span": [
+            4,
+            4
+          ]
+        },
+        {
+          "id": "preliminaries-p002",
+          "text": "sufficiency is",
+          "page_span": [
+            4,
+            4
+          ]
+        },
+        {
+          "id": "preliminaries-p003",
+          "text": "always preserved under injective transformation: Lemma 1. Suppose T : Rp →Rm is a measurable and injective function. Then it always holds that P(Y | X) = P(Y | Z) almost surely, and in particular Z is sufficient for Y . 4 Moreover, any compositions of injective transformations remains injective and is also sufficient. 3.2 Classical Neural Network Architecture Classical neural networks usually just include fully connected layers, activation functions, and possibly softmax layer at the end for classification tasks. For the purpose of subsequent theorems, we opt to use random variables (as row-vector for multivariate variable) throughout this paper. Fully Connected Layers A fully connected layer applies an affine transformation to the input. Given input variable X ∈R1×p, a fully connected layer (without activation function) can be defined as Z = Xα + β, where α ∈Rp×m is a weight matrix, and β ∈R1×m is a row vector. The output Z ∈Rm is a random variable of dimension 1 × m. This single layer is parameterized by α and β, which are learned during training to minimize a loss function. Activation Functions Activation function is usually applied to the output of a layer elementwise, which",
+          "page_span": [
+            4,
+            4
+          ]
+        },
+        {
+          "id": "preliminaries-p004",
+          "text": "introduce nonlinearity and allow neural networks to approximate complex functions.",
+          "page_span": [
+            4,
+            4
+          ]
+        },
+        {
+          "id": "preliminaries-p005",
+          "text": "The ReLU function σ(z) = max(0, z), is the most common in modern architecture due to its simplicity, which is non-invertible and zeroes out all negative values. The identity activation σ(z) = z leaves the input unchanged. The sigmoid function σ(z) = 1 1+e−z , is a traditional choice, which transforms each coordinate into (0, 1) and is strictly monotonic and continuous. Multiple Layers and Composition Classical neural networks are mostly formed by composing multiple fully connected layers, typically alternating between single layers and nonlinear activations: Z(1) = σ(1)(Xα(1) + β(1)), . . . , Z(L) = σ(L)(Z(L−1)α(L) + β(L)). Here, • X ∈R1×p is the input random variable • α(l) ∈Rm(l−1)∗m(l) and β(l) ∈R1∗m(l) are weights and biases at layer l, where m(l) is the neuron size at layer land m0 = p. • σ(l) is an elementwise activation function (e.g., ReLU, sigmoid). Learning and Training Objective All trainable parameters in a neural network, including weights {α(l)}, biases {β(l)}, are learned from sample data. Training is typically performed via stochastic gradient descent or its variants, optimizing a task-specific loss function, usually either the squared error loss in regression, or",
+          "page_span": [
+            5,
+            5
+          ]
+        },
+        {
+          "id": "preliminaries-p006",
+          "text": "cross-entropy loss in classification, as well as custom losses",
+          "page_span": [
+            5,
+            5
+          ]
+        },
+        {
+          "id": "preliminaries-p007",
+          "text": "such as contrastive loss, KL divergence, etc., depending on the problem setting. The optimization algorithm randomly initialize initial parameters, forward the training data into the model, then back-propagate to update parameters by the previous estimator minus learning rate times derivatives. The final model is determined upon some stopping criterion is reached. 4 Graph Variable and Anchor Points In this section, we formalize a graph variable from classical neural networks. This graph perspective allows us to view each layer in fully connected neural network as producing a new random variable 5 that is graph-like, based on the input variable and a set of anchor points, setting the foundation for achieving sufficiency via either injectivity and region separation in later sections. 4.1 Graph Perspective of Single Layer We will start with a single fully connected layer. A fully connected layer with activation is written as: Z = σ(Xα + β) ∈Rm. Equivalently, we can interpret this layer as constructing a graph variable Z, via the random variable X, the anchor points αj (each column of α) for j = 1, . . . , m, and a pairwise graph function A(x, α) = σ(⟨x, α⟩+ β), such that Z = [A(X,",
+          "page_span": [
+            5,
+            5
+          ]
+        },
+        {
+          "id": "preliminaries-p008",
+          "text": "α1), . . . , A(X, αm)] ∈Rm.",
+          "page_span": [
+            5,
+            5
+          ]
+        },
+        {
+          "id": "preliminaries-p009",
+          "text": "This can be viewed as first forming an inner product similarity between the input and all anchor points, then threshold-ed by the term β to adjusts the edge weight between X and α, and the ReLU function ensures non-negative edge weights. The output Z ∈Rm, therefore, can be viewed as a graph variable that is aggregated, adjusted, with ensured non-negativity entry-wise. While the above formulation very well suits a high-level analysis, a more granular view can be more convenient at times. We may assume A(x, α) = ⟨x, α⟩, form the graph variable Z as concatenations of {A(X, αj)}, then let ̃Z = σ(Z + β). This view better connects with standard pairwise function, where A(·, ·) : Rp ×Rp →R can simply assume classical pairwise functions, some standard examples include: • Inner product: A(x, α) = ⟨x, α⟩ • Euclidean distance (squared): A(x, α) = ∥x −α∥2 • Cosine similarity: A(x, α) = ⟨x,α⟩ • Gaussian kernel: A(x, α) = exp \u0010 −∥x−α∥2 2σ2 \u0011 In general, one can use any distance metric, kernels, dissimilarity functions here. Inner product is the dominating choice in classical neural network, because of the convenience in gradient calculation. We shall use the granular view, i.e., separately",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "preliminaries-p010",
+          "text": "analyze inner product, intercept, activation,",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "preliminaries-p011",
+          "text": "in Section 5 for single-layer analysis; and consider the more general graph view in Section 6 for multi-layer analysis. 4.2 Dense Support for Initialized Anchor Points Next, we consider the property of each anchor points {αj, j = 1, . . . , m}, which are columns of α. In practice, those anchor points are learned parameters from training data. Therefore, to ensure neural network models can preserve sufficiency, we need to investigate proper conditions on {αj}. A key result needed for Section 5 and Section 6 is that the anchor points, if we let m goes to infinite, are densely supported in the support of X — or more generally, the anchor points α(l) of current layer are densely supported in the support of prior input Z(l−1). This can be easily proved if the anchor points are independently and identically distributed: Lemma 2. Suppose anchor points {αj}m j=1 are drawn i.i.d. from the same distribution as X, with distribution FX supported on a compact subset of Rp. As m →∞, the set {αj}m j=1 becomes dense in the support of X with probability approaching 1. The iid assumption of αj, and it sampled from FX, matches with parameter initialization in neural network [20, 39], and also in",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "preliminaries-p012",
+          "text": "high-capacity overparameterized regimes [1, 5].",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "preliminaries-p013",
+          "text": "6 4.3 Dense Support for Learned Anchor Points We would like the same dense support to always hold for the anchor points in subsequent model training and backpropagation. To justify that, let L(Z, Y ) denote the loss function, the update rule under gradient descent is: αt+1 = αt j −η · ∂L ∂αj , with η > 0 the learning rate. Note that for this subsection only, the superscripts ·t+1 denotes the current training iteration, not to be confused with layer notation. Clearly, this update depends on the current data batch X, labels Y , and the anchor vector αj itself, but not directly on any other αk for k ̸= j, except through possibly empirical loss from previous iteration. The next lemma proves when the back propagation preserves dense support of anchor points. Lemma 3. Let {α0 j}m j=1 be drawn i.i.d. from FX, the distribution of X with compact support supp(FX) = supp(X) ⊂Rp. Define the gradient update: αt+1 = αt j −η · ∂L ∂αj , j = 1, . . . , m, for a differentiable loss L = L(X, Y ; {αj}, θ). Suppose: (i) L is differentiable in each αj and jointly continuous in (X, {αj}, θ); (ii) For each t, the iterates {αt j} remain in a compact superset supp(X)t ⊇supp(X); (iii) Each update map ft : α",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "preliminaries-p014",
+          "text": "7→α −η · ∂L/∂α is a homeomorphism from supp(X)t onto its image.",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "preliminaries-p015",
+          "text": "Then, as m →∞, with probability 1, the sets {αt j}m j=1 are dense in supp(X)t for all t ≥0. Assumption (i) of Lemma 3 — that the loss L is differentiable in each anchor point αj and continuous in all inputs — is satisfied for standard smooth loss functions such as mean squared error and cross-entropy, and for neural network outputs composed of linear layers, affine transforms, and any smooth activation functions. Assumption (ii), which requires that {αt j} remain within a compact superset of the data support supp(X), is typically satisfied in practice under bounded weight initialization and common training conditions. In particular, inputs X are supported on a compact set, parameters are initialized from compactly supported distributions (e.g., uniform or truncated Gaussian), and learning rate and gradient clipping prevent parameter explosion, ensuring that iterates remain within a bounded region. Assumption (iii) asserts that the gradient-based update map does not collapse the anchor points, i.e., the mapping remains injective and continuous, thereby preserving the topological structure (and density) of the initial anchor configuration. While global injectivity is difficult to",
+          "page_span": [
+            7,
+            7
+          ]
+        },
+        {
+          "id": "preliminaries-p016",
+          "text": "guarantee",
+          "page_span": [
+            7,
+            7
+          ]
+        },
+        {
+          "id": "preliminaries-p017",
+          "text": "in full generality, it is reasonable to assume local injectivity and continuity of the gradient update in common training regimes, such as in the lazy training regime [8] and the neural tangent kernel regime [20, 25]. These perspectives suggest that for appropriately tuned learning rates and smooth loss landscapes, the gradient flow behaves as a locally injective and continuous transformation, and therefore preserves the denseness of anchor points in supp(X) throughout training. 5 Asymptotic Sufficiency for Fully Connected Hidden Layer In this section we present a sequence of results for asymptotic sufficiency of single-layer neural representations. Based on the graph variable perspective and anchor points being dense from Sec- 7 tion 4, we begin with asymptotic sufficiency for general pairwise function, then extend to specific corollaries for inner product, distance-based, and kernel-based transformations, then include activation functions such as ReLU or sigmoid, and a combination of the above to characterize sufficiency for Z = σ(Xα + β). 5.1 Injectivity-Based Sufficiency Theorem 5.1. Let X ∈Rp be a random variable supported on a compact set supp(X), and let Y be any target",
+          "page_span": [
+            7,
+            7
+          ]
+        },
+        {
+          "id": "preliminaries-p018",
+          "text": "variable of finite moments.",
+          "page_span": [
+            7,
+            7
+          ]
+        },
+        {
+          "id": "preliminaries-p019",
+          "text": "Let {αj}∞ j=1 ⊂Rp be dense in supp(X), and let A : Rp × Rp →R be a measurable function satisfying: (i) For any x1 ̸= x2 in supp(X), there exists α ∈supp(X) such that A(x1, α) ̸= A(x2, α); (ii) For each x ∈supp(X), the map α 7→A(x, α) is continuous; (iii) Each A(X, αj) is measurable and has finite second moment. Define Zm := [A(X, α1), . . . , A(X, αm)] ∈Rm. Then, as m →∞, Zm becomes injective on supp(X), and lim m→∞∥P(Y | Zm) −P(Y | X)∥L2(FX) = 0. 5.2 Asymptotic Sufficiency under Specific Pairwise Functions Theorem 5.1 is in fact a general result for any function A(·, ·). Namely, if the pairwise similarity satisfies the required condition, then the resulting graph variable Z is asymptotically sufficient for infinite m. The next corollary verifies that standard pairwise functions, from inner product to distance to universal kernel, satisfy the required conditions. Theorem 5.2. Let X ∈Rp be a random variable supported on a compact set supp(X) ⊂Rp, and let {αj}∞ j=1 ⊂Rp be a sequence of anchor points dense in supp(X). Then the representation Zm = [A(X, α1), . . . , A(X, αm)] ∈Rm is asymptotically sufficient for X in each of the following cases: (a) A(X, α) = ⟨X, α⟩, (b) A(X, α) = ∥X",
+          "page_span": [
+            8,
+            8
+          ]
+        },
+        {
+          "id": "preliminaries-p020",
+          "text": "−α∥,",
+          "page_span": [
+            8,
+            8
+          ]
+        },
+        {
+          "id": "preliminaries-p021",
+          "text": "(c) A(X, α) = ∥X −α∥2, (d) A(X, α) = k(X, α), where k is a continuous universal kernel on supp(X), (e) A(X, α) = ⟨X,α⟩ ∥X∥∥α∥, under the assumption that Y ⊥∥X∥| ̃X. Moreover, in case (e), if ∥X∥carries information about Y , then the augmented representation [Zm; ∥X∥] is asymptotically sufficient. Next, a fully connected layer usually comes with an intercept term, which is a learned parameter but still preserves sufficiency. Corollary 5.1. Following the same conditions and notations as in Theorem 5.1, further define: ̃Z = Z + β, β ∈Rm. Then, as m →∞, the map X 7→ ̃Z becomes injective on the support of X: lim m→∞∥P(Y | ̃Z) −P(Y | X)∥L2(FX) = 0. 8 5.3 Asymptotic Sufficiency under Nonlinear Activations Next, we aim to extend the injectivity-based asymptotic sufficiency to include nonlinear activation function. If using identity activation function, and there is nothing to prove. The sigmoid function is strictly increasing, continuous, and bijective from R →(0, 1) — which means if Z is sufficient for X, σ(Z) is also sufficient for X. Therefore, all we need is to justify the ReLU activation function, which is not injective in general, as stated in the following lemma: Lemma 4. Let Z be",
+          "page_span": [
+            8,
+            8
+          ]
+        },
+        {
+          "id": "preliminaries-p022",
+          "text": "sufficient for X with respect to Y .",
+          "page_span": [
+            8,
+            8
+          ]
+        },
+        {
+          "id": "preliminaries-p023",
+          "text": "(a) If σ : R →R is bijective and measurable (e.g., identity, sigmoid), then σ(Z) is always sufficient. (b) If σ is not injective (e.g., ReLU), then sufficiency may not be preserved unless Z lies in a subset of Rm on which σ is injective. However, even with information-destroying σ (like ReLU), if we use enough such features, we can still recover all the information about X asymptotically, as proved in the next theorem: Theorem 5.3. Under the same assumptions as Theorem 5.1, define the ReLU-activated representation: ̃Z = σ(Z + β), where Z = [A(X, α1), . . . , A(X, αm)] ∈Rm, and β ∈Rm. Here, σ denotes the ReLU function σ(u) = max(0, u) applied elementwise. Then, as m →∞, the map X 7→ ̃Z becomes injective on the support of X, and: P(Y | ̃Z) −P(Y | X) L2(FX) = 0. lim m→∞ 6 Classical Multi-Layer Neural Networks and Asymptotic Sufficiency We now extend our sufficiency results to classical multi-layer neural networks. 6.1 Graph Perspective of Multi-Layer Representations The classical multi-layer network typically consists of multiple fully connected layers and activation function for each. This structure means l= 1, . . . , L layers, let Z(0) := X ∈Rp and recursively define: Z(l) = σ(l) \u0010",
+          "page_span": [
+            9,
+            9
+          ]
+        },
+        {
+          "id": "preliminaries-p024",
+          "text": "Z(l−1)α(l) + β(l)\u0011 , where: • α(l) ∈Rm(l−1)×mlis a matrix of anchor columns, • β(l) ∈R1×mlis a bias vector, • σ(l) is an elementwise activation function (e.g., ReLU, sigmoid), • m0 = p, mlis the width of layer l. We already tackled each component, from affine transformation to possibly other pairwise similarity function, as well as adding intercept, and activation function, in Section 5, which allows us to adopt a more general graph view in this section. In a multi-layer architecture, we can view each Z(l) as a graph variable, based on the previous graph variable Z(l−1) and a new set of anchors α(l) drawn from Fα(l) ∈Rm(l−1). Namely, Z(l) = [A(l)(Z(l−1), α(l) 1 ), . . . , A(l)(Z(l), α(l) m(l))] ∈Rm(l). 9 Here, the pairwise function A(l) can be different in each layer. This recursive graph embedding induces a nested graph structure over layers, where each new representation can be seen as a graph transformation over a previous graph variable. 6.2 Layerwise Preservation of Sufficiency We now show that if each layer satisfies the conditions from the single layer case, i.e., pointseparating feature maps, coupled with proved dense support in Lemma 3, the resulting multi-layer neural",
+          "page_span": [
+            9,
+            9
+          ]
+        },
+        {
+          "id": "preliminaries-p025",
+          "text": "network is asymptotically sufficient for any finite number of layers.",
+          "page_span": [
+            9,
+            9
+          ]
+        },
+        {
+          "id": "preliminaries-p026",
+          "text": "Theorem 6.1. Let X ∈Rp be a random variable supported on a compact set supp(X) ⊂Rp, and let Y be any target variable. Define a sequence of layerwise representations: Z(0) := X, Z(l) := A(l) \u0010 Z(l−1), α(l) 1 \u0011 , . . . , A(l) \u0010 Z(l−1), α(l) m(l) \u0011i ∈Rm(l), l= 1, . . . , L, where L is a fixed positive integer, each A(l) : Rm(l−1) × Rm(l−1) →R defines a neuron-wise feature map, and each α(l) is a learned parameter (e.g., weight or embedding vector) such that: (i) A(l)(z, α) is measurable in (z, α) and continuous in α for each fixed z; (ii) For any distinct z1, z2 in the support of Z(l−1), there exists α such that A(l)(z1, α) ̸= A(l)(z2, α); (iii) The anchor parameters {α(l) j }∞ j=1 remain dense in supp(Z(l−1)) with probability 1 under initialization and gradient updates, as in Lemma 3. Then, with probability 1, the final-layer representation Z(L) is asymptotically sufficient for X as all layer widths grow: P(Y | Z(L)) −P(Y | X) L2(FX) = 0. lim m(1),...,m(L)→∞ This result applies to any composition of single-layer components previously analyzed — including inner products, additive intercepts, ReLU activations, or kernel evaluations — as long as each neuron’s feature map A(l) satisfies",
+          "page_span": [
+            10,
+            10
+          ]
+        },
+        {
+          "id": "preliminaries-p027",
+          "text": "the continuity and separation conditions. Furthermore,",
+          "page_span": [
+            10,
+            10
+          ]
+        },
+        {
+          "id": "preliminaries-p028",
+          "text": "since each α(l) can correspond to a neuron’s parameters at any stage of training, this theorem implies that information about X is preserved across layers and across training iterations, from initialization to convergence. Note that the finiteness of L is essential here to ensure convergence, as it allows the sum of layerwise errors to vanish. 7 Exact Sufficiency with Region Separation The injectivity-based sufficiency thus far requires the pairwise function to be point-separating, and the number of anchor points increases to infinity so it is dense in the support of X. However, in real-world neural network architectures, the number of neurons per layer is always finite. In order to better align the theoretical results with practice, we start by considering an important special case: when the input random variable X takes on only m discrete values, one can use m anchor points from each value of X, and sufficiency can be achieved exactly using m neurons. This motivates our next investigation of sufficiency through region-separating representations: instead of requiring infinite anchor points over the full support of X, we aim to show that neural networks can distinguish the relevant",
+          "page_span": [
+            10,
+            10
+          ]
+        },
+        {
+          "id": "preliminaries-p029",
+          "text": "statistical modes of X that determine P(Y | X) — which",
+          "page_span": [
+            10,
+            10
+          ]
+        },
+        {
+          "id": "preliminaries-p030",
+          "text": "means neural network does not need to be injective, but still preserves sufficiency (or approximately so) for structured random variables. 10 We shall first consider general transformation T, not just neural network, and pinpoint the region-separating property to ensure sufficiency. Then we prove that fully-connected layer and convolutional layer are region-separating transformation in the next two sections. 7.1 Exact Sufficiency with Discrete Support Lemma 5. Let X be a random variable taking values in a finite set {x1, . . . , xm} ⊂Rp, and let Y be any target variable. Suppose T : Rp →Rd is a measurable function such that: T(xi) ̸= T(xj) for all i ̸= j. Then the representation Z = T(X) is sufficient for X with respect to Y , i.e., P(Y | Z) = P(Y | X). When X is discrete, the setting of Lemma 5 is simple enough to allow for sufficiency with finite neuron count in a single layer. For example. let T(X) = [⟨X, x1⟩, . . . , ⟨X, xm⟩]. Since the vectors {xi} are distinct, the resulting vector T(X) is injective on {x1, . . . , xm} as long as the Gram matrix is nonsingular (which holds if the xi are linearly independent or in general position). 7.2 Defining Region Separation Next, we",
+          "page_span": [
+            10,
+            10
+          ]
+        },
+        {
+          "id": "preliminaries-p031",
+          "text": "extend the structured variable X to be more realistic — instead of being discrete, they",
+          "page_span": [
+            10,
+            10
+          ]
+        },
+        {
+          "id": "preliminaries-p032",
+          "text": "can be continuous, but its support can be partitioned into m disjoint regions where each region has constant conditional distribution. This arises naturally, for example, in piecewise-constant classification, such as decision trees where the model attempt to split the support into pure leaf region; and also in piecewise-linear regression, where f(X) is linear or constant within each region. To that end, we define what we meant for region-separated random variable and region-separating transformation. Definition 2 (Region-Separated Random Variable). Given a random variable X in Rp, whose support can be partitioned into m compact and measurable regions {R1, . . . , Rm} such that for each i, the conditional distribution P(Y | X = x) is constant over Ri: ∀x ∈Ri, P(Y | X = x) = qi. Furthermore, the regions {R1, . . . , Rm} have non-empty interior and their intersections are of zeromeasure, i.e., For all i ̸= j, Prob(X ∈Ri ∩Rj) = 0. Then we say X is a region-separated random variable with m regions. Definition 3 (Region-Separating Transformation). Given a region-separated random variable X with m regions {R1, . . . , Rm}, we say T : Rp →Rd is a region-separating transformation for X, if",
+          "page_span": [
+            11,
+            11
+          ]
+        },
+        {
+          "id": "preliminaries-p033",
+          "text": "and only if ∀i ̸= j, ∀x ∈Ri, x′ ∈Rj, T(x) ̸= T(x′). Theorem 7.1. Given a region-separated random variable X with m regions. If the transformation T is region-separating for X, then Z = T(X) is sufficient for X with respect to Y . 11 The requirement that T is region-separating is notably weaker than requiring T to be injective on the support of X. Injectivity demands that T(x) ̸= T(x′) for all x ̸= x′, but region separation only asks that T(x) differs whenever x belongs to a different region Ri that determines P(Y | X). Within each region, T is free to collapse — for example, mapping all of Ri to a single position zi. This is somewhat related the recently observed phenomenon of neural collapse in deep classification networks [15, 36]: It has been empirically observed that representations of inputs from the same class collapse to a single prototype vector, while inter-class prototypes become maximally separated. A region-separating transformation does support this empirical observation: collapsed representation can be sufficient and preserves all information for prediction, in case of regionseparated random variables, which is supported by Figure 1 in simulation. 7.3 Approximated",
+          "page_span": [
+            11,
+            11
+          ]
+        },
+        {
+          "id": "preliminaries-p034",
+          "text": "Region Separation",
+          "page_span": [
+            11,
+            11
+          ]
+        },
+        {
+          "id": "preliminaries-p035",
+          "text": "Instead of requiring the conditional distribution to be identical within each region, we may allow for bounded variation within each region. Definition 4. Given a random variable X in Rp, whose support can be partitioned into m compact and measurable regions {R1, . . . , Rm} such that for each i, the conditional distribution P(Y | X = x) is constant over Ri up-to ε > 0: ∀x, x′ ∈Ri, ∥P(Y | x) −P(Y | x′)∥1 ≤ε. Furthermore, the regions {R1, . . . , Rm} have non-empty interior and their intersections are of zeromeasure, i.e., For all i ̸= j, Prob(X ∈Ri ∩Rj) = 0. Then we say X is an ε-region-separated random variable with m regions. With mild condition, any random variable X can be viewed as ε-region-separated, but possibly with infinite m. Theorem 7.2. Let X ∈Rp be a random variable supported on a compact set X ⊂Rp, and let f(x) := P(Y | X = x) denote the conditional distribution of Y given X. Suppose f ∈L1(FX), i.e., f is integrable with respect to the marginal distribution of X. Then for any ε > 0, there exists a finite measurable partition {R1, . . . , Rm} of X such that: ∀i ∈{1, . . . , m}, ∀x, x′ ∈Ri, ∥P(Y | x) −P(Y | x′)∥1 ≤ε. That is, X is ε-region-separated with respect to the",
+          "page_span": [
+            12,
+            12
+          ]
+        },
+        {
+          "id": "preliminaries-p036",
+          "text": "partition {Ri}m",
+          "page_span": [
+            12,
+            12
+          ]
+        },
+        {
+          "id": "preliminaries-p037",
+          "text": "i=1. 7.4 Probability Bound under Approximated region separation Next, we prove a general sufficiency result regarding an ε-region-separated random variable X. For any region-separating transformation T (with respect to the regions of X), it can preserve the conditional distribution up-to an error bound that is controlled by the maximum deviation ε of the conditional distributions within each region. Theorem 7.3. Let X be an ε-region-separated random variable with m regions {R1, . . . , Rm}. Suppose T(X) is a region-separating transformation; that is, ∀i = 1, . . . , m, ∀x, x′ ∈Ri, T(x) = T(x′) := zi. Then the transformed variable Z := T(X) is also ε-region-separated. Specifically: 12 • The support of Z is finite and contained in {z1, . . . , zm}. • For all i and all x ∈Ri, we have: ∥P(Y | Z = zi) −P(Y | x)∥1 ≤ε. Therefore, when the random variable X is region-separated, and the transformation T(·) is region-separating for X, then, T(X) would remain region-separated. This is true for the general ε-region-separated variable. If we think about this result in terms of neural network layers, if every single layer ends up being region-separating, then the output of each layer remains",
+          "page_span": [
+            12,
+            12
+          ]
+        },
+        {
+          "id": "preliminaries-p038",
+          "text": "region-separating and preserve sufficiency",
+          "page_span": [
+            12,
+            12
+          ]
+        },
+        {
+          "id": "preliminaries-p039",
+          "text": "up-to the error ε. 8 Sufficiency and Optimal Loss Bound of Neural Networks 8.1 Sufficiency for Fully Connected Layer Based on the results for general transformation, it suffices to prove that a single full connected layer is region-separating, which then qualify it, as well as any multi-layer composition, as preserving conditional density for region-separated random variables and therefore sufficient. From here onwards, we further require that each region be convex, as this is necessary to enable explicit construction of anchor points in neural networks. Theorem 8.1. Let X ∈Rp be an ε-region-separated random variable with m measurable regions {R1, . . . , Rm}, each is convex and of positive measure. Then there exists a linear map Z(x) = [⟨x, α1⟩+ b1, . . . , ⟨x, αm⟩+ bm] ∈Rm such that: x ∈Ri, x′ ∈Rj, i ̸= j ⇒ Z(x) ̸= Z(x′) almost surely. That is, Z separates the regions almost everywhere. Theorem 8.2. Let X ∈Rp be an ε-region-separated random variable with m measurable regions {R1, . . . , Rm}, each is convex and of positive measure. Then there exist vectors {αj}m j=1 ⊂Rp and biases {bj}m j=1 ⊂R such that the ReLU-activated representation Z(x) := [max(0, ⟨x, α1⟩+ b1), . . . ,",
+          "page_span": [
+            13,
+            13
+          ]
+        },
+        {
+          "id": "preliminaries-p040",
+          "text": "max(0, ⟨x, αm⟩+ bm)] ∈Rm",
+          "page_span": [
+            13,
+            13
+          ]
+        },
+        {
+          "id": "preliminaries-p041",
+          "text": "≥0 is region-separating almost surely. That is, x ∈Ri, x′ ∈Rj, i ̸= j ⇒ Z(x) ̸= Z(x′) almost surely. Now, combined with Theorem 7.3, we can readily conclude that neural networks remain sufficient, or approximately sufficient, even as the number of layers increases, potentially to infinity. This is a desirable property that aligns well with modern deep architectures. 13 8.2 Optimal Loss Bound on Regression and Classification Theorem 7.2 showed that any random variable can be represented as ε-region-separated. Combined with Theorems 7.3 and 8.2, we immediately obtain the following corollary: a neural network is a sufficient transformation when ε = 0, or approximately so with at most ε deviation in conditional probability. Corollary 8.1. Let X be an ε-region-separated random variable with m convex regions {R1, . . . , Rm}, and T(X) denotes a ReLU neural network with at least m neurons in each hidden layer, where all parameters satisfy Theorem 8.2 to ensure region-separating. Then the output Z = T(X) is sufficient for X when ε = 0; and in general approximately sufficient with bound: ∥P(Y | Z) −P(Y | X)∥1 ≤ε. Next, we relate the probability bound to the Bayes-optimal loss in both",
+          "page_span": [
+            13,
+            13
+          ]
+        },
+        {
+          "id": "preliminaries-p042",
+          "text": "regression and classi-",
+          "page_span": [
+            13,
+            13
+          ]
+        },
+        {
+          "id": "preliminaries-p043",
+          "text": "fication settings. Background on optimal loss, i.e., mean squared error for regression and Bayes classification error under random variables, can be found in [12, 17]. Theorem 8.3. Let X be an ε-region-separated random variable with m convex regions {R1, . . . , Rm}, and let T(X) denote a ReLU neural network with at least m neurons in each hidden layer, where all parameters satisfy the conditions of Theorem 8.2 to ensure region separation. Define Z := T(X). Then the following bounds on prediction loss hold: (1) Regression: If Y ∈[y1, y2] and a regression neural network is trained, then the optimal mean squared error satisfies where MSE∗(X) := E[(Y −E[Y | X])2]. (2) Classification: If Y ∈{1, . . . , K} and a classification neural network is trained, then the Bayes-optimal classification error satisfies |Err∗(Z) −Err∗(X)| ≤ε, where Err∗(X) := 1 −EX [maxy P(Y = y | X)]. In the special case where ε = 0, the neural network is exactly sufficient, and the Bayes-optimal loss remains unchanged. The theorem also showed that in classification problems, the optimal loss is robust against small deviations. For example, a region-separation imperfection of ε = 0.001 leads to at most a 0.001",
+          "page_span": [
+            14,
+            14
+          ]
+        },
+        {
+          "id": "preliminaries-p044",
+          "text": "increase in Bayes-optimal classification error. However, in regression tasks, the",
+          "page_span": [
+            14,
+            14
+          ]
+        },
+        {
+          "id": "preliminaries-p045",
+          "text": "same imperfection can lead to a larger increase in optimal mean squared error, as the error scales with the range of Y . This may partially explain why neural networks tend to achieve more success and breakthroughs in classification-type tasks, particularly those involving categorical outputs, compared to regression tasks. 8.3 On the Number of Anchor Points In our explicit constructions, we show that if a random variable X is ε-region-separated with m measurable regions {R1, . . . , Rm}, then a representation map using m neurons (or anchor points) is sufficient to asymptotically preserve region separation. Each neuron is explicitly designed to distinguish one region from the others, leading to a region-separating map Z(X) where each region is mapped to a distinct code. When X is m-region-separated, it is possible to use fewer than m neurons. For instance, if the regions are geometrically aligned or linearly separable in groups, a smaller set of neurons can 14 distinguish them by composing simple linear cuts. In practice, however, the number of regions m is unknown, and the true data distribution may contain finer substructure or continuous variation that is not captured by a fixed",
+          "page_span": [
+            14,
+            14
+          ]
+        },
+        {
+          "id": "preliminaries-p046",
+          "text": "partition. For this reason, it is common to begin with a generously",
+          "page_span": [
+            14,
+            14
+          ]
+        },
+        {
+          "id": "preliminaries-p047",
+          "text": "sized initial layer, often with width far exceeding the number of output classes, enabling the network to detect latent subregions and preserve flexibility for downstream compression [34]. This practice reflects both theoretical insights and empirical heuristics in modern neural networks. 9 Graph Sufficiency for Convolution In this section, we extend the region separation based sufficiency into convolutional neural networks (CNNs), a layer design working particularly well for structured inputs such as images. We first reinterpret convolutional layer through our anchor-point framework between input random variable and sparse anchor points. In CNN, inputs typically take the form of 3D tensors X ∈RH×W×C, representing height, width, and channels. A 2D convolutional layer applies learned filters (kernels) K ∈RkH×kW ×C over sliding spatial windows of X, producing output feature maps. Formally, for stride s and padding p, the output spatial size is: \u0017 + 1, ˆW = \u0016W −kW + 2p \u0017 + 1. ˆH = \u0016H −kH + 2p Each output activation is computed by sliding the kernel over a local region and computing an inner product. Multiple kernels yield multiple output channels. 9.1 Graph-Theoretic Interpretation",
+          "page_span": [
+            15,
+            15
+          ]
+        },
+        {
+          "id": "preliminaries-p048",
+          "text": "with Regularized Anchor Points",
+          "page_span": [
+            15,
+            15
+          ]
+        },
+        {
+          "id": "preliminaries-p049",
+          "text": "The convolutional layer can be adapted via a standard layer with regularized anchor points. Let X ∈R1×p denote the random variable for the corresponding flattened input. Let α ∈Rp×m represent m convolutional filters, each reshaped and flattened to lie in Rp. Then the convolutional feature map with activation is: Z = σ(Xα + β), Z ∈Rn×m, where β ∈R1×m is a bias vector, and σ is the elementwise activation function (typically ReLU in CNN). The j-th column of α, denoted αj, corresponds to the j-th filter. In classical convolution, each filter αj is nonzero only on a small, spatially localized region Rc j ⊆{1, . . . , p}. That is: supp(αj) ⊆Rc j, with |Rc j| ≪p. We thus interpret αj as a regularized anchor point, localized over the receptive field Rc j. The output Zj = A(X, αj) = σ(Xαj + βj) continues the interpretation of each neuron as a pairwise interaction between X and anchor point αj, modulated by the activation σ. 9.2 Region Separation for Convolution To prove sufficiency for region-separated random variable, it suffices to prove that the convolutional layer, or more precisely under our framework, there exists regularized anchor points such that the transformation is",
+          "page_span": [
+            15,
+            15
+          ]
+        },
+        {
+          "id": "preliminaries-p050",
+          "text": "region-separating. An additional patch condition is needed, which is explained",
+          "page_span": [
+            15,
+            15
+          ]
+        },
+        {
+          "id": "preliminaries-p051",
+          "text": "in the next subsection. 15 Theorem 9.1. Let X ∈Rp be a random variable that is region-separated with respect to m measurable regions {R1, . . . , Rm}, each is convex and of positive measure. Suppose that for each i = 1, . . . , m, there exists coordinate subsets Q1, . . . , Qm ⊆{1, . . . , p} and fixed reference patches x1, . . . , xm such that: ∀x ∈Ri, ∥xQi −xi∥= 0, where for any i ̸= j, the patterns disagree on their shared patch: xi|Qi∩Qj ̸= xj|Qi∩Qj. Then there exist sparse vectors {α1, . . . , αm} ⊂Rp with supp(αi) ⊆Qi, and biases β ∈Rm, such that the ReLU-activated convolutional output Z(x) = [σ(⟨x, α1⟩+ β1), . . . , σ(⟨x, αm⟩+ βm)] ∈Rm ≥0 is region-separating: for any x ∈Ri, x′ ∈Rj with i ̸= j, we have Z(x) ̸= Z(x′). Next, instead of exact patches, we consider a more general version with a bound in the patch condition. Theorem 9.2. Let X ∈Rp be a region-separated random variable with m disjoint and convex regions {R1, . . . , Rm}, and suppose there exist coordinate subsets Q1, . . . , Qm ⊆{1, . . . , p} and fixed reference patches x1, . . . , xm such that: ∀x ∈Ri, ∥xQi −xi∥≤δ. Then, using the same sparse filters αi and biases βi as in Theorem 9.1, the ReLU output Z(x) :=",
+          "page_span": [
+            15,
+            15
+          ]
+        },
+        {
+          "id": "preliminaries-p052",
+          "text": "[σ(⟨x, α1⟩+ β1), . . . , σ(⟨x, αm⟩+ βm)]",
+          "page_span": [
+            15,
+            15
+          ]
+        },
+        {
+          "id": "preliminaries-p053",
+          "text": "satisfies: ∥Z(x) −Z(x′)∥≥γ(δ) > 0 for x ∈Ri, x′ ∈Rj, i ̸= j, where γ(δ) →0 as δ →0. That is, Z is approximately region-separating, with separation error controlled by δ. 9.3 Sufficiency under the Patch Condition We first state an obvious corollary based on the results thus far: Corollary 9.1. Under the assumptions of Theorem 9.1, the transformation: T(X) = σ(Xα + β) = Z is a sufficient statistic for X with respect to any target variable Y measurable with respect to X. That is: P(Y | T(X)) = P(Y | X). Now, about the additional patch condition—that for any i ̸= j, the fixed patterns xi and xj disagree on their shared support Qi ∩Qj—is essential for ensuring region separation. To see this, note that in our construction, each neuron Zi(x) computes a ReLU-activated inner product between x and a sparse filter αi supported on Qi, followed by a bias shift. For the representation Z(x) to be region-separating, we require that Z(x) ̸= Z(x′) whenever x and x′ lie in different regions. 16 If two distinct regions Ri and Rj have identical values on the overlapping coordinates Qi ∩Qj, then it is possible that: ⟨x, αi⟩= ⟨x′, αi⟩ for x ∈Ri, x′ ∈Rj, which implies Zi(x) = Zi(x′), defeating the purpose",
+          "page_span": [
+            16,
+            16
+          ]
+        },
+        {
+          "id": "preliminaries-p054",
+          "text": "of the neuron as a region detector.",
+          "page_span": [
+            16,
+            16
+          ]
+        },
+        {
+          "id": "preliminaries-p055",
+          "text": "The assumption xi|Qi∩Qj ̸= xj|Qi∩Qj ensures that the inner products differ, and hence that Zi(x) ̸= Zi(x′) for i ̸= j. This assumption matches well with the design of convolutional neural networks (CNNs), particularly for structured inputs like image patches. In images, it is common for each region (e.g., part of a digit, texture, or object) to be characterized by a distinct local pattern over a spatial patch. The index set Qi corresponds to the receptive field of a convolutional kernel, and the condition ensures that each region has a distinctive signal over its local patch, which the convolutional filter αi is designed to detect. Many datasets naturally satisfy this condition: • In digit classification (e.g., MNIST), different digits often contain distinctive local strokes or curves in different parts of the image. • In texture or material recognition, patches exhibit local structure that differs across categories. • In object recognition, local parts (ears, wheels, eyes) appear in roughly consistent locations but differ across object classes. 10 Simulations 10.1 Standard Neural Networks and Region Separation We simulate a 3-class classification setting in R3, where each class",
+          "page_span": [
+            17,
+            17
+          ]
+        },
+        {
+          "id": "preliminaries-p056",
+          "text": "consists of 500 points: 400 points",
+          "page_span": [
+            17,
+            17
+          ]
+        },
+        {
+          "id": "preliminaries-p057",
+          "text": "are drawn from class-specific Gaussian distributions with means [10, 0, 0], [0, 10, 0], and [0, 0, 10], respectively, and the remaining 100 points per class are drawn from a shared standard Gaussian centered at the origin. While these mixed points are assigned the same class labels during training, they are colored in gray for visualization, to highlight their ambiguity in the input space. This setting is constructed to illustrate how neural networks preserve information across layers. The input is a region-separated random variable: the three outer regions are class-specific and have conditional probabilities equal to 1 for their respective labels, while the central region (near the origin) corresponds to inputs where P(Y | X) is uniformly distributed across all three classes. We train a standard fully connected neural network with three hidden layers (each with 3 ReLU neurons) and a softmax output layer. Figure 1 visualizes the learned representations in 3D at each layer of the network. The class-specific regions remain clearly separable throughout, while the ambiguous (mixed) points remain clustered near the origin. This experiment demonstrates that when the input distribution",
+          "page_span": [
+            17,
+            17
+          ]
+        },
+        {
+          "id": "preliminaries-p058",
+          "text": "is region-separated, neural networks preserve the essential information",
+          "page_span": [
+            17,
+            17
+          ]
+        },
+        {
+          "id": "preliminaries-p059",
+          "text": "required for optimal classification, even as they apply nonlinear transformations that distort the input geometry. It is worth noting that this example is intentionally simple to make the structure and information preservation visually interpretable. In real-world scenarios, the data geometry can be far more complex and high-dimensional, making region separation difficult to visualize. Nonetheless, the key message of the simulation resonates with the theoretical results: if the input distribution is region-separated (or approximately so), neural networks are capable of preserving the optimal classification error through their layers. 17 Figure 1: Input data consists of three classes in R3 with partially overlapping components. Each subplot shows the output representation at a different stage of a 3-layer ReLU network. Class-specific points are shown in blue, orange, and green, while mixed points are plotted in gray. As depth increases, the network maintains class separation for the clean regions and learns representations that preserve sufficient information for classification. 10.2 Convolutional Layers and Patch Condition Here, we simulate a 3-class image classification task using",
+          "page_span": [
+            17,
+            17
+          ]
+        },
+        {
+          "id": "preliminaries-p060",
+          "text": "synthetic 8 × 8 grayscale images. Each",
+          "page_span": [
+            17,
+            17
+          ]
+        },
+        {
+          "id": "preliminaries-p061",
+          "text": "image is constructed to contain a class-specific 3 × 3 bright patch at one of three distinct spatial locations: top-left, center, or bottom-right, corresponding to class labels 1, 2, and 3 respectively. The rest of the image is filled with low-magnitude Gaussian noise to simulate natural background variability. This design satisfies the condition from Theorem 9.1: each class has a distinct pattern on a localized coordinate subset Qi, while remaining pixels vary but do not interfere with the regionseparating structure. It also mimics real-world image classification tasks, where localized discriminative features are embedded in noisy backgrounds. We train a shallow convolutional neural network with a single convolutional layer of three 3× 3 filters (stride 1, no padding), followed by ReLU activation and global average pooling. The outputs are passed to a softmax classifier. Figure 2 shows three representative images (one per class) and the 2D PCA projection of the final-layer outputs. The network successfully separates the classes based on the local patch 18 structure, demonstrating that convolutional layers preserve the information needed for classification in region-separated",
+          "page_span": [
+            18,
+            18
+          ]
+        },
+        {
+          "id": "preliminaries-p062",
+          "text": "settings. This supports our theoretical claim that convolutional architectures",
+          "page_span": [
+            18,
+            18
+          ]
+        },
+        {
+          "id": "preliminaries-p063",
+          "text": "can achieve sufficiency when local region patterns distinguish the classes. Figure 2: Illustration of region separation in convolutional neural networks. Left: one example image from each of the three classes, where class identity is determined by the location of a bright 3×3 patch, embedded in noisy background. Right: PCA projection of the convolutional output after ReLU and global pooling. The network successfully separates classes based on local patterns, demonstrating that convolution preserves the sufficient information needed for classification in region-separated input distributions. 11",
+          "page_span": [
+            19,
+            19
+          ]
+        }
+      ]
+    },
+    {
+      "id": "conclusion",
+      "title": "Conclusion",
+      "paras": [
+        {
+          "id": "conclusion-p001",
+          "text": "This paper presents a new graph-based statistical framework for understanding when and how neural network layers preserve information about the target variable Y . We approach this from the perspective of statistical sufficiency and graph-like anchor points, formalizing conditions under which neural representations Z retain the conditional distribution P(Y | X). Our key results revolve around two core regimes: sufficiency via injectivity and sufficiency via region separation. The injectivity condition is data-agnostic and holds universally given sufficiently large width, whereas region separation is data-adaptive: it requires trained anchor points to specialize to the data distribution, thereby aligning more closely with modern architectures in practice. Table 1 summarizes the key differences between the two theoretical paths, while Figure 3 illustrates the overall graph sufficiency perspective of neural networks. In our view, each neural network layer constructs a graph variable by computing pairwise interactions between the input and a set of 19 anchor points. A multi-layer neural network then corresponds to a nested formation of such graph variables, where each graph preserves",
+          "page_span": [
+            19,
+            19
+          ]
+        },
+        {
+          "id": "conclusion-p002",
+          "text": "information from the previous graph.",
+          "page_span": [
+            19,
+            19
+          ]
+        },
+        {
+          "id": "conclusion-p003",
+          "text": "Table 1: Comparison of Injectivity-Based vs. Region-Separated Sufficiency Property Injectivity-Based Region-Separated Assumption on X None Region-separated distributions Neuron Width Must be infinite Can be finite Layer Size Must be finite Can be finite or infinite Layer Types General (e.g., ReLU, sigmoid) General + Convolutional (with local patches) Form of Sufficiency Asymptotic sufficiency wrt neuron width Exact sufficiency or approximate with bound Anchor Requirements Dense in support of X By construction Model Training Holds throughout training under density assumptions Holds when proper anchor points are learned Our work complements but differs fundamentally from classical universal approximation theorems. While universal approximation guarantees that neural networks can approximate any continuous function, our results are distribution-based and focus on whether the internal representations in neural networks retain enough information to permit statistically optimal prediction. This sufficiency-based analysis reveals when and how neural networks can preserve the population-level signal, regardless of the functional relationship. Overall, this work provides a new statistical",
+          "page_span": [
+            20,
+            20
+          ]
+        },
+        {
+          "id": "conclusion-p004",
+          "text": "framework to characterize the sufficiency property",
+          "page_span": [
+            20,
+            20
+          ]
+        },
+        {
+          "id": "conclusion-p005",
+          "text": "of neural networks across a range of components. By bridging ideas from graph representations, statistical sufficiency, and modern deep learning, it provides a statistical foundation for understanding when and how neural networks preserve the population-level signal necessary for optimal prediction. We hope this perspective inspires future work in theory-guided architecture design, and deeper exploration for better and more principled development of neural networks.",
+          "page_span": [
+            20,
+            20
+          ]
+        }
+      ]
+    },
+    {
+      "id": "references",
+      "title": "References",
+      "paras": [
+        {
+          "id": "references-p001",
+          "text": "[1] Z. Allen-Zhu, Y. Li, and Z. Song. A convergence theory for deep learning via overparameterization. In International Conference on Machine Learning, pages 242–252. PMLR, 2019. [2] A. Athreya, D. E. Fishkind, M. Tang, C. E. Priebe, Y. Park, J. T. Vogelstein, K. Levin, V. Lyzinski, Y. Qin, and D. L. Sussman. Statistical inference on random dot product graphs: a survey. Journal of Machine Learning Research, 18(226):1–92, 2018. [3] A. R. Barron. Universal approximation bounds for superpositions of a sigmoidal function. IEEE Transactions on Information Theory, 39(3):930–945, 1993. [4] M. Belkin and P. Niyogi. Laplacian eigenmaps for dimensionality reduction and data representation. In Advances in Neural Information Processing Systems, volume 16, 2003. [5] M. Belkin, D. Hsu, S. Ma, and S. Mandal. Reconciling modern machine learning practice and the classical bias–variance trade-off. Proceedings of the National Academy of Sciences, 116 20 Figure 3: A simplified illustration of a multi-layer neural network viewed as nested graph variables. The input X (center) is transformed into the first-layer representation Z(1) by applying pairwise functions (e.g., inner products) with learned",
+          "page_span": [
+            20,
+            20
+          ]
+        },
+        {
+          "id": "references-p002",
+          "text": "anchor points {α(1)",
+          "page_span": [
+            20,
+            20
+          ]
+        },
+        {
+          "id": "references-p003",
+          "text": "1 , α(1) 2 , α(1) 3 , . . .}. The second layer Z(2) is then formed by applying new anchor points {α(2) 1 , α(2) 2 , α(2) 3 , . . .} to Z(1). Each layer corresponds to a graph-like variable defined by the pairwise interactions, where sufficiency can be preserved through the nested graphs, i.e., Prob(Y |X) = Prob(Y |Z(1)) = Prob(Y |Z(2)) = . . .. [6] J. Bruna and S. Mallat. Invariant scattering convolution networks. IEEE Transactions on Pattern Analysis and Machine Intelligence, 35(8):1872–1886, 2013. [7] S. Chen, C. Shen, Y. Park, and C. E. Priebe. Graph neural networks powered by encoder embedding for improved node learning. arXiv preprint arXiv:2507.11732, 2025. [8] L. Chizat, E. Oyallon, and F. Bach. On lazy training in differentiable programming. In Advances in Neural Information Processing Systems, volume 32, 2019. [9] T. S. Cohen and M. Welling. Group equivariant convolutional networks. International Conference on Machine Learning, pages 2990–2999, 2016. [10] R. Cook and L. Ni. Sufficient dimension reduction via inverse regression: a minimum discrepancy approach. Journal of the American Statistical Association, 100(472):410–428, 2005. [11] G. Cybenko. Approximation by",
+          "page_span": [
+            21,
+            21
+          ]
+        },
+        {
+          "id": "references-p004",
+          "text": "superpositions of a sigmoidal function. Mathematics of Con-",
+          "page_span": [
+            21,
+            21
+          ]
+        },
+        {
+          "id": "references-p005",
+          "text": "trol, Signals and Systems, 2:303–314, 1989. [12] L. Devroye, L. Gyorfi, and G. Lugosi. A Probabilistic Theory of Pattern Recognition. Springer, 1996. [13] Z. Goldfeld and Y. Polyanskiy. The information bottleneck problem and its applications in machine learning. IEEE Journal on Selected Areas in Information Theory, 1(1):19–38, 2020. [14] A. Grover and J. Leskovec. node2vec: Scalable feature learning for networks. In Proceedings of The 22nd ACM SIGKDD international conference on Knowledge discovery and data mining, pages 855–864, 2016. 21 [15] X. Han, V. Papyan, and D. L. Donoho. Neural collapse under mse loss: Proximity to and dynamics on the manifold. In International Conference on Learning Representations, 2021. [16] B. Hanin and M. Sellke. Universal function approximation by deep neural nets with bounded width and relu activations. Mathematics, 7(10):992, 2019. [17] T. Hastie, R. Tibshirani, and J. Friedman. The Elements of Statistical Learning: Data Mining, Inference, and Prediction. Springer Science & Business Media, 2009. [18] K. Hornik, M. Stinchcombe, and H. White. Multilayer feedforward networks are universal approximators. Neural Networks, 2(5):359–366, 1989. [19] A.",
+          "page_span": [
+            21,
+            21
+          ]
+        },
+        {
+          "id": "references-p006",
+          "text": "Jacot, F. Gabriel, and C. Hongler. Neural tangent kernel: Convergence and generalization",
+          "page_span": [
+            21,
+            21
+          ]
+        },
+        {
+          "id": "references-p007",
+          "text": "in neural networks. In Advances in Neural Information Processing Systems, volume 31, pages 8571–8580, 2018. [20] A. Jacot, F. Gabriel, and C. Hongler. Neural tangent kernel: Convergence and generalization in neural networks. In Advances in Neural Information Processing Systems, volume 31, 2018. [21] K. Kawaguchi, Z. Deng, X. Ji, and J. Huang. How does information bottleneck help deep learning? In Proceedings of the 40th International Conference on Machine Learning, volume 202, pages 16049–16096. PMLR, 2023. [22] T. N. Kipf and M. Welling. Semi-supervised classification with graph convolutional networks. In International Conference on Learning Representations, 2017. [23] A. Krizhevsky, I. Sutskever, and G. E. Hinton. Imagenet classification with deep convolutional neural networks. Communications of the ACM, 60(6):84–90, 2012. [24] Y. LeCun, L. Bottou, Y. Bengio, and P. Haffner. Gradient-based learning applied to document recognition. Proceedings of the IEEE, 86(11):2278–2324, 1998. [25] J. Lee, L. Xiao, S. Schoenholz, Y. Bahri, R. Novak, J. Sohl-Dickstein, and J. Pennington. Wide neural networks of any depth evolve as linear models under gradient descent. In Advances in Neural",
+          "page_span": [
+            22,
+            22
+          ]
+        },
+        {
+          "id": "references-p008",
+          "text": "Information Processing Systems, volume 32, 2019.",
+          "page_span": [
+            22,
+            22
+          ]
+        },
+        {
+          "id": "references-p009",
+          "text": "[26] E. L. Lehmann and J. P. Romano. Testing Statistical Hypotheses. Springer, 2005. [27] B. Li. Sufficient dimension reduction: Methods and applications with R. CRC Press, 2018. [28] B. Li, A. Artemiou, and L. Li. Principal support vector machines for linear and nonlinear sufficient dimension reduction. Annals of Statistics, 39(6):3182–3210, 2011. [29] K.-C. Li. Sliced inverse regression for dimension reduction. Journal of the American Statistical Association, 86(414):316–327, 1991. [30] Z. Lu, H. Pu, F. Wang, Z. Hu, and L. Wang. The expressive power of neural networks: A view from the width. In Advances in Neural Information Processing Systems, volume 30. Curran Associates, Inc., 2017. [31] S. Mallat. Understanding deep convolutional networks. Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences, 374(2065):20150203, 2016. 22 [32] G. F. Mont ́ufar, R. Pascanu, K. Cho, and Y. Bengio. On the number of linear regions of deep neural networks. In Advances in Neural Information Processing Systems, volume 27, pages 2924–2932, 2014. [33] B. Neyshabur, S. Bhojanapalli, D. McAllester, and N. Srebro. Exploring generalization in deep learning. In",
+          "page_span": [
+            22,
+            22
+          ]
+        },
+        {
+          "id": "references-p010",
+          "text": "Advances in Neural Information Processing Systems, volume 30, pages 5947–5956,",
+          "page_span": [
+            22,
+            22
+          ]
+        },
+        {
+          "id": "references-p011",
+          "text": "2017. [34] B. Neyshabur, S. Bhojanapalli, and D. McAllester. The role of over-parametrization in generalization of neural networks. International Conference on Learning Representations, 2018. [35] V. Papyan, X. Han, and M. Elad. Convolutional neural networks analyzed via convolutional sparse coding. Journal of Machine Learning Research, 18(1):2887–2938, 2017. [36] V. Papyan, X. Han, and D. L. Donoho. Prevalence of neural collapse during the terminal phase of deep learning training. Proceedings of the National Academy of Sciences, 117(40): 24652–24663, 2020. [37] C. Priebe, Y. Parker, J. Vogelstein, J. Conroy, V. Lyzinskic, M. Tang, A. Athreya, J. Cape, and E. Bridgeford. On a ’two truths’ phenomenon in spectral graph clustering. Proceedings of the National Academy of Sciences, 116(13):5995–5600, 2019. [38] A. Radford, J. Wu, R. Child, D. Luan, D. Amodei, and I. Sutskever. Language models are unsupervised multitask learners. OpenAI Blog, 1(8):1–18, 2019. [39] A. Rahimi and B. Recht. Random features for large-scale kernel machines. In Advances in Neural Information Processing Systems, pages 1177–1184, 2007. [40] B. Sch ̈olkopf and A. J. Smola. Learning with kernels: support vector",
+          "page_span": [
+            23,
+            23
+          ]
+        },
+        {
+          "id": "references-p012",
+          "text": "machines, regularization,",
+          "page_span": [
+            23,
+            23
+          ]
+        },
+        {
+          "id": "references-p013",
+          "text": "optimization, and beyond. MIT press, 2002. [41] C. Shen, Q. Wang, and C. E. Priebe. One-hot graph encoder embedding. IEEE Transactions on Pattern Analysis and Machine Intelligence, 45(6):7933–7938, 2023. [42] C. Shen, Y. Dong, C. E. Priebe, J. Larson, H. Trinh, and Y. Park. Principal graph encoder embedding and principal community detection. IEEE Transactions on Network Science and Engineering, 2025. [43] N. Tishby and N. Zaslavsky. Deep learning and the information bottleneck principle. In Proc. IEEE Information Theory Workshop, pages 1–5, 2015. [44] A. Tsitsulin, J. Palowitch, B. Perozzi, and E. M ̈uller. Graph clustering with graph neural networks. Journal of Machine Learning Research, 24(127):1–21, 2023. [45] A. Vaswani, N. Shazeer, N. Parmar, J. Uszkoreit, L. Jones, A. N. Gomez, L. Kaiser, and I. Polosukhin. Attention is all you need. In Advances in Neural Information Processing Systems, volume 30. Curran Associates, Inc., 2017. [46] H. Wang, X. Guo, Z.-H. Deng, and Y. Lu. Rethinking minimal sufficient representation in contrastive learning. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition, pages 16041–16050, 2022. [47] Z. Wu, S. Pan, F.",
+          "page_span": [
+            23,
+            23
+          ]
+        },
+        {
+          "id": "references-p014",
+          "text": "Chen, G. Long, C. Zhang, and P. S. Yu.",
+          "page_span": [
+            23,
+            23
+          ]
+        },
+        {
+          "id": "references-p015",
+          "text": "A comprehensive survey on graph neural networks. IEEE Transactions on Neural Networks and Learning Systems, 32: 4–24, 2019. 23 [48] S. Xu and Z. Yu. Neural networks perform sufficient dimension reduction. In Proceedings of the AAAI Conference on Artificial Intelligence, pages 21806–21814, 2025. [49] P. Zhang, J. Chen, C. Che, L. Zhang, B. Jin, and Y. Zhu. Iea-gnn: Anchor-aware graph neural network fused with information entropy. Information Sciences, 634:665–676, 2023. [50] Y. Zhang and M. Tang. A theoretical analysis of deepwalk and node2vec for exact recovery of community structures in stochastic blockmodels. IEEE Transactions on Pattern Analysis and Machine Intelligence, 46(2):1065–1078, February 2024. [51] S. Zheng, Y. Lin, and J. Huang. Deep sufficient representation learning via mutual information. arXiv preprint arXiv:2207.10772, 2022. [52] D. Zhou, O. Bousquet, T. Lal, J. Weston, and B. Sch ̈olkopf. Learning with local and global consistency. Advances in Neural Information Processing Systems, 16, 2004. 24",
+          "page_span": [
+            23,
+            23
+          ]
+        }
+      ]
+    },
+    {
+      "id": "appendix",
+      "title": "Appendix",
+      "paras": [
+        {
+          "id": "appendix-p001",
+          "text": "Proofs Lemma 1. Suppose T : Rp →Rm is a measurable and injective function. Then it always holds that P(Y | X) = P(Y | Z) almost surely, and in particular Z is sufficient for Y . Proof. Since Z = T(X) and T is injective, there exists a measurable inverse function T −1 on the range of T. Therefore, X = T −1(Z) is a measurable function of Z, and hence: P(Y | Z) = P(Y | T(X)) = P(Y | X). Lemma 2. Suppose anchor points {αj}m j=1 are drawn i.i.d. from the same distribution as X, with distribution FX supported on a compact subset of Rp. As m →∞, the set {αj}m j=1 becomes dense in the support of X with probability approaching 1. Proof. Since Fα = FX, the anchor points {αj} are drawn i.i.d. from the same distribution as X. By classical results in probability, with probability one, the empirical set {αj}∞ j=1 becomes dense in the support of FX. This follows from the fact that i.i.d. samples eventually fall into every open set of positive measure, and the separability of compact subsets of Rp ensures a countable basis to cover the support. Lemma 3. Let {α0 j}m j=1 be drawn i.i.d. from FX, the distribution of X with compact support supp(FX) = supp(X) ⊂Rp. Define the gradient update: αt+1 = αt",
+          "page_span": [
+            25,
+            25
+          ]
+        },
+        {
+          "id": "appendix-p002",
+          "text": "j −η · ∂L",
+          "page_span": [
+            25,
+            25
+          ]
+        },
+        {
+          "id": "appendix-p003",
+          "text": "∂αj , j = 1, . . . , m, for a differentiable loss L = L(X, Y ; {αj}, θ). Suppose: (i) L is differentiable in each αj and jointly continuous in (X, {αj}, θ); (ii) For each t, the iterates {αt j} remain in a compact superset supp(X)t ⊇supp(X); (iii) Each update map ft : α 7→α −η · ∂L/∂α is a homeomorphism from supp(X)t onto its image. Then, as m →∞, with probability 1, the sets {αt j}m j=1 are dense in supp(X)t for all t ≥0. Proof. At t = 0, since the α0 j are drawn i.i.d. from FX, and supp(X) is compact, it follows from Lemma 2 that as m →∞, the set {α0 j} is dense in supp(X) with probability 1. Now fix any sample {α0 j}∞ j=1 such that this denseness holds (which occurs with probability 1). Since the update map ft is a homeomorphism (by assumption (iii)), and {αt j} is obtained by applying ft to {αt−1 }, it follows by a standard result in topology that the image of a dense set under a homeomorphism is dense in the image. Moreover, by assumption (ii), each iterate αt j lies in a compact set supp(X)t, and the updates map one compact support to the next. Therefore, if {αt j} is dense in supp(X)t, then {αt+1 } = ft(αt j) is dense in supp(X)t+1. By induction on t, the density property is",
+          "page_span": [
+            25,
+            25
+          ]
+        },
+        {
+          "id": "appendix-p004",
+          "text": "preserved at every step. Since the initial density",
+          "page_span": [
+            25,
+            25
+          ]
+        },
+        {
+          "id": "appendix-p005",
+          "text": "holds with probability 1 as m →∞, so does the density of {αt j} in supp(X)t for all t. 25 Theorem 5.1. Let X ∈Rp be a random variable supported on a compact set supp(X), and let Y be any target variable of finite moments. Let {αj}∞ j=1 ⊂Rp be dense in supp(X), and let A : Rp × Rp →R be a measurable function satisfying: (i) For any x1 ̸= x2 in supp(X), there exists α ∈supp(X) such that A(x1, α) ̸= A(x2, α); (ii) For each x ∈supp(X), the map α 7→A(x, α) is continuous; (iii) Each A(X, αj) is measurable and has finite second moment. Define Zm := [A(X, α1), . . . , A(X, αm)] ∈Rm. Then, as m →∞, Zm becomes injective on supp(X), and lim m→∞∥P(Y | Zm) −P(Y | X)∥L2(FX) = 0. Proof. Let x1 ̸= x2 in supp(X). By assumption (i), there exists α∗such that A(x1, α∗) ̸= A(x2, α∗). Since {αj} is dense and A(x, ·) is continuous, we can find αj arbitrarily close to α∗such that A(x1, αj) ̸= A(x2, αj). Therefore, for sufficiently large m, the vectors Zm(x1) and Zm(x2) differ — i.e., Zm is injective on supp(X) as m →∞. Since Zm becomes injective on supp(X) as m →∞, the map X 7→Zm becomes invertible in the limit, and X becomes a measurable function of Zm. As a result, the conditional distribution P(Y | Zm)",
+          "page_span": [
+            25,
+            25
+          ]
+        },
+        {
+          "id": "appendix-p006",
+          "text": "converges to the true conditional P(Y | X).",
+          "page_span": [
+            25,
+            25
+          ]
+        },
+        {
+          "id": "appendix-p007",
+          "text": "Moreover, since Y has finite second moment, the conditional probability function P(Y | X) is square-integrable, and so: lim m→∞∥P(Y | Zm) −P(Y | X)∥L2(FX) = 0. Thus, the representation Zm is asymptotically sufficient for X with respect to Y . Theorem 5.2. Let X ∈Rp be a random variable supported on a compact set supp(X) ⊂Rp, and let {αj}∞ j=1 ⊂Rp be a sequence of anchor points dense in supp(X). Then the representation Zm = [A(X, α1), . . . , A(X, αm)] ∈Rm is asymptotically sufficient for X in each of the following cases: (a) A(X, α) = ⟨X, α⟩, (b) A(X, α) = ∥X −α∥, (c) A(X, α) = ∥X −α∥2, (d) A(X, α) = k(X, α), where k is a continuous universal kernel on supp(X), (e) A(X, α) = ⟨X,α⟩ ∥X∥∥α∥, under the assumption that Y ⊥∥X∥| ̃X. Moreover, in case (e), if ∥X∥carries information about Y , then the augmented representation [Zm; ∥X∥] is asymptotically sufficient. Proof. We apply Theorem 5.1 by verifying that each pairwise function A(x, α) satisfies point separation, i.e., for any x1 ̸= x2 ∈supp(X), there exists α such that A(x1, α) ̸= A(x2, α), as well as continuity in α. (a) Inner product: For x1 ̸= x2, we have x1−x2 ̸= 0, so there exists α such that ⟨x1, α⟩̸= ⟨x2, α⟩. Since inner",
+          "page_span": [
+            26,
+            26
+          ]
+        },
+        {
+          "id": "appendix-p008",
+          "text": "product is continuous and bounded on compact sets, both conditions hold.",
+          "page_span": [
+            26,
+            26
+          ]
+        },
+        {
+          "id": "appendix-p009",
+          "text": "(b) Euclidean distance: The function α 7→∥x −α∥is continuous and strictly convex, and ∥x1 −α∥= ∥x2 −α∥defines a hypersurface in Rp. Thus, for almost every α, A(x1, α) ̸= A(x2, α), and the dense sequence {αj} suffices to ensure point-separation. Continuity and integrability hold on compact domains. 26 (c) Squared distance: Since A(x, α) = ∥x−α∥2 is strictly increasing in the distance and smooth in α, point-separation and continuity follow from case (b). Square-integrability is preserved. (d) Universal kernel: A continuous universal kernel k on compact supp(X) defines an injective embedding x 7→k(x, ·) into its RKHS Hk. Since {αj} is dense and k is continuous in both arguments, the evaluations {k(x, αj)} uniquely determine x via the kernel map. Thus, the conditions of Theorem 5.1 are satisfied. (e) Cosine similarity: Define ̃X := X/∥X∥on supp(X) \\ {0}. Under the assumption Y ⊥∥X∥| ̃X, we have: P(Y | X) = P(Y | ̃X), so sufficiency for ̃X implies sufficiency for Y . Now note: A(X, α) = ⟨X, α⟩ ∥X∥∥α∥= ⟨ ̃X, ̃α⟩, with ̃α = α/∥α∥. On the unit sphere, inner products again separate points (as in case (a)), and continuity holds. Thus, cosine similarity yields an asymptotically sufficient",
+          "page_span": [
+            26,
+            26
+          ]
+        },
+        {
+          "id": "appendix-p010",
+          "text": "representation for ̃X.",
+          "page_span": [
+            26,
+            26
+          ]
+        },
+        {
+          "id": "appendix-p011",
+          "text": "If the norm ∥X∥carries additional information about Y , then the augmented representation [Zm; ∥X∥] fully reconstructs X asymptotically and is therefore sufficient. Corollary 5.1. Following the same conditions and notations as in Theorem 5.1, further define: ̃Z = Z + β, β ∈Rm. Then, as m →∞, the map X 7→ ̃Z becomes injective on the support of X: lim m→∞∥P(Y | ̃Z) −P(Y | X)∥L2(FX) = 0. Proof. Since addition of a fixed vector is a bijective affine transformation on Rm, injectivity of the map X 7→Z implies injectivity of X 7→ ̃Z. That is, Theorem 5.3. Under the same assumptions as Theorem 5.1, define the ReLU-activated representation: ̃Z = σ(Z + β), where Z = [A(X, α1), . . . , A(X, αm)] ∈Rm, and β ∈Rm. Here, σ denotes the ReLU function σ(u) = max(0, u) applied elementwise. Then, as m →∞, the map X 7→ ̃Z becomes injective on the support of X, and: P(Y | ̃Z) −P(Y | X) L2(FX) = 0. lim m→∞ Proof. By Theorem 5.1, if {αj} is dense and A(x, α) separates points, then the map X 7→Z is injective as m →∞. Adding any fixed bias β ∈Rm preserves injectivity, so X 7→Z + β remains injective in the limit. Now consider ̃Z = σ(Z + β). The ReLU function is continuous, monotonic, and injective on [0, ∞),",
+          "page_span": [
+            27,
+            27
+          ]
+        },
+        {
+          "id": "appendix-p012",
+          "text": "but non-invertible on R due to its flat zero region on (−∞, 0].",
+          "page_span": [
+            27,
+            27
+          ]
+        },
+        {
+          "id": "appendix-p013",
+          "text": "Suppose for contradiction that x1 ̸= x2 in supp(X) yield ̃Z(x1) = ̃Z(x2). Then Z(x1) + β and Z(x2) + β differ, but their ReLU outputs agree. This can only happen if the differences lie entirely in negative coordinates that are zeroed out — i.e., all nonzero differences lie in coordinates where both values are negative. 27 But this contradicts the injectivity of Z +β: if all coordinates where (Z +β)(x1) ̸= (Z +β)(x2) are clipped to zero by ReLU, then Z(x1) + β = Z(x2) + β on the support of nonzero output, which implies x1 = x2. Therefore, such x1 ̸= x2 cannot exist. Thus, ̃Z remains injective in the limit. By the same reasoning as in Theorem 5.1, this implies that P(Y | ̃Z) →P(Y | X) in L2(FX) norm, completing the proof. Theorem 6.1. Let X ∈Rp be a random variable supported on a compact set supp(X) ⊂Rp, and let Y be any target variable. Define a sequence of layerwise representations: Z(0) := X, Z(l) := A(l) \u0010 Z(l−1), α(l) 1 \u0011 , . . . , A(l) \u0010 Z(l−1), α(l) m(l) \u0011i ∈Rm(l), l= 1, . . . , L, where L is a fixed positive integer, each A(l) : Rm(l−1) × Rm(l−1) →R defines a neuron-wise feature map, and each α(l) is a learned parameter (e.g., weight or embedding vector) such that: (i)",
+          "page_span": [
+            27,
+            27
+          ]
+        },
+        {
+          "id": "appendix-p014",
+          "text": "A(l)(z, α) is measurable in (z, α) and continuous in α for each fixed z;",
+          "page_span": [
+            27,
+            27
+          ]
+        },
+        {
+          "id": "appendix-p015",
+          "text": "(ii) For any distinct z1, z2 in the support of Z(l−1), there exists α such that A(l)(z1, α) ̸= A(l)(z2, α); (iii) The anchor parameters {α(l) j }∞ j=1 remain dense in supp(Z(l−1)) with probability 1 under initialization and gradient updates, as in Lemma 3. Then, with probability 1, the final-layer representation Z(L) is asymptotically sufficient for X as all layer widths grow: P(Y | Z(L)) −P(Y | X) L2(FX) = 0. lim m(1),...,m(L)→∞ Proof. We prove the result by induction on the layer index l. Base case (l= 1): Since the anchors {α(1) j } are dense in supp(X) with probability 1, and A(1)(x, α) separates points and is continuous in α, Theorem 5.1 implies that Z(1) becomes an injective function of X as m(1) →∞. Therefore, P(Y | Z(1)) −P(Y | X) L2(FX) = 0. lim m(1)→∞ Moreover, since Z(1) is a continuous function of X, it is supported on a compact set. Inductive step: Assume the result holds up to layer l−1, so that Z(l−1) is injective in the limit and supported on a compact set. By assumption, {α(l) j } remains dense in this support, and A(l) satisfies the same continuity and separation conditions. Applying Theorem 5.1 again gives: P(Y | Z(l)) −P(Y | Z(l−1)) L2(FX) = 0. lim m(l)→∞ Final",
+          "page_span": [
+            28,
+            28
+          ]
+        },
+        {
+          "id": "appendix-p016",
+          "text": "conclusion: Since L is fixed and finite, we apply the triangle inequality:",
+          "page_span": [
+            28,
+            28
+          ]
+        },
+        {
+          "id": "appendix-p017",
+          "text": "P(Y | Z(L)) −P(Y | X) L2(FX) ≤ P(Y | Z(l)) −P(Y | Z(l−1)) L2(FX) , l=1 and each term tends to zero as m(l) →∞. Taking the joint limit over all widths, the total deviation vanishes, completing the proof. Lemma 5. Let X be a random variable taking values in a finite set {x1, . . . , xm} ⊂Rp, and let Y be any target variable. Suppose T : Rp →Rd is a measurable function such that: T(xi) ̸= T(xj) for all i ̸= j. Then the representation Z = T(X) is sufficient for X with respect to Y , i.e., P(Y | Z) = P(Y | X). 28 Proof. Since X takes on only m discrete values, we may identify the support of X with the finite set {x1, . . . , xm}. The assumption that T is injective over this set implies that for each xi, there is a unique zi = T(xi). Thus, T induces a bijection between {xi} and {zi}. Let Z = T(X) denote the transformed variable. Since T is injective on supp(X), there exists an inverse mapping T −1 defined on {z1, . . . , zm} such that T −1(T(xi)) = xi. It follows that: P(Y | Z) = P(Y | X), almost surely, which proves that Z is a sufficient statistic for X with respect to Y . Theorem 7.1. Given a region-separated random variable X with m regions. If the transformation T is",
+          "page_span": [
+            28,
+            28
+          ]
+        },
+        {
+          "id": "appendix-p018",
+          "text": "region-separating for X, then Z = T(X) is sufficient for X with respect to Y .",
+          "page_span": [
+            28,
+            28
+          ]
+        },
+        {
+          "id": "appendix-p019",
+          "text": "Proof. Let Z = T(X), and assume T is region-separating, i.e., the map x 7→Z maps all x ∈Ri to some fixed value zi, distinct from zj for j ̸= i. This induces a deterministic partition of Z into {z1, . . . , zm}, each corresponding to a region Ri. Since P(Y | X = x) = qi for all x ∈Ri, and Z uniquely identifies the region x belongs to, we have: P(Y | Z = zi) = qi = P(Y | X = x), ∀x ∈Ri. Therefore, P(Y | Z) = P(Y | X) almost surely, which proves sufficiency. Theorem 7.2. Let X ∈Rp be a random variable supported on a compact set X ⊂Rp, and let f(x) := P(Y | X = x) denote the conditional distribution of Y given X. Suppose f ∈L1(FX), i.e., f is integrable with respect to the marginal distribution of X. Then for any ε > 0, there exists a finite measurable partition {R1, . . . , Rm} of X such that: ∀i ∈{1, . . . , m}, ∀x, x′ ∈Ri, ∥P(Y | x) −P(Y | x′)∥1 ≤ε. That is, X is ε-region-separated with respect to the partition {Ri}m i=1. Proof. Since f ∈L1(FX) and X is supported on the compact set, f is measurable on the support, by Lusin’s theorem, for any δ > 0, there exists a compact set X such that: FX(X) ≥1 −δ, and f is continuous on X. Since f is continuous on compact X, it is uniformly",
+          "page_span": [
+            29,
+            29
+          ]
+        },
+        {
+          "id": "appendix-p020",
+          "text": "continuous. Thus, for any ε > 0, there",
+          "page_span": [
+            29,
+            29
+          ]
+        },
+        {
+          "id": "appendix-p021",
+          "text": "exists η > 0 such that: ∥x −x′∥< η ⇒ ∥f(x) −f(x′)∥1 < ε, ∀x, x′ ∈X. We can cover X by a finite number of balls {B1, . . . , Bm} of radius at most η. Define regions Ri := Bi ∩X for i = 1, . . . , m. These form a measurable cover of X, and we may refine them into a disjoint measurable partition (e.g., by subtracting overlaps or assigning boundaries arbitrarily). By construction, for all x, x′ ∈Ri, ∥f(x) −f(x′)∥1 ≤ε. Then, let R0 := supp(X) \\ X. Since FX(R0) ≤δ, we may assign R0 arbitrarily (e.g., as an (m + 1)-th region or absorb it into the nearest Ri). For integrated approximations, its effect is bounded: R0 ∥f(x) − ̄f(x)∥1 dFX(x) ≤2δ, for any constant ̄f over R0. Choosing δ < ε/2, we obtain a finite measurable partition {R1, . . . , Rm} such that ∥f(x) − f(x′)∥1 ≤ε for all x, x′ in any region. Hence, X is ε-region-separated with m regions, as desired. 29 Theorem 7.3. Let X be an ε-region-separated random variable with m regions {R1, . . . , Rm}. Suppose T(X) is a region-separating transformation; that is, ∀i = 1, . . . , m, ∀x, x′ ∈Ri, T(x) = T(x′) := zi. Then the transformed variable Z := T(X) is also ε-region-separated. Specifically: • The support of Z is finite and contained in",
+          "page_span": [
+            29,
+            29
+          ]
+        },
+        {
+          "id": "appendix-p022",
+          "text": "{z1, . . . , zm}.",
+          "page_span": [
+            29,
+            29
+          ]
+        },
+        {
+          "id": "appendix-p023",
+          "text": "• For all i and all x ∈Ri, we have: ∥P(Y | Z = zi) −P(Y | x)∥1 ≤ε. Proof. Since T is region-separating, it maps each region Ri to a unique point zi = T(x) for all x ∈Ri. Hence, the support of Z = T(X) is exactly {z1, . . . , zm}. For each i, the event {Z = zi} corresponds exactly to {X ∈Ri}. Therefore, the conditional distribution of Y given Z = zi is: P(Y | Z = zi) = E[P(Y | X) | X ∈Ri]. Now fix any x ∈Ri. Using the triangle inequality and the definition of ε-region separation: ∥P(Y | Z = zi) −P(Y | x)∥1 = Ex′∈Ri[P(Y | x′)] −P(Y | x) 1 ≤ε. Thus, the conditional distribution P(Y | Z = zi) approximates P(Y | x) uniformly within each region Ri up to total variation ε. Hence, Z is ε-region-separated with respect to the induced partition {z1, . . . , zm}. Theorem 8.1. Let X ∈Rp be an ε-region-separated random variable with m measurable regions {R1, . . . , Rm}, each is convex and of positive measure. Then there exists a linear map Z(x) = [⟨x, α1⟩+ b1, . . . , ⟨x, αm⟩+ bm] ∈Rm such that: x ∈Ri, x′ ∈Rj, i ̸= j ⇒ Z(x) ̸= Z(x′) almost surely. That is, Z separates the regions almost everywhere. Proof. Assume each region Ri ⊂Rp is compact, convex, and has nonzero interior. For each region",
+          "page_span": [
+            30,
+            30
+          ]
+        },
+        {
+          "id": "appendix-p024",
+          "text": "Ri, choose a representative point ci ∈Ri. Define:",
+          "page_span": [
+            30,
+            30
+          ]
+        },
+        {
+          "id": "appendix-p025",
+          "text": "αj := cj, bj := −∥cj∥2, for j = 1, . . . , m. Then the map Z(x) := [⟨x, α1⟩+ b1, . . . , ⟨x, αm⟩+ bm] satisfies: Z(ci) = [⟨ci, c1⟩−∥c1∥2, . . . , ⟨ci, cm⟩−∥cm∥2]. We claim that for a generic choice of representatives {c1, . . . , cm}, the vectors {Z(ci)} are distinct. This follows because: if Z(ci) = Z(cj) for i ̸= j, then ci −cj must lie in the orthogonal complement of the span of {c1, . . . , cm}, which is a measure-zero event. Since each region Ri has positive measure and contains interior points, such collisions can be avoided by re-selecting ci from a full-measure subset. Thus, we may choose the ci so that Z(ci) ̸= Z(cj) for all i ̸= j. Now, because Z is affine and continuous, it maps each small neighborhood around ci in Ri to an open set around Z(ci) in Rm. Since each region is convex, for each cj, there exists a hyperplane, namely, ⟨x, cj⟩= ∥cj∥2, that separates a neighborhood of cj within Rj from the other regions. This guarantees that for sufficiently small neighborhoods around ci and cj, the map Z produces distinct outputs. Hence, for almost every x ∈Ri and x′ ∈Rj with i ̸= j, we have Z(x) ̸= Z(x′). Therefore, Z separates the regions almost surely. 30 Theorem 8.2. Let X",
+          "page_span": [
+            30,
+            30
+          ]
+        },
+        {
+          "id": "appendix-p026",
+          "text": "∈Rp be an ε-region-separated random variable with m measurable regions",
+          "page_span": [
+            30,
+            30
+          ]
+        },
+        {
+          "id": "appendix-p027",
+          "text": "{R1, . . . , Rm}, each is convex and of positive measure. Then there exist vectors {αj}m j=1 ⊂Rp and biases {bj}m j=1 ⊂R such that the ReLU-activated representation Z(x) := [max(0, ⟨x, α1⟩+ b1), . . . , max(0, ⟨x, αm⟩+ bm)] ∈Rm ≥0 is region-separating almost surely. That is, x ∈Ri, x′ ∈Rj, i ̸= j ⇒ Z(x) ̸= Z(x′) almost surely. Proof. For each region Ri, select a representative point ci ∈Ri. Define αj := cj and bj := −∥cj∥2 for j = 1, . . . , m. Then each coordinate of the representation is: Zj(x) = max(0, ⟨x, cj⟩−∥cj∥2). By construction: Zj(x) > 0 if ⟨x, cj⟩> ∥cj∥2, and Zj(x) = 0 if ⟨x, cj⟩≤∥cj∥2. In particular, for x = ci: Zi(ci) = max(0, ∥ci∥2 −∥ci∥2) = 0, Zj(ci) = max(0, ⟨ci, cj⟩−∥cj∥2) ≤0 for j ̸= i. To ensure that Z(ci) ̸= Z(cj) for i ̸= j, we may reselect ci from Ri if needed — since each region has positive measure, this is always possible. By continuity of Z(x) and the fact that each region has nonzero interior and convex, the pattern Z(x) ≈Z(ci) holds for almost all x ∈Ri, and Z(x) ̸= Z(x′) for x′ ∈Rj, j ̸= i, except possibly on boundaries of measure zero. Hence, Z separates regions almost surely. Corollary 8.1. Let X be an ε-region-separated random variable with m convex",
+          "page_span": [
+            31,
+            31
+          ]
+        },
+        {
+          "id": "appendix-p028",
+          "text": "regions {R1, . . . , Rm},",
+          "page_span": [
+            31,
+            31
+          ]
+        },
+        {
+          "id": "appendix-p029",
+          "text": "and T(X) denotes a ReLU neural network with at least m neurons in each hidden layer, where all parameters satisfy Theorem 8.2 to ensure region-separating. Then the output Z = T(X) is sufficient for X when ε = 0; and in general approximately sufficient with bound: ∥P(Y | Z) −P(Y | X)∥1 ≤ε. Proof. Since T is region-separating, we have T(x) = zi for all x ∈Ri. Define Z = T(X). Then for any zi = T(x), and any x ∈Ri: P(Y | Z = zi) = EX|Z=zi[P(Y | X)]. Since P(Y | X) varies by at most ε within each Ri, and Z is constant on Ri, it follows that: ∥P(Y | Z = zi) −P(Y | X = x)∥1 ≤ε. This holds for all x in the same region, proving the bound. Theorem 8.3. Let X be an ε-region-separated random variable with m convex regions {R1, . . . , Rm}, and let T(X) denote a ReLU neural network with at least m neurons in each hidden layer, where all parameters satisfy the conditions of Theorem 8.2 to ensure region separation. Define Z := T(X). Then the following bounds on prediction loss hold: (1) Regression: If Y ∈[y1, y2] and a regression neural network is trained, then the optimal mean squared error satisfies 31 where MSE∗(X) := E[(Y −E[Y | X])2]. (2) Classification: If Y ∈{1, . . . , K} and a",
+          "page_span": [
+            31,
+            31
+          ]
+        },
+        {
+          "id": "appendix-p030",
+          "text": "classification neural network is trained, then the",
+          "page_span": [
+            31,
+            31
+          ]
+        },
+        {
+          "id": "appendix-p031",
+          "text": "Bayes-optimal classification error satisfies |Err∗(Z) −Err∗(X)| ≤ε, where Err∗(X) := 1 −EX [maxy P(Y = y | X)]. Proof. (1) Regression: Let μX := E[Y | X] and μZ := E[Y | Z]. It follows that MSE∗(Z) = E[(Y −μX + μX −μZ)2] = E[(Y −μX)2] + E[(μX −μZ)2] + 2E[(Y −μX)(μX −μZ)] = MSE∗(X) + E[(μX −μZ)2] + 2E[(Y −μX)(μX −μZ)]. Since Y ∈[y1, y2] and ∥P(Y | Z) −P(Y | X)∥1 ≤ε, it follows that |μX −μZ| ≤ε(y2 −y1) (pointwise), and Var(Y | X) ≤(y2 −y1)2 4 . It follows that E[(μX −μZ)2] ≤ε2(y2 −y1)2, and |E[(Y −μX)(μX −μZ)]| ≤ E[(Y −μX)2] · E[(μX −μZ)2] ≤(y2 −y1) 2 · ε(y2 −y1) = 1 2ε(y2 −y1)2 Putting it all together: | MSE∗(Z) −MSE∗(X)| ≤ε2(y2 −y1)2 + ε 2(y2 −y1)2. (2) Classification: For classification, the Bayes-optimal classification error is: \u0014 max P(Y = y | Z) \u0015 . \u0014 max P(Y = y | X) \u0015 , Err∗(Z) = 1 −EZ Err∗(X) = 1 −EX Since ∥P(Y | Z) −P(Y | X)∥1 ≤ε for all Y , this holds for the maximum as well. Applying the same bound pointwise and then integrating gives: |Err∗(Z) −Err∗(X)| ≤ε. Theorem 9.1. Let X ∈Rp be a random variable that is region-separated with respect to m measurable regions {R1, . . . , Rm}, each is convex and of positive measure. Suppose that for each i = 1, . . . , m, there exists",
+          "page_span": [
+            32,
+            32
+          ]
+        },
+        {
+          "id": "appendix-p032",
+          "text": "coordinate subsets Q1, . . . , Qm ⊆{1, . . . , p} and",
+          "page_span": [
+            32,
+            32
+          ]
+        },
+        {
+          "id": "appendix-p033",
+          "text": "fixed reference patches x1, . . . , xm such that: ∀x ∈Ri, ∥xQi −xi∥= 0, where for any i ̸= j, the patterns disagree on their shared patch: xi|Qi∩Qj ̸= xj|Qi∩Qj. Then there exist sparse vectors {α1, . . . , αm} ⊂Rp with supp(αi) ⊆Qi, and biases β ∈Rm, such that the ReLU-activated convolutional output Z(x) = [σ(⟨x, α1⟩+ β1), . . . , σ(⟨x, αm⟩+ βm)] ∈Rm ≥0 is region-separating: for any x ∈Ri, x′ ∈Rj with i ̸= j, we have Z(x) ̸= Z(x′). 32 Proof. For each i = 1, . . . , m, define a sparse vector αi ∈Rp supported on Qi: ( xi[k], if k ∈Qi, 0, otherwise. αi[k] := Let βi := −1 2∥xi∥2. Now, for any x ∈Ri, we have xQi = xi, so: ⟨x, αi⟩= ⟨xi, xi⟩= ∥xi∥2, and thus: 2∥xi∥2 \u0013 > 0. Zi(x) = σ(⟨x, αi⟩+ βi) = σ \u00121 For x′ ∈Rj with j ̸= i, the inner product becomes: ⟨x′, αi⟩= ⟨x′ Qi, xi⟩. Since x′ Qj = xj and xi ̸= xj on Qi ∩Qj, there exists some coordinate k ∈Qi where x′ Qi[k] ̸= xi[k]. Therefore: ⟨x′ Qi, xi⟩< ∥xi∥2, and hence: Zi(x′) = σ \u0000 ⟨x′, αi⟩+ βi \u0001 < σ \u0012 ∥xi∥2 −1 2∥xi∥2 \u0013 = 1 2∥xi∥2. If the inner product gap is large enough (e.g., due to orthogonal or contrasting values), we can make Zi(x′) = 0 by design. Therefore, Zi(x) > 0 for all x ∈Ri, and Zi(x′) = 0 for x′ ∈Rj, j ̸= i. Thus, the vector",
+          "page_span": [
+            32,
+            32
+          ]
+        },
+        {
+          "id": "appendix-p034",
+          "text": "Z(x) is",
+          "page_span": [
+            32,
+            32
+          ]
+        },
+        {
+          "id": "appendix-p035",
+          "text": "uniquely activated on region Ri and zero elsewhere. Theorem 9.2. Let X ∈Rp be a region-separated random variable with m disjoint and convex regions {R1, . . . , Rm}, and suppose there exist coordinate subsets Q1, . . . , Qm ⊆{1, . . . , p} and fixed reference patches x1, . . . , xm such that: ∀x ∈Ri, ∥xQi −xi∥≤δ. Then, using the same sparse filters αi and biases βi as in Theorem 9.1, the ReLU output Z(x) := [σ(⟨x, α1⟩+ β1), . . . , σ(⟨x, αm⟩+ βm)] satisfies: ∥Z(x) −Z(x′)∥≥γ(δ) > 0 for x ∈Ri, x′ ∈Rj, i ̸= j, where γ(δ) →0 as δ →0. That is, Z is approximately region-separating, with separation error controlled by δ. Proof. Let x ∈Ri, x′ ∈Rj with i ̸= j. By assumption, ∥xQi −xi∥≤δ, ∥x′ Qj −xj∥≤δ. Define αi ∈Rp by zero-padding xi outside Qi, and βi := −1 2∥xi∥2. Then: ⟨x, αi⟩= ⟨xQi, xi⟩= ∥xi∥2 + ⟨xQi −xi, xi⟩, so |⟨x, αi⟩−∥xi∥2| ≤∥xQi −xi∥· ∥xi∥≤δ∥xi∥. 33 Thus, Zi(x) = σ(⟨x, αi⟩+ βi) ≥1 2∥xi∥2 −δ∥xi∥. Now consider Zi(x′) for x′ ∈Rj, j ̸= i. We estimate: ⟨x′, αi⟩= ⟨x′ Qi, xi⟩= ⟨xj|Qi∩Qj, xi⟩+ error, where the error is at most δ∥xi∥. By assumption, xi ̸= xj on Qi ∩Qj, so: ⟨x′ Qi, xi⟩≤∥xi∥2 −∆ for some ∆> 0. Hence: Zi(x′) ≤max \u0000 0, ∥xi∥2 −∆+ βi + δ∥xi∥ \u0001 = max \u0012 0, 1 2∥xi∥2 −∆+ δ∥xi∥ \u0013 .",
+          "page_span": [
+            33,
+            33
+          ]
+        },
+        {
+          "id": "appendix-p036",
+          "text": "Now define the separation margin:",
+          "page_span": [
+            33,
+            33
+          ]
+        },
+        {
+          "id": "appendix-p037",
+          "text": "2∥xi∥2 −δ∥xi∥ \u0015 − \u00141 2∥xi∥2 −∆+ δ∥xi∥ \u0015 = ∆−2δ∥xi∥. γ(δ) := \u00141 So as long as δ < ∆/(2∥xi∥), we have γ(δ) > 0, and: |Zi(x) −Zi(x′)| ≥γ(δ). Since this holds for some i depending on (Ri, Rj), we get: ∥Z(x) −Z(x′)∥≥γ(δ), which completes the proof. Corollary 9.1. Under the assumptions of Theorem 9.1, the transformation: T(X) = σ(Xα + β) = Z is a sufficient statistic for X with respect to any target variable Y measurable with respect to X. That is: P(Y | T(X)) = P(Y | X). Proof. Let T(X) = Z = σ(Xα + β) be the transformation constructed in Theorem 9.1. For each region Ri, Z(x) takes a unique value (e.g., a one-hot or sparse vector with nonzero only in position i). Therefore, Z(x) uniquely determines the region Ri to which x belongs. Since P(Y | X) is constant on each Ri (because the regions partition supp(X)), and Z identifies the region, we have: P(Y | Z) = P(Y | X). Hence, Z is a sufficient statistic for X with respect to Y . 34",
+          "page_span": [
+            34,
+            34
+          ]
+        }
+      ]
+    }
+  ]
+}

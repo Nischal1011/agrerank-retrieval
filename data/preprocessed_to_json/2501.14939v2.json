@@ -1,0 +1,837 @@
+{
+  "id": "2501.14939v2",
+  "title": "Principal Graph Encoder Embedding and Principal Community Detection",
+  "metadata": {
+    "source_path": "data/pdf_files/2501.14939v2.pdf",
+    "page_count": 16,
+    "hash": "28762a48cfa70ed5e7020d1e9991de0334e86a32069ddfe8408a8b5afff5e85b"
+  },
+  "sections": [
+    {
+      "id": "front-matter",
+      "title": "Front Matter",
+      "paras": [
+        {
+          "id": "front-matter-p001",
+          "text": "1 Principal Graph Encoder Embedding and Principal Community Detection Cencheng Shen, Yuexiao Dong, Carey E. Priebe, Jonathan Larson, Ha Trinh, Youngser Park many such techniques exist, two popular and theoretically sound methods are spectral embedding [7] and node2vec [8], with asymptotic theoretical guarantees such as convergence to the latent position [9] and consistency in community recovery [10], under popular random graph models such as the stochastic block model and random dot graph model [11]– [13]. The resulting vertex embeddings facilitate a wide range of downstream inference tasks, such as community detection [14], [15], vertex classification [16], [17], and the analysis of multiple graphs and time-series data [18], [19]. The scalability of spectral embedding is often a bottleneck due to its use of singular value decomposition, which can be time-consuming for moderate to large graphs. When vertex labels are available for at least part of the vertex set, a recent method called one-hot graph encoder embedding [20], which can be viewed as a supervised version of spectral embedding, is significantly faster yet shares similar theoretical properties, such as convergence to the",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "front-matter-p002",
+          "text": "latent positions. It also",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "front-matter-p003",
+          "text": "has several applications to weighted, multiple, and dynamic graphs [21]–[25], often exhibiting significantly better finitesample performance over spectral embedding with a fraction of the time required. Building upon the one-hot graph encoder embedding, this paper proposes a principal graph encoder embedding algorithm. The key addition is the introduction of a sample community score that ranks the importance of each community. The community score is then used to estimate a set of principal communities that contribute to the decision boundary for separating vertices of different communities. Due to the duality of community and dimensionality in the encoder embedding, the principal graph encoder embedding achieves further dimension reduction by restricting the embedding to the dimensions corresponding to the principal communities. The proposed algorithm maintains the same computational complexity as the original encoder embedding, making it significantly faster than other graph embedding techniques. Additionally, the reduced dimensionality enhances both the speed and robustness of subsequent inference, particularly in the presence of a large number of redundant or noisy communities.",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "front-matter-p004",
+          "text": "To theoretically justify the sample algorithm, we provide a population characterization of the encoder embedding and principal communities. We prove, under a random Bernoulli graph model, that the principal graph encoder embedding preserves the conditional density of the label vector, making the proposed method Bayes optimal for vertex classification. Furthermore, under a regularity condition, we demonstrate that the proposed sample community score converges to a population community score, which equals zero if and only Abstract—In this paper, we introduce the concept of principal communities and propose a principal graph encoder embedding method that concurrently detects these communities and achieves vertex embedding. Given a graph adjacency matrix with vertex labels, the method computes a sample community score for each community, ranking them to measure community importance and estimate a set of principal communities. The method then produces a vertex embedding by retaining only the dimensions corresponding to these principal communities. Theoretically, we define the population version of the encoder embedding and the community score based on a random Bernoulli graph",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "front-matter-p005",
+          "text": "distribution. We prove that the population principal graph",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "front-matter-p006",
+          "text": "encoder embedding preserves the conditional density of the vertex labels and that the population community score successfully distinguishes the principal communities. We conduct a variety of simulations to demonstrate the finite-sample accuracy in detecting ground-truth principal communities, as well as the advantages in embedding visualization and subsequent vertex classification. The method is further applied to a set of realworld graphs, showcasing its numerical advantages, including robustness to label noise and computational scalability. arXiv:2501.14939v2 [cs.SI] 2 Jul 2025 Index Terms—Graph Embedding, Dimension Reduction, Random Graph Model I. INTRODUCTION RAPH data has become increasingly popular over the past two decades. It plays a pivotal role in modeling relationships between entities across a wide array of domains, including social networks, communication networks, webpage hyperlinks, and biological systems [1]–[6]. Given n vertices and s edges, a binary graph can be represented by an adjacency matrix A ∈{0, 1}n×n, where A(i, j) = 1 means there exists an edge between vertex i and vertex j, and 0 otherwise. The high dimensionality of graph data, dictated by the number",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "front-matter-p007",
+          "text": "of",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "front-matter-p008",
+          "text": "vertices, often necessitates dimension reduction techniques for subsequent inferences. Dimension reduction techniques applied to graph data are commonly referred to as graph embedding. Specifically, graph embedding transforms the adjacency matrix into a low-dimensional Euclidean representation per vertex. While Cencheng Shen is with the Department of Applied Economics and Statistics, University of Delaware. E-mail: shenc@udel.edu Yuexiao Dong is with the Department of Statistics, Operations, and Data Science, Temple University. E-mail: ydong@temple.edu Jonathan Larson and Ha Trinh are with Microsoft Research at Redmond Carey E.Priebe and Youngser Park are with the Department of Applied Mathematics and Statistics (AMS), the Center for Imaging Science (CIS), and the Mathematical Institute for Data Science (MINDS), Johns Hopkins This work was supported in part by the National Science Foundation HDR TRIPODS 1934979, the National Science Foundation DMS-2113099, and by funding from Microsoft Research. 2 then set the estimated principal communities as ˆD = {k ∈[1, K] and ˆλ(k) > ε} for a positive threshold ε. The choice of ε is discussed in later subsection. if the corresponding community",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "front-matter-p009",
+          "text": "is not a principal community.",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "front-matter-p010",
+          "text": "Through comprehensive simulations and real-data experiments, we validate the numerical performance and theoretical findings through embedding visualization, ground-truth principal community detection, and vertex classification. The proposed method demonstrates excellent numerical accuracy, computational scalability, and robustness against noisy data. Theorem proofs are provided in the appendix. The code and data are available on GitHub1. • Step 6 (Principal Encoder): Denote the embedding limited to ˆD in Z as Z ˆ D. Then re-normalize each vertex embedding, i.e., for each i, set ˆ D(i, ·) = Z(i, ˆD) ∥Z(i, ˆD)∥ , • Output: The original graph encoder embedding Z, the principal graph encoder embedding Z ˆ D, the sample community score {ˆλ(k)}, and the estimated set of principal communities ˆD. Note that Z ˆ D does not remove any observations from the embedding; rather, it only removes the kth dimension when community k is not a principal community, i.e., Z ˆ D ∈Rn×| ˆ D|. Every vertex, whether it is from a principal community or not, is always present in the final embedding Z ˆ D. A brief flowchart of the main method is provided in Figure 1. II. THE MAIN METHOD In this section, we",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "front-matter-p011",
+          "text": "present the principal graph encoder",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "front-matter-p012",
+          "text": "embedding method for a given sample graph, followed by discussions on several practical issues such as normalization, sample community score threshold, and label availability. A. Principal Graph Encoder Embedding • Input: The graph adjacency matrix A ∈{0, 1}n×n and a label vector Y ∈{0, 1, . . . , K}n, where 1 to K represent known labels, and 0 is a dummy category for vertices with unknown labels. B. On Normalization • Step 1: Compute the number of known observations per class, i.e., Normalization ensures that all vertex embeddings have the same norm. In the context of graph encoder embedding, normalization projects the resulting sample embedding onto a unit sphere, which eliminates degree differences and often leads to improved separation among communities [26]. This is particularly beneficial for heterogeneous graphs, which are common in real-world data. In our case, normalization also ensures that the sample community score behaves well. nk = i=1 1(Y(i) = k) for k = 1, . . . , K. • Step 2: Compute the matrix W ∈[0, 1]n×K as follow: for each vertex i = 1, . . . , n, set W(i, k) = 1/nk C. The Community Score if and only if Y(i) = k, and 0 otherwise. Note that vertices with unknown",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "front-matter-p013",
+          "text": "labels are effectively assigned zero",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "front-matter-p014",
+          "text": "values, i.e., W(i, :) is a zero vector if Y(i) = 0. The community score is designed to measure the importance of each community. Intuitively, in the original graph encoder embedding, the kth dimension can be interpreted as the average connectivity of the target vertex to all vertices in community k. Therefore, the proposed community score checks whether there is significant variability within dimension k, or equivalently, whether the connectivity from other communities to community k is close to a constant or not. If the connectivity is almost the same, the numerator will be relatively small, or in the extreme case, simply zero, indicating that community k has no information in separating other communities. A practical question is how large the score should be for a community to qualify as principal. One possible approach is to rank the scores and decide a cut-off via cross-validation. In the presented algorithm, we opt for a faster approach using an adaptive threshold ε for cut-off. To determine this threshold, we employ the profile likelihood method from [27], a popular technique for selecting an elbow threshold given a vector. We choose the third elbow of all sample community",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "front-matter-p015",
+          "text": "scores,",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "front-matter-p016",
+          "text": "denoting it as εA, and then set ε = max{εA, 0.7}. Empirically, the third elbow is very effective for large values of n and K. However, for smaller to moderate values of (n, K), the third elbow may be overly conservative. Through experimentation across various models and real datasets, it has been observed that principal communities typically have scores • Step 3: Compute the original graph encoder embedding through matrix multiplication: Z = AW ∈[0, 1]n×K. • Step 4 (Normalization): Given Z from step 3, for each i where ∥Z(i, ·)∥> 0, update the embedding as follows: Z(i, ·) = Z(i, ·) ∥Z(i, ·)∥. • Step 5 (Sample Community Score): Based on Z in step 4, for each k ∈[1, K], compute the sample community score as follows: ˆλ(k) = maxl=1,...,K{ˆμ(k|l)} −minl=1,...,K{ˆμ(k|l)} maxl=1,...,K{ˆσ( ̃Z(k|l))} , where PY(i)=l i=1,...,n Z(i, k) ˆμ(k|l) = nl , PY(i)=l i=1,...,n Z2(i, k) ˆσ2(k|l) = nl −1 −ˆμ2(k|l), 1https://github.com/cshen6/GraphEmd 3 Fig. 1. This flowchart illustrates the input, output, and intermediate steps of the principal graph encoder embedding. several popular random graph models, followed by the introduction of a random graph variable. We then define the population version of",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "front-matter-p017",
+          "text": "the principal community and the graph encoder",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "front-matter-p018",
+          "text": "embedding for this graph variable. This framework allows us to prove that the principal graph encoder embedding preserves the conditional density of the label vector. Additionally, we demonstrate that the sample community score converges to a population community score, which, under a regularity condition, equals zero if and only if the corresponding community is not a principal community. It is important to note that while the other sections focus on the sample method applied to sample graphs, everything in this section pertains to the population version of the method. around or higher than 1, while redundant communities tend to have scores of no more than 0.5 for small (n, K). As a result, we settled on the maximum of the third elbow and 0.7 as an empirical choice for ε. D. On Label Vector Note that the given algorithm assumes knowledge of the label vector Y ∈{0, 1, . . . , K}n, which is at least partially known, where 0 denotes the dummy category of unknown labels. In the absence of a label vector, one could either use a random initialization and k-means to estimate the ground-truth labels [26], or employ a direct label estimation algorithm such as Louvain, Leiden, or label",
+          "page_span": [
+            3,
+            3
+          ]
+        },
+        {
+          "id": "front-matter-p019",
+          "text": "propagation [28]–[31] to estimate",
+          "page_span": [
+            3,
+            3
+          ]
+        },
+        {
+          "id": "front-matter-p020",
+          "text": "a label vector directly from the graph. In either scenario, one can compute the community score and principal encoder accordingly for any estimated label vector. The meaning of principal communities will pertain to the estimated labels, and the population theories in the next section still apply. Therefore, it suffices to assume a given label vector for the purpose of this paper, regardless of whether the label vector is ground-truth or estimated from some algorithms. A. Existing Random Graph Models The Stochastic Block Model: The standard stochastic block model (SBM) is a widely used graph model known for its simplicity and ability to capture community structures [11], [32], [33]. Under SBM, each vertex i is first assigned a class label Y(i) ∈{1, . . . , K}. This label can either be predetermined or assumed to follow a categorical distribution with prior probabilities {πk ∈(0, 1], PK k=1 πk = 1}. Given the vertex labels, the model independently generates each edge between vertex i and another vertex j ̸= i using a Bernoulli random variable: E. Computational Complexity The computational complexity of the principal graph encoder embedding (P-GEE) is the same as the original graph",
+          "page_span": [
+            3,
+            3
+          ]
+        },
+        {
+          "id": "front-matter-p021",
+          "text": "encoder embedding (GEE), which is O(nK + s), where s",
+          "page_span": [
+            3,
+            3
+          ]
+        },
+        {
+          "id": "front-matter-p022",
+          "text": "represents the number of edges [20], [22]. This is because neither the normalization nor the community score computation increases the overall complexity. For instance, the method is capable of embedding a graph with 100, 000 vertices, 40 classes, and 10 million edges in under 10 seconds on a standard computer using MATLAB code. While the additional steps 5-6 in P-GEE may make it marginally slower than GEE, the reduced dimensionality of Z ˆ D can actually enhance its speed and scalability for subsequent tasks such as vertex classification. This is demonstrated in our real data experiments. A(i, j) ∼Bernoulli(B(Y(i), Y(j))). Here, B = [B(k, l)] ∈[0, 1]K×K represents the block probability matrix, which serves as the parameters of the model. In a directed graph, the lower diagonal of the adjacency matrix is generated using the same distribution, while in an undirected graph, the lower diagonals are set to be equal to the upper diagonals. Note that the model does not have self-loops, meaning that A(i, i) = 0. Additionally, whether the graph is directed or undirected does not affect the results here. The Degree-Corrected Stochastic Block Model: The standard stochastic block model (SBM)",
+          "page_span": [
+            3,
+            3
+          ]
+        },
+        {
+          "id": "front-matter-p023",
+          "text": "generates dense graphs",
+          "page_span": [
+            3,
+            3
+          ]
+        },
+        {
+          "id": "front-matter-p024",
+          "text": "where all vertices within the same class have the same expected degrees. However, many real-world graphs are heterogeneous, with different vertices having varying degrees, and the graph can be very sparse. To accommodate this, the degreecorrected stochastic block model (DC-SBM) was introduced as an extension of SBM [12]. III. POPULATION DEFINITION AND SUPPORTING THEORY In this section, we characterize the population behavior of the method on random graph models. We begin by reviewing 4 Note that ⃗V is a known vector. Alternatively, one could view it as independent sample realizations using the same categorical distribution of Y . As we have required each integer from 1 to K to be present in ⃗V, it necessarily implies m ≥K. In essence, the random Bernoulli graph distribution is a multivariate concatenation of mixture Bernoulli distributions. In this distribution, the probability of each Bernoulli trial is determined by a function involving the latent variable X and an independent copy Uj with a known label vj. The random Bernoulli graph distribution is a versatile framework encompassing SBM, DC-SBM, RDPG, and more general cases, due to its flexibility in allowing any δ(·, ·) and any",
+          "page_span": [
+            3,
+            3
+          ]
+        },
+        {
+          "id": "front-matter-p025",
+          "text": "particular distribution for X. Consider the sample adjacency matrix and the labels (A, Y) ∈{0, 1}n×n × {1, 2, . . . , K}n as an example, where the graph has no self-loop. Then, for each i = 1, . . . , n, the ith row of A is distributed as In addition to the existing parameters of SBM, DC-SBM assigns a non-negative and bounded degree parameter θi to each vertex i. Given these degrees, the edge between vertex i and another vertex j ̸= i is independently generated by: A(i, j) ∼Bernoulli(θiθjB(Y(i), Y(j))). When all degrees are set to 1, DC-SBM reduces to the standard SBM. Typically, degrees may be assumed to be fixed a priori or independently and identically distributed within each community. These degree parameters allow DC-SBM to better approximate real-world graphs. The Random Dot Product Graph: Under the random dot product graph (RDPG), each vertex i is associated with a hidden latent variable Ui i.i.d. ∼ fU ∈Rm [13], [34]. Then each edge is independently generated as follows: A(i, j) ∼Bernoulli(< Ui, Uj >), A(i, :) ∼RBG(X, ⃗V, δ), where < ·, · > denotes the inner product. To enable communities under RDPG, it suffices to assume the latent variable follows a K-component mixture",
+          "page_span": [
+            4,
+            4
+          ]
+        },
+        {
+          "id": "front-matter-p026",
+          "text": "distribution. In other words,",
+          "page_span": [
+            4,
+            4
+          ]
+        },
+        {
+          "id": "front-matter-p027",
+          "text": "each vertex is associated with a class label Y(i) such that where X is the underlying latent variable for vertex i, and ⃗V is the known sample labels of all other vertices. Note that the dimension m = n −1 because A(i, i) = 0, and it suffices to consider the edges between vertex i and all other vertices. Ui|(Y(i) = k) i.i.d. ∼fU|k. C. The Principal Graph Encoder Embedding for the Graph Variable B. Defining a Graph Variable To characterize the graph embedding using a framework similar to the conventional setup of predictor and response variables, we formulate the above graph models into the following graph variable, called the random Bernoulli graph distribution. Given a vertex, we assume Y is the underlying label that follows a categorical distribution with prior probabilities {πk ∈(0, 1], PK k=1 πk = 1}. Additionally, X ∈Rp is the latent variable with a K-component mixture distribution, denoted as In this section, we characterize the population version of the original graph encoder embedding, the principal community, and the principal graph encoder embedding on the graph variable. Note that their sample notations are Z, ˆD, and Z ˆ respectively in Section II, and the corresponding",
+          "page_span": [
+            4,
+            4
+          ]
+        },
+        {
+          "id": "front-matter-p028",
+          "text": "population",
+          "page_span": [
+            4,
+            4
+          ]
+        },
+        {
+          "id": "front-matter-p029",
+          "text": "notations are Z, D, and ZD respectively in this section. Definition 2. Given random graph variable ∼ RBG(X, ⃗V, δ). For each k = 1, . . . , K, calculate mk = j=1 1(vj = k), X ∼ k=1 πkfX|Y =k, where 1(vj = k) equals 1 if vj = k, and 0 otherwise. We then compute the matrix W ∈Rm×K as follows: where fX|Y =k represents the conditional density. Moreover, we assume known label vector ⃗V = {v1, v2, . . . , vm} ∈[1, K]m, where each k ∈[1, K] is present in ⃗V. Additionally, there exists a corresponding random matrix ( 1/mk when vj = k, 0 otherwise. W(i, j) = The population graph encoder embedding is then defined as Z = AW ∈[0, 1]K. ⃗U = [U1; U2; · · · ; Um] ∈Rm×p, where each Uj is independently distributed with density fX|Y =vj. Note that the W matrix is conceptually similar to the onehot encoding scheme, except the entries are normalized rather than binary. Next, we introduce the concepts of principal and redundant communities for the graph variable: Definition 1. We define an m-dimensional random variable A following the random Bernoulli graph distribution as Definition 3. Given A ∼RBG(X, ⃗V, δ), and U k as an independent variable distributed as fX|Y =k. A community k is defined as a",
+          "page_span": [
+            4,
+            4
+          ]
+        },
+        {
+          "id": "front-matter-p030",
+          "text": "principal community if and only if",
+          "page_span": [
+            4,
+            4
+          ]
+        },
+        {
+          "id": "front-matter-p031",
+          "text": "A ∼RBG(X, ⃗V, δ) ∈{0, 1}m, if and only if each dimension Aj is distributed as V ar \u0000 E(δ(X, U k) | X) \u0001 > 0. Aj ∼Bernoulli(δ(X, Uj)), j = 1, . . . , m. Here, δ(·, ·) : Rp × Rp →[0, 1] can be any deterministic function, such as weighted inner product or kernel function. On the other hand, any community for which the above variance equals 0 is referred to as a redundant community. 5 For example, in the stochastic block model, the condition V ar(E(δ(X, U k) | X)) = 0 is equivalent to the kth column of the block probability matrix B(:, k) being a constant vector, which does not provide any information about Y via the edge probability. Finally, the principal graph encoder embedding can be defined as follows: effectively detect such principal communities. To this end, we first introduce the population community score: Definition 5. Define λ(k) = maxl=1,...,K{E(Zk|Y = l)} maxl=1,...,K{ V ar(Zk|Y = l)} − minl=1,...,K{E(Zk|Y = l)} Definition 4. Define D as the set of principal communities, and ZD as the graph encoder embedding whose dimensions are restricted to the indices in D. We call ZD the principal graph encoder embedding. V ar(Zk|Y = l)} ∈[0, +∞) maxl=1,...,K{ as the population",
+          "page_span": [
+            4,
+            4
+          ]
+        },
+        {
+          "id": "front-matter-p032",
+          "text": "community score for each community k ∈",
+          "page_span": [
+            4,
+            4
+          ]
+        },
+        {
+          "id": "front-matter-p033",
+          "text": "[1, K]. For example, if K = 5 and D = {1, 2}, then Z spans five dimensions while ZD only keeps the first two dimensions from Z. The principal graph encoder embedding achieves additional dimension reduction compared to the original graph encoder embedding. Given the population definitions, the sample versions Z, ˆD, and Z ˆ D in Section II can be viewed as sample estimates for the population counterparts Z, D, and ZD. Since the sample community score used in Step 5 of Section II-A relies on the sample expectation and variance, which converge to their respective population counterparts, it follows immediately that ˆλ(k) n→∞ → λ(k). In other words, the sample community score converges to the population community score. The following theorem proves that, under a regularity condition, the population community score perfectly separates principal communities from redundant communities. D. Conditional Density Preserving Property Based on the population setting, we can prove the principal graph encoder embedding preserves the conditional density, and as a result, preserves the Bayes optimal classification error via the classical pattern recognition framework [35]. Theorem 2. Assume A",
+          "page_span": [
+            5,
+            5
+          ]
+        },
+        {
+          "id": "front-matter-p034",
+          "text": "∼RBG(X, ⃗V), and δ(X, U k)|Y is",
+          "page_span": [
+            5,
+            5
+          ]
+        },
+        {
+          "id": "front-matter-p035",
+          "text": "independent of X|Y , which is satisfied under the stochastic block model. Then the population community score λ(k) = 0 if and only if community k is a redundant community. Theorem 1. Given A ∼RBG(X, ⃗V, δ), the principal graph encoder embedding preserves the following conditional density: Note that the condition δ(X, U k)|Y is independent of X|Y can also hold for the degree-corrected stochastic block model, as shown in the proof. Since DC-SBM is often a good model for real-world sparse graphs, the designed community score usually performs well in practice. It is important to emphasize that this property holds at the population level, meaning it is expected to perform well for sufficiently large vertex sizes rather than any finite n, due to sample estimation variance. Finally, there exist other alternative statistics that can consistently detect principal communities. For example, as shown in the proof, one could use the numerator of the community score or the variance of E(Zk|Y = l), both of which also equal zero under the same condition. Nevertheless, the numerator based on order statistics makes it more robust, and the denominator provides effective normalization for ranking and",
+          "page_span": [
+            5,
+            5
+          ]
+        },
+        {
+          "id": "front-matter-p036",
+          "text": "thresholding",
+          "page_span": [
+            5,
+            5
+          ]
+        },
+        {
+          "id": "front-matter-p037",
+          "text": "purposes, making the proposed community score well-behaved and robust in empirical assessments. Y |A dist = Y |Z dist = Y |ZD. Denote L∗(Y, A) as the Bayes optimal error to classify Y using A, we have L∗(Y, A) = L∗(Y, Z) = L∗(Y, ZD). Intuitively, the graph variable A is an m-dimensional multivariate concatenation of mixture Bernoulli distributions, the original graph encoder embedding Z is a K-dimensional multivariate concatenation of mixture Binomial distributions, and the principal graph encoder embedding ZD discards every dimension in Z whose Binomial mixture component is equivalent to a single Binomial. Note that this property is on the population level. For the sample version, we expect the property to hold for sufficiently large vertex size, rather than at any n, due to sample estimation variance. This theorem shows that the principal communities are welldefined, and retaining the dimensions corresponding to the principal communities is sufficient for subsequent vertex classification. While both the original graph encoder embedding and the principal graph encoder embedding are equivalent in population, the principal graph encoder embedding has fewer dimensions and therefore",
+          "page_span": [
+            5,
+            5
+          ]
+        },
+        {
+          "id": "front-matter-p038",
+          "text": "usually provides a finite-sample",
+          "page_span": [
+            5,
+            5
+          ]
+        },
+        {
+          "id": "front-matter-p039",
+          "text": "advantage in subsequent inference. IV. SIMULATIONS We consider three simulated models with K = 20 and increasing n. In each model, vertex label assignment is randomly determined based on prior probabilities: πk = 0.25 for k = {1, 2, 3}, then equally likely to be 0.25/(K −3) for the remaining classes. Given these labels, edge probabilities are generated under each model. Here are the details of the model parameters for each: • SBM: Block probability matrix: B(k, k) = 0.2 for k = {1, 2, 3}, and B(k, l) = 0.1 otherwise. E. Population Community Score While Theorem 1 establishes that the principal community is well-defined and preserves the conditional density, it remains to demonstrate that the proposed community score can • DC-SBM: Vertex degree generation: θi|(Y(i) = y) ∼Beta(1, 5 + y/5). 6 Block probability matrix: B(1, 1) = 0.9, B(2, 2) = 0.7, B(3, 3) = 0.5, and B(k, l) = 0.1 otherwise. evaluation), apply linear discriminant analysis as the classifier, and report the testing error on the testing vertices. This process is repeated for 100 Monte-Carlo replicates for each n, ensuring that all standard deviations fall within a margin of 1%. The average results are reported in Figure 3.",
+          "page_span": [
+            5,
+            5
+          ]
+        },
+        {
+          "id": "front-matter-p040",
+          "text": "The first column of Figure 3 shows the sample community scores as n increases. The red line represents the average sample community score among the principal communities, while the blue line represents the average sample community score among the redundant communities. For all three models, as n increases, the principal communities and the redundant communities become increasingly separated. This separation translates well to the second column of Figure 3, which shows that the sample algorithm quickly achieves a true positive rate of 1 and a false positive rate of 0 in detecting the true principal communities. In other words, Prob( ˆD = D) →1 as n increases. This implies our method is consistent in detecting the ground-truth principal communities. The third column of Figure 3 evaluates the quality of the graph embedding by conducting a 5-fold vertex classification task on the sample embedding. In each instance, we compute the sample embedding by setting all testing labels to 0, apply linear discriminant analysis to the embedding and labels of the training vertices, predict the testing labels using the embedding of the testing vertices, and then calculate the error by comparing the",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "front-matter-p041",
+          "text": "predicted label to the true testing label.",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "front-matter-p042",
+          "text": "According to the population model, we can compute that the optimal Bayes error is approximately 0.235. As the sample size increases, we observe that the classification error using the principal graph encoder embedding converges to the Bayes-optimal error. The encoder embedding without principal community detection also approaches the Bayes error, though the principal version performs slightly better across all settings. It is important to note that empirical performance is influenced by both the block structure and the values of nk within the principal communities. In particular, the DC-SBM simulations are much sparser, requiring larger vertex counts to achieve lower error rates. Additionally, as nk increases, the classification error decreases accordingly. • RDPG: Latent variable U ∈R4. For k = {1, 2, 3}, U(:, k)|(Y = k) ∼Uniform(0.2, 0.3). For k > 3, U(:, k)|(Y > 3) ∼Uniform(0.1, 0.2). For all dimensions l ̸= k. U(:, l)|(Y = k) ∼Uniform(0, 0.1). In all three models, the parameter settings are designed such that vertices from the top three communities can be perfectly separated on a population level, and these communities are considered the principal communities, represented as D",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "front-matter-p043",
+          "text": "=",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "front-matter-p044",
+          "text": "{1, 2, 3}. On the other hand, vertices from the remaining communities are intentionally designed to be indistinguishable from each other, constituting redundant communities. As a result, 75% of the vertices belong to the principal communities. A. Embedding Visualization and Sample Community Score Figure 2 shows the adjacency matrix heatmap for one sample realization, the visualization of the resulting principal graph encoder embedding, and the sample community score for each dimension. The first column shows the heatmap of the generated adjacency matrix A. The sample indices are sorted by class to highlight the block structure. All three graphs exhibit a similar block structure, with higher withinclass probabilities for the top three communities. The SBM graph is the most dense graph, followed by RDPG, and the DC-SBM graph is the most sparse by design. The second column presents the sample community scores ˆλ(k) based on the proposed sample method. Clearly, the sample scores for the first three communities / dimensions stand out and are significantly higher than the others. As a result, the proposed method successfully identifies and reveals the ground-truth dimension, setting ˆD =",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "front-matter-p045",
+          "text": "D = {1, 2, 3}.",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "front-matter-p046",
+          "text": "The third column visualizes the principal graph encoder embedding Z ˆ D. Each dot represents the embedding for a vertex, and different colors indicate the class membership of each vertex, particularly those from the principal communities. Since ˆD = D = {1, 2, 3}, the embedding is in 3D and occupies the top three dimensions. We observe that the encoder embedding effectively separates the top three communities, while all redundant communities are mixed together and cannot be distinguished, which aligns with the given models. V. REAL DATA A. Setting We collected a diverse set of real graphs with associated labels from various sources, including the Network Repository2 [36], Stanford Network Data3, and internally collected graph data. To ensure transparency and reproducibility, we processed all public datasets using MATLAB and have made them available on our GitHub repository. Since the ground-truth principal communities are unknown in real graphs, we primarily use vertex classification on embedding as a proxy to evaluate the embedding quality. We compare this to the original graph encoder embedding to assess the quality of the principal community detection. We use 5-fold",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "front-matter-p047",
+          "text": "cross-validation and linear discriminant analysis, and",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "front-matter-p048",
+          "text": "B. Detection Accuracy and Vertex Classification Using the same simulation models, we further assess the capability of the proposed method to identify the groundtruth dimensions and evaluate the quality of the embedding through a classification task on the vertex embedding. For each model, we generate sample graphs with increasing n, compute the sample community score, report accuracy in detecting the ground-truth principal communities, compute the principal graph encoder embedding (using training labels only via 5-fold 2http://networkrepository.com/ 3https://snap.stanford.edu/ 7 Sample Embedding Adjacency Matrix 8Community Score 1 Community 1 Community 2 Community 3 1 6 SBM 4 0.5 0.5 2 1 1 0 0 0.5 0.5 1 10 20 Dimension 1 1 2 DC-SBM 0.5 0.5 1 0 1 1 0.5 0 0 0.5 0 0 1 10 20 Dimension 1 1 4 RDPG 0.5 0.5 2 0 1 1 0.5 0 0 0.5 0 0 1 10 20 Dimension Fig. 2. This figure visualizes the sample adjacency matrix for each model at n = 5000 and K = 20, the sample community scores for k ∈[1, 20], and the principal graph encoder embedding. compare the graph encoder embedding (GEE), the principal graph encoder embedding (P-GEE), the adjacency spectral embedding (ASE), and node2vec (N2V). ASE requires",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "front-matter-p049",
+          "text": "an",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "front-matter-p050",
+          "text": "explicit dimension choice, which is set to d = 30. For node2vec, we use the graspy package [37] with default parameters and 128 dimensions. Any directed graph was transformed to undirected, and any singleton vertex was removed. cases. We also observe that the proposed principal graph encoder embedding is generally very close to the original graph encoder embedding in classification error: by detecting and only retaining the dimensions corresponding to the principal communities, the principal GEE either maintains or slightly improves the classification error compared to the original GEE throughout all data (except the IIP data with K being only 3). B. Using Original Data Table I summarizes the average error and standard deviation after conducting 100 Monte Carlo replicates for each given graph. It also provides basic dataset details, including n, K, and the median dimension choice | ˆD| for P-GEE. The numerical results clearly indicate that both GEE and P-GEE deliver excellent performance across all datasets, outperforming spectral embedding in all cases and node2vec in most This implies that as long as K is not too small, the principal GEE successfully extracts important",
+          "page_span": [
+            7,
+            7
+          ]
+        },
+        {
+          "id": "front-matter-p051",
+          "text": "communities",
+          "page_span": [
+            7,
+            7
+          ]
+        },
+        {
+          "id": "front-matter-p052",
+          "text": "that preserve sufficient label information and improves the classification error. Another observation is that the encoder embedding produces the best error in most cases, and in the two cases where node2vec yields better error than GEE, GEE is also very close in error. 8 (n, K) GEE (%) P-GEE (%) | ˆD| ASE (%) N2V (%) Citeseer (3312, 6) 32.8 ± 0.6 32.3 ± 0.6 4 60.3 ± 0.5 77.5 ± 0.5 Cora (2708, 7) 20.9 ± 1.5 20.9 ± 1.5 5 31.8 ± 0.6 75.1 ± 0.5 Email (1005, 42) 34.1 ± 0.8 34.2 ± 0.8 39 43.6 ± 0.4 29.2 ± 0.5 IIP (219, 3) 31.7 ± 1.9 32.7 ± 1.7 2 35.6 ± 0.4 48.9 ± 3.2 IMDB (19503, 3) 1.4 ± 2.9 1.4 ± 2.9 3 60.1 ± 0.4 44.8 ± 0.1 LastFM (7624, 18) 20.3 ± 0.3 20.3 ± 0.3 17 43.3 ± 0.4 14.7 ± 0.1 Letter (10507, 15) 7.4 ± 0.3 7.4 ± 0.3 4 89.2 ± 0.3 74.9 ± 0.3 Phone (1703, 71) 30.1 ± 0.8 28.6 ± 0.8 53 55.9 ± 0.2 83.7 ± 0.5 Protein (43471, 3) 30.8 ± 0.2 30.8 ± 0.2 3 51.0 ± 0.7 45.8 ± 0.1 Pubmed (19717, 3) 22.6 ± 0.2 22.6 ± 0.2 3 35.5 ± 0.7 58.9 ± 0.2 TABLE I VERTEX CLASSIFICATION ERROR USING 5-FOLD LINEAR DISCRIMINANT ANALYSIS ON EACH GRAPH EMBEDDING. THE TABLE REPORTS THE AVERAGE ERROR AND STANDARD DEVIATION AFTER 100 MONTE CARLO REPLICATES, HIGHLIGHTING THE BEST ERROR WITHIN EACH DATASET. ALL",
+          "page_span": [
+            7,
+            7
+          ]
+        },
+        {
+          "id": "front-matter-p053",
+          "text": "ACCURACY",
+          "page_span": [
+            7,
+            7
+          ]
+        },
+        {
+          "id": "front-matter-p054",
+          "text": "ARE IN PERCENTILE. C. Using Noisy Data VI. CONCLUSION To further demonstrate the advantage and robustness of P- GEE, we conducted a noisy data experiment. We used the same real data and evaluation as above, with the exception that the vertex labels were partially polluted. For each replicate, we randomly assigned 10% of the ground-truth vertex labels to one of 30 additional noise classes. For example, suppose K = 3 and vertex 1 belongs to class 2, so Y(1) = 2. If vertex 1 is not polluted, we have Ynoise(1) = Y(1) = 2; otherwise, Ynoise(1) ∈[4, 5, . . . , 33] with equal probability. We then used the given graph and noisy labels Ynoise to perform vertex embedding and classification for GEE, P-GEE, and ASE, and reported the results in Table II. Comparing vertex classification accuracy, we observed that P-GEE consistently outperforms GEE and ASE in most cases. In fact, P-GEE is nearly insusceptible to label noise, achieving ideal error rates on the noisy data in most cases. Here, ”ideal error” can be defined as the best error on the original data in the corresponding row of Table I, plus approximately 10%. For example, on the IMDB data, the best error on the original data is 1%, while",
+          "page_span": [
+            8,
+            8
+          ]
+        },
+        {
+          "id": "front-matter-p055",
+          "text": "P-GEE achieves an error of 10.2% on the noisy",
+          "page_span": [
+            8,
+            8
+          ]
+        },
+        {
+          "id": "front-matter-p056",
+          "text": "data, compared to a much worse error of 28.3% for GEE on the noisy data. Similarly, on the PubMed data, the best error on the original data is 22.6%, with P-GEE achieving an error of 32.3% on the noisy data, while GEE on the noisy data has a higher error of 39.0%. We also observed that the estimated number of principal communities | ˆD| accurately matches the true K of the original data in most cases, indicating that the sample community score remains robust and well-behaved in the presence of noisy data. Finally, we compared the running times of GEE, P-GEE, and ASE, including both embedding and classification time. While the running times for P-GEE and GEE are mostly similar, the reduced dimensionality in P-GEE speeds up subsequent classification, leading to noticeable improvements in running time. Both GEE and P-GEE are significantly faster than spectral embedding for moderate to large graph sizes. For example, for relatively larger graphs, such as LastFM, letter, and protein data, which have tens of thousands of vertices, spectral embedding requires several seconds, whereas GEE only takes a fraction of a second. In this paper, we propose a Principal Graph Encoder Embedding",
+          "page_span": [
+            8,
+            8
+          ]
+        },
+        {
+          "id": "front-matter-p057",
+          "text": "(P-GEE) algorithm for analyzing a given graph and",
+          "page_span": [
+            8,
+            8
+          ]
+        },
+        {
+          "id": "front-matter-p058",
+          "text": "its associated label vector. P-GEE simultaneously projects the graph into a lower-dimensional space and ranks community importance with respect to the label. We prove that P-GEE preserves conditional density and is Bayes-optimal under the random Bernoulli graph model. Empirically, it demonstrates strong performance in embedding visualization, principal community extraction, vertex classification, and robustness to noisy labels and redundant communities. Compared to existing methods, such as random walk-based approaches (e.g., node2vec) and neural network-based models like Graph Neural Networks and Graph Autoencoders [38]– [41], P-GEE offers practical advantages in both interpretability and scalability. Each embedding coordinate Z(i, k) directly represents the edge connectivity between vertex i and community k, enabling transparent analysis of community-level influence. This stands in contrast to all other methods, where embedding coordinates lack explicit semantic meaning. From a computational standpoint, P-GEE is highly efficient due to its non-iterative design. In contrast, spectral methods, node2vec, and Graph Neural Networks rely on iterative procedures, such as singular value",
+          "page_span": [
+            8,
+            8
+          ]
+        },
+        {
+          "id": "front-matter-p059",
+          "text": "decomposition, random walks,",
+          "page_span": [
+            8,
+            8
+          ]
+        },
+        {
+          "id": "front-matter-p060",
+          "text": "or gradient descent, which are computationally expensive and prone to amplifying small noise. We believe the noniterative structure and explicit exclusion of noisy dimensions make P-GEE more robust, as demonstrated in our noisy data experiments. While P-GEE performs well across many benchmarks, several future directions remain. First, it is well known that neural network-based methods are sensitive to initialization and may not always perform reliably [42]–[44]. Simpler approaches such as FastGCN [45] and label-based methods [46], [47] have shown competitive performance. In this context, our encoder embedding could serve as a strong initialization scheme or be extended to an iterative, gradient-optimized version, potentially improving performance on complex graph structure, albeit with increased computational cost. Second, modern real-world graphs are increasingly complex. Multiple graphs, multivariate node attributes, overlapping communities, and 9 GEE (%) Time (s) P-GEE (%) Time (s) (K, | ˆD|) ASE (%) Time (s) Citeseer 49.9 ± 0.6 0.11 41.5 ± 0.5 0.09 (6, 6) 72.9 ± 0.3 0.16 Cora 42.6 ± 0.6 0.12 29.4 ± 0.5 0.11 (7, 7) 61.8 ± 0.4 0.15 Email 50.5 ± 0.8 0.38 51.2 ± 0.9 0.37 (42, 60)",
+          "page_span": [
+            8,
+            8
+          ]
+        },
+        {
+          "id": "front-matter-p061",
+          "text": "50.8 ± 0.5 0.42 IIP 42.8 ± 2.0 0.02 39.2 ± 2.0 0.02 (3, 2) 52.3 ± 2.2 0.03 IMDB 28.3 ± 0.4 0.17 10.2 ± 0.05 0.13 (3, 3) 69.0 ± 0.06 0.75 LastFM 42.1 ± 0.4 0.22 30.4 ± 0.3 0.19 (18, 17) 53.0 ± 0.2 5.9 Letter 29.7 ± 0.3 0.20 21.1 ± 0.3 0.18 (15, 15) 90.8 ± 0.03 1.1 Phone 48.8 ± 1.0 0.75 41.3 ± 0.9 0.67 (71, 53) 64.1 ± 0.3 0.70 Protein 42.5 ± 0.2 0.30 38.3 ± 0.2 0.17 (3, 3) 56.6 ± 0.02 2.4 Pubmed 39.0 ± 0.3 0.16 32.3 ± 0.2 0.12 (3, 3) 44.9 ± 0.5 0.48 TABLE II THE EVALUATION IS THE SAME AS IN TABLE I, EXCEPT THAT 10% OF THE GIVEN LABELS ARE RANDOMIZED INTO ONE OF 30 NOISE GROUPS. WE ALSO REPORT THE AVERAGE RUNNING TIME. THE BEST ERROR WITHIN THE NOISE COLUMNS IS HIGHLIGHTED. ALL ACCURACY ARE PRESENTED AS PERCENTAGES, AND ALL RUNNING TIMES ARE IN SECONDS. multiple label vectors are becoming more common. Extending the theoretical framework and algorithmic design of P-GEE to accommodate such scenarios would further enhance its versatility and applicability in real-world settings. [15] I. Gallagher, A. Jones, A. Bertiger, C. E. Priebe, and P. Rubin-Delanchy, “Spectral clustering of weighted graphs,” Journal of the American Statistical Association, 2023. [16] M. Tang, D. L. Sussman, and C.",
+          "page_span": [
+            9,
+            9
+          ]
+        },
+        {
+          "id": "front-matter-p062",
+          "text": "E. Priebe, “Universally consistent vertex",
+          "page_span": [
+            9,
+            9
+          ]
+        },
+        {
+          "id": "front-matter-p063",
+          "text": "classification for latent positions graphs,” Annals of Statistics, vol. 41, [17] K. Mehta, R. Goldin, D. Marchette, J. T. Vogelstein, C. E. Priebe, and G. A. Ascoli, “Neuronal classification from network connectivity via adjacency spectral embedding,” Network Neuroscience, vol. 5, no. 3, pp. 689–710, 2021. [18] J. Arroyo, A. Athreya, J. Cape, G. Chen, C. E. Priebe, and J. T. Vogelstein, “Inference for multiple heterogeneous networks with a common invariant subspace,” Journal of Machine Learning Research, vol. 22, no. 142, pp. 1–49, 2021. [19] I. Gallagher, A. Jones, and P. Rubin-Delanchy, “Spectral embedding for dynamic networks with stability guarantees,” in Advances in Neural Information Processing Systems, pp. 10158–10170, 2021. [20] C. Shen, Q. Wang, and C. E. Priebe, “One-hot graph encoder embedding,” IEEE Transactions on Pattern Analysis and Machine Intelligence, vol. 45, no. 6, pp. 7933 – 7938, 2023. [21] C. Shen, C. E. Priebe, J. Larson, and H. Trinh, “Synergistic graph fusion via encoder embedding,” Information Sciences, vol. 678, p. 120912, 2024. [22] C. Shen, J. Larson, H. Trinh, X. Qin, Y. Park, and C. E. Priebe, “Discovering communication pattern shifts in large-scale",
+          "page_span": [
+            9,
+            9
+          ]
+        },
+        {
+          "id": "front-matter-p064",
+          "text": "labeled networks",
+          "page_span": [
+            9,
+            9
+          ]
+        },
+        {
+          "id": "front-matter-p065",
+          "text": "using encoder embedding and vertex dynamics,” IEEE Transactions on Network Science and Engineering, vol. 11, no. 2, pp. 2100 – 2109, 2024. [23] C. Shen, “Encoder embedding for general graph and node classification,” Applied Network Science, vol. 9, p. 66, 2024. [24] C. Shen, J. Larson, H. Trinh, and C. E. Priebe, “Refined graph encoder embedding via self-training and latent community recovery,” Social Network Analysis and Mining, vol. 15, p. 14, 2025. [25] C. Shen, J. Arroyo, J. Xiong, and J. T. Vogelstein, “Community correlations and testing independence between binary graphs,” arXiv preprint arXiv:1906.03661, 2024. [26] C. Shen, Y. Park, and C. E. Priebe, “Graph encoder ensemble for simultaneous vertex embedding and community detection,” in 2023 2nd International Conference on Algorithms, Data Mining, and Information Technology, ACM, 2023. [27] M. Zhu and A. Ghodsi, “Automatic dimensionality selection from the scree plot via the use of profile likelihood,” Computational Statistics and Data Analysis, vol. 51, pp. 918–930, 2006. [28] V. D. Blondel, J. L. Guillaume, R. Lambiotte, and E. Lefebvre, “Fast unfolding of communities in large networks,” Journal of Statistical Mechanics:",
+          "page_span": [
+            9,
+            9
+          ]
+        },
+        {
+          "id": "front-matter-p066",
+          "text": "Theory and Experiment, vol. 10008, p. 6, 2008.",
+          "page_span": [
+            9,
+            9
+          ]
+        },
+        {
+          "id": "front-matter-p067",
+          "text": "[29] V. A. Traag, L. Waltman, and N. J. van Eck, “From louvain to leiden: guaranteeing well-connected communities,” Scientific Reports, vol. 9, p. 5233, 2019. [30] V. A. Traag, P. Van Dooren, and Y. Nesterov, “Narrow scope for resolution-limit-free community detection,” Physical Review E, vol. 84, [31] U. Raghavan, R. Albert, and S. Kumara, “Near linear time algorithm to detect community structures in large-scale networks,” Physical Review E, vol. 76, no. 3, p. 036106, 2007.",
+          "page_span": [
+            9,
+            9
+          ]
+        }
+      ]
+    },
+    {
+      "id": "references",
+      "title": "References",
+      "paras": [
+        {
+          "id": "references-p001",
+          "text": "[1] M. Girvan and M. E. J. Newman, “Community structure in social and biological networks,” Proceedings of National Academy of Science, vol. 99, no. 12, pp. 7821–7826, 2002. [2] M. E. J. Newman, “The structure and function of complex networks,” SIAM Review, vol. 45, no. 2, pp. 167–256, 2003. [3] A. Barab ́asi and Z. N. Oltvai, “Network biology: Understanding the cell’s functional organization,” Nature Reviews Genetics, vol. 5, no. 2, pp. 101–113, 2004. [4] S. Boccaletti, V. Latora, Y. Moreno, M. Chavez, and D. Hwang, “Complex networks: Structure and dynamics,” Physics Reports, vol. 424, [5] L. Varshney, B. Chen, E. Paniagua, D. Hall, and D. Chklovskii, “Structural properties of the caenorhabditis elegans neuronal network,” PLoS Computational Biology, vol. 7, no. 2, p. e1001066, 2011. [6] J. Ugander, B. Karrer, L. Backstrom, and C. Marlow, “The anatomy of the facebook social graph,” arXiv preprint arXiv:1111.4503, 2011. [7] C. Priebe, Y. Parker, J. Vogelstein, J. Conroy, V. Lyzinskic, M. Tang, A. Athreya, J. Cape, and E. Bridgeford, “On a ’two truths’ phenomenon in spectral graph clustering,” Proceedings of the National Academy of Sciences, vol. 116, no. 13, pp. 5995–5600, 2019. [8]",
+          "page_span": [
+            9,
+            9
+          ]
+        },
+        {
+          "id": "references-p002",
+          "text": "A. Grover and J. Leskovec, “node2vec: Scalable feature learning for",
+          "page_span": [
+            9,
+            9
+          ]
+        },
+        {
+          "id": "references-p003",
+          "text": "networks,” in Proceedings of the 22nd ACM SIGKDD international conference on Knowledge discovery and data mining, pp. 855–864, 2016. [9] D. Sussman, M. Tang, D. Fishkind, and C. Priebe, “A consistent adjacency spectral embedding for stochastic blockmodel graphs,” Journal of the American Statistical Association, vol. 107, no. 499, pp. 1119–1128, 2012. [10] Y. Zhang and M. Tang, “A theoretical analysis of deepwalk and node2vec for exact recovery of community structures in stochastic blockmodels,” IEEE Transactions on Pattern Analysis and Machine Intelligence, vol. 46, pp. 1065–1078, February 2024. [11] B. Karrer and M. E. J. Newman, “Stochastic blockmodels and community structure in networks,” Physical Review E, vol. 83, p. 016107, 2011. [12] Y. Zhao, E. Levina, and J. Zhu, “Consistency of community detection in networks under degree-corrected stochastic block models,” Annals of Statistics, vol. 40, no. 4, pp. 2266–2292, 2012. [13] A. Athreya, D. E. Fishkind, M. Tang, C. E. Priebe, Y. Park, J. T. Vogelstein, K. Levin, V. Lyzinski, Y. Qin, and D. Sussman, “Statistical inference on random dot product graphs: a survey,” Journal of Machine Learning Research, vol. 18, no. 226, pp. 1–92,",
+          "page_span": [
+            9,
+            9
+          ]
+        },
+        {
+          "id": "references-p004",
+          "text": "2018.",
+          "page_span": [
+            9,
+            9
+          ]
+        },
+        {
+          "id": "references-p005",
+          "text": "[14] K. Rohe, S. Chatterjee, and B. Yu, “Spectral clustering and the highdimensional stochastic blockmodel,” Annals of Statistics, vol. 39, no. 4, pp. 1878–1915, 2011. 10 Carey E. Priebe received the BS degree in mathematics from Purdue University in 1984, the MS degree in computer science from San Diego State University in 1988, and the PhD degree in information technology (computational statistics) from George Mason University in 1993. From 1985 to 1994 he worked as a mathematician and scientist in the US Navy research and development laboratory system. Since 1994 he has been a professor in the Department of Applied Mathematics and Statistics at Johns Hopkins University. His research interests include computational statistics, kernel and mixture estimates, statistical pattern recognition, model selection, and statistical inference for high-dimensional and graph data. He is a Senior Member of the IEEE, an Elected Member of the International Statistical Institute, a Fellow of the Institute of Mathematical Statistics, and a Fellow of the American Statistical Association. [32] P. Holland, K. Laskey, and S. Leinhardt, “Stochastic blockmodels: First steps,” Social Networks, vol. 5, no.",
+          "page_span": [
+            9,
+            9
+          ]
+        },
+        {
+          "id": "references-p006",
+          "text": "2, pp. 109–137, 1983.",
+          "page_span": [
+            9,
+            9
+          ]
+        },
+        {
+          "id": "references-p007",
+          "text": "[33] T. Snijders and K. Nowicki, “Estimation and prediction for stochastic blockmodels for graphs with latent block structure,” Journal of Classification, vol. 14, no. 1, pp. 75–100, 1997. [34] S. Young and E. Scheinerman, “Random dot product graph models for social networks,” in Algorithms and Models for the Web-Graph, pp. 138– 149, Springer Berlin Heidelberg, 2007. [35] L. Devroye, L. Gyorfi, and G. Lugosi, A Probabilistic Theory of Pattern Recognition. Springer, 1996. [36] R. A. Rossi and N. K. Ahmed, “The network data repository with interactive graph analytics and visualization,” in AAAI, 2015. [37] J. Chung, P. B. D., E. W. Bridgeford, B. K. Varjavand, H. S. Helm, and J. T. Vogelstein, “Graspy: Graph statistics in python,” Journal of Machine Learning Research, vol. 20, no. 158, pp. 1–7, 2019. [38] T. N. Kipf and M. Welling, “Semi-supervised classification with graph convolutional networks,” in International Conference on Learning Representations, 2017. [39] T. N. Kipf and M. Welling, “Variational graph auto-encoders,” arXiv preprint arXiv:1611.07308, 2016. [40] J. Zhou, G. Cui, S. Hu, Z. Zhang, C. Yang, Z. Liu, L. Wang, L. Changcheng, and M. Sun, “Graph neural networks: A",
+          "page_span": [
+            10,
+            10
+          ]
+        },
+        {
+          "id": "references-p008",
+          "text": "review of",
+          "page_span": [
+            10,
+            10
+          ]
+        },
+        {
+          "id": "references-p009",
+          "text": "methods and applications,” AI Open, vol. 1, pp. 57–81, 2020. [41] Z. Wu, S. Pan, F. Chen, G. Long, C. Zhang, and P. S. Yu, “A comprehensive survey on graph neural networks,” IEEE Transactions on Neural Networks and Learning Systems, vol. 32, pp. 4–24, 2019. [42] K. Oono and T. Suzuki, “Graph neural networks exponentially lose expressive power for node classification,” in International Conference on Learning Representations (ICLR), 2020. [43] K. Xu, J. Li, M. Zhang, S. S. Du, K. ichi Kawarabayashi, and S. Jegelka, “What can neural networks reason about?,” in International Conference on Learning Representations, 2020. [44] N. H. C. E. Priebe, C. Shen and T. Chen, “A simple spectral failure mode for graph convolutional networks,” IEEE Transactions on Pattern Analysis and Machine Intelligence, vol. 44, no. 11, pp. 8689 – 8693, 2022. [45] J. Chen, T. Ma, and C. Xiao, “Fastgcn: Fast learning with graph convolutional networks via importance sampling,” in International Conference on Learning Representations (ICLR), 2018. [46] Q. Huang, H. He, A. Singh, S.-N. Lim, and A. Benson, “Combining label propagation and simple models out-performs graph neural networks,” in International Conference",
+          "page_span": [
+            10,
+            10
+          ]
+        },
+        {
+          "id": "references-p010",
+          "text": "on Learning Representations, 2021.",
+          "page_span": [
+            10,
+            10
+          ]
+        },
+        {
+          "id": "references-p011",
+          "text": "[47] H. Wang and J. Leskovec, “Combining graph convolutional neural networks and label propagation,” ACM Transactions on Information Systems, vol. 40, no. 4, pp. 1–27, 2022. Jonathan Larson is a Partner Data Architect at Microsoft Research working on Special Projects. He currently leads a research team focused on the intersection of graph machine learning, LLM memory representations, and LLM orchestration. Some of his group’s recent research include GraphRAG, organizational science, and cybersecurity. His research has led to shipping new features in Bing, Viva, PowerBI. Ha Trinh received a BS degree in Applied Computing from the University of Dundee in 2009 and a PhD degree in Computing from the same university in 2013. She is currently working as a senior data scientist at Microsoft Research. Her research interests lie at the intersection of artificial intelligence and human-computer interaction. Cencheng Shen received the BS degree in Quantitative Finance from National University of Singapore in 2010, and the PhD degree in Applied Mathematics and Statistics from Johns Hopkins University in 2015. He is an associate professor in the Department of Applied Economics and Statistics at",
+          "page_span": [
+            10,
+            10
+          ]
+        },
+        {
+          "id": "references-p012",
+          "text": "University of Delaware. His research",
+          "page_span": [
+            10,
+            10
+          ]
+        },
+        {
+          "id": "references-p013",
+          "text": "interests include graph embedding, dependence measures, and neural networks. Youngser Park received the B.E. degree in electrical engineering from Inha University in Seoul, Korea in 1985, the M.S. and Ph.D. degrees in computer science from The George Washington University in 1991 and 2011 respectively. From 1998 to 2000 he worked at the Johns Hopkins Medical Institutes as a senior research engineer. From 2003 until 2011 he worked as a senior research analyst, and has been an associate research scientist since 2011 then research scientist since 2019 in the Center for Imaging Science at the Johns Hopkins University. At Johns Hopkins, he holds joint appointments in the The Institute for Computational Medicine and the Human Language Technology Center of Excellence. His current research interests are clustering algorithms, pattern classification, and data mining for high-dimensional and graph data. Yuexiao Dong is an Associate Professor from the Department of Statistical Science. Dr. Dong received his Bachelor’s degree in mathematics from Tsinghua University. He obtained his PhD from the statistics department of the Pennsylvania State University in 2009. Dr. Dong’s research focuses on",
+          "page_span": [
+            10,
+            10
+          ]
+        },
+        {
+          "id": "references-p014",
+          "text": "sufficient dimension reduction and",
+          "page_span": [
+            10,
+            10
+          ]
+        },
+        {
+          "id": "references-p015",
+          "text": "high-dimensional data analysis. 11 0.8 Classification Error Community Score Detection Accuracy 8 1 P-GEE GEE Bayes Principal Redundant 6 0.6 True Positive False Positive SBM 4 0.5 0.4 2 0 250 2500 5000 0 250 2500 5000 0.2 250 2500 5000 Sample Size 2.5 0.6 1 2 0.5 DC-SBM 1.5 0.4 0.5 1 0.3 0.5 250 2500 5000 0 250 2500 5000 0.2 0 250 2500 5000 Sample Size 5 1 0.6 4 0.5 3 RDPG 0.5 0.4 2 0.3 1 250 2500 5000 0 250 2500 5000 0.2 0 250 2500 5000 Sample Size Fig. 3. This figure displays the average sample community score, the average principal community detection accuracy, and the average vertex classification error using the embedding, based on 100 Monte-Carlo replicates with increasing n. P-GEE denotes the principal graph encoder embedding, and GEE denotes the original graph encoder embedding. 1",
+          "page_span": [
+            10,
+            10
+          ]
+        }
+      ]
+    },
+    {
+      "id": "appendix",
+      "title": "Appendix",
+      "paras": [
+        {
+          "id": "appendix-p001",
+          "text": "To facilitate the proof, we introduce the following notations for conditioning and density arguments: • We use ·|⃗U to denote the conditioning on all the independent variables Uj, i.e., for j = 1, 2, . . . , m, we fix Uj = uj. • When conditioning on (X, Y ) = (x, y), we simply use ·|(X, Y ). • We assume (U, V ) is an independent copy of (X, Y ). Moreover, when conditioning on (U, V ) = (u, v), we simply use ·|(U, V ). • (a1, a2, . . . , am) denotes the density argument for each dimension of A, and (z1, z2, . . . , zK) denotes the density argument for each dimension of Z. Theorem 1. Given A ∼RBG(X, ⃗V, δ), the principal graph encoder embedding preserves the following conditional density: Y |A dist = Y |Z dist = Y |ZD. Denote L∗(Y, A) as the Bayes optimal error to classify Y using A, we have L∗(Y, A) = L∗(Y, Z) = L∗(Y, ZD). Proof. The proof is decomposed into three parts: • (i) establish Y |A dist = Y |Z; • (ii) establish Y |Z dist = Y |ZD; • (iii) establish the Bayes error equivalence. (i) It suffices to show the following always holds: Prob(Y |A) = Prob(Y |Z) where Z = AW is the encoder embedding. Given that Y is a categorical variable with prior probabilities {πk, k = 1, . . . ,",
+          "page_span": [
+            12,
+            12
+          ]
+        },
+        {
+          "id": "appendix-p002",
+          "text": "K},",
+          "page_span": [
+            12,
+            12
+          ]
+        },
+        {
+          "id": "appendix-p003",
+          "text": "each conditional probability satisfies Prob(Y = y|A) = πyfA|Y =y(a1, a2, . . . , am) PK l=1 πlfA|Y =l(a1, a2, . . . , am) , Prob(Y = y|Z) = πyfZ|Y =y(z1, z2, . . . , zK) PK l=1 πlfZ|Y =l(z1, z2, . . . , zK) . Therefore, it suffices to prove that the two numerators are proportional, i.e., c × fA|Y (a1, a2, . . . , am) = fZ|Y (z1, z2, . . . , zK) for some positive constant c that is unrelated to Y . We begin by examining the conditional density of A: j=1 δ(x, uj)aj(1 −δ(x, uj))1−aj fA|(Y,X,⃗U)(a1, a2, . . . , am) = vj=k j=1,...,m δ(x, uj)aj(1 −δ(x, uj))1−aj. = k=1 The first line follows because each dimension of A, under all the conditioning, is independently distributed as a Bernoulli random variable with probability δ(x, uj) for j = 1, . . . , m. Then the second line rearranges the product based on the class membership of each vj. 2 We proceed by un-conditioning with respect to ⃗U, resulting in the following expression: fA|(Y,X)(a1, a2, . . . , am) = ⃗U fA|(Y,X,⃗U)(a1, . . . , am)f⃗U(u1, . . . , um) = u1,...,um fA|(Y,X,⃗U)(a1, . . . , am)fU1(u1) · · · fUm(um) vj=k = j=1,...,m δ(x, uj)aj(1 −δ(x, uj))1−ajfU|V =v1(u1) · · · fU|V =vm(um) u1,··· ,um k=1 vj=k j=1,...,m E(δ(x, U)|V =",
+          "page_span": [
+            12,
+            12
+          ]
+        },
+        {
+          "id": "appendix-p004",
+          "text": "k)aj(1 −E(δ(x, U)|V = k))1−aj",
+          "page_span": [
+            12,
+            12
+          ]
+        },
+        {
+          "id": "appendix-p005",
+          "text": "= k=1 vj =k vj =k j=1,...,m (1−aj) . j=1,...,m aj (1 −τx,k(U)) = k=1 (τx,k(U)) The first line is a standard application of conditional density manipulation, and note that ⃗U is independent of (X, Y ). The second line rewrites the joint density of f⃗U into individual densities, since the joint density is simply a product of fU|V =vj(uj). The fourth line computes the integral: since uj only appears once in the whole product, either via δ(x, uj)aj or (1 −δ(x, uj))1−aj due to aj taking values of either 0 or 1, solving the integral at each j yields either E(δ(x, uj)) or (1 −E(δ(x, uj))). Since this expectation is identical throughout the same vj, we can represent this expectation as: τx,k(U) = E(δ(x, U)|V = k). This allows us to group terms with the same expectation together based on k. Continuing with the derivation, we un-condition X to derive fA|Y : fA|Y (a1, a2, . . . , am) = fA|(Y,X)(a1, a2, . . . , am)fX|Y (x) vj =k vj =k j=1,...,m (1−aj) fX|Y (x). j=1,...,m aj (1 −τx,k(U)) = k=1 (τx,k(U)) Next, we consider the encoder embedding Z. Starting from fZ|(Y,X,⃗U)(z1, z2, . . . , zK), under such conditioning, the density at each dimension k is a Poisson Binomial distribution, i.e.,",
+          "page_span": [
+            13,
+            13
+          ]
+        },
+        {
+          "id": "appendix-p006",
+          "text": "mkZk|(Y, X, ⃗U) ∼Poisson Binomial({δ(x, uj)})",
+          "page_span": [
+            13,
+            13
+          ]
+        },
+        {
+          "id": "appendix-p007",
+          "text": "for j = 1, . . . , m and vj = k. After un-conditioning ⃗U, each probability δ(x, uj) again becomes E(δ(x, U)|V = k) by the same reasoning as above for fA|(Y,X). Therefore, mkZk|(Y, X) ∼Binomial(mk, τx,k(U)). As each dimension is conditionally independent, the density of Z is the product of independent Binomials, and we have \u0012 mk mkzk \u0013 (τx,k(U))mkzk(1 −τx,k(U))mk−mkzk, fZ|(Y,X)(z1, z2, . . . , zK) = k=1 and fZ|Y (z1, z2, . . . , zK) = fZ|(Y,X)(z1, z2, . . . , zK)fX|Y (x) \u0012 mk mkzk \u0013 (τx,k(U))mkzk(1 −τx,k(U))mk−mkzkfX|Y (x) = k=1 \u0012 mk mkzk \u0013 Z k=1 (τx,k(U))mkzk(1 −τx,k(U))mk−mkzkfX|Y (x), = k=1 where the third line follows because (mk, zk) are not affected by the integration of x. Observe that the encoder embedding enforces mkzk = Pvj=k j=1,...,m aj for each k. Comparing fZ|Y to fA|Y , we immediately have c × fA|Y (a1, a2, . . . , am) = fZ|Y (z1, z2, . . . , zK) 3 when Z = AW, where c = QK k=1 \u0000 mk mkzk \u0001 is a positive constant. This conditional density equality holds regardless of the underlying (X, ⃗V) or δ(·, ·). Hence, we have Y |A dist = Y |Z for the encoder embedding. (ii) Without loss of generality, let us assume that D = {1, 2, . . . , d}, and d ∈[1, K). This means the first",
+          "page_span": [
+            13,
+            13
+          ]
+        },
+        {
+          "id": "appendix-p008",
+          "text": "d communities",
+          "page_span": [
+            13,
+            13
+          ]
+        },
+        {
+          "id": "appendix-p009",
+          "text": "are the principal communities, and the remaining are redundant communities. The trivial cases that d = 0 or d = K will be addressed at the end Recall the expression from part (i) above: \u0012 mk mkzk \u0013 Z k=1 (τx,k(U))mkzk(1 −τx,k(U))mk−mkzkfX|Y (x). fZ|Y (z1, z2, . . . , zK) = k=1 This leads to: Prob(Y = y|Z) = πyfZ|Y =y(z1, z2, . . . , zK) PK l=1 πlfZ|Y =l(z1, z2, . . . , zK) = πy QK k=1 \u0000 mk mkzk \u0001 R QK k=1(τx,k(U))mkzk(1 −τx,k(U))mk−mkzkfX|Y =y(x) PK l=1 πl QK k=1 \u0000 mk mkzk \u0001 R QK k=1(τx,k(U))mkzk(1 −τx,k(U))mk−mkzkfX|Y =l(x) QK k=1(τx,k(U))mkzk(1 −τx,k(U))mk−mkzkfX|Y =y(x) PK l=1 πl = πy QK k=1(τx,k(U))mkzk(1 −τx,k(U))mk−mkzkfX|Y =l(x) where τx,k(U) = E(δ(x, U k)). We first look at the terms from community K, which is assumed the redundant community. From the definition of redundant community, we have τx,K(U) = E(δ(x, U K)) = cK for all possible x where fX(x) > 0, where cK is a constant unrelated to x. Consequently, all terms involving τx,K(U) can be taken outside of the integral in both numerator and denominator, and the same holds for terms associated with τx,k(U) for each k = d + 1, . . . , K. In essence, for any l ∈[1, K], we always have k=1 (τx,k(U))mkzk(1 −τx,k(U))mk−mkzkfX|Y",
+          "page_span": [
+            14,
+            14
+          ]
+        },
+        {
+          "id": "appendix-p010",
+          "text": "=l(x)",
+          "page_span": [
+            14,
+            14
+          ]
+        },
+        {
+          "id": "appendix-p011",
+          "text": "πl k=d+1 cmkzk (1 −ck)mk−mkzk)πl k=1 (τx,k(U))mkzk(1 −τx,k(U))mk−mkzkfX|Y =l(x). = ( It follows that Qd k=1(τx,k(U))mkzk(1 −τx,k(U))mk−mkzkfX|Y =y(x) PK l=1 πl Prob(Y = y|Z) = πy Qd k=1(τx,k(U))mkzk(1 −τx,k(U))mk−mkzkfX|Y =l(x) , which exclusively pertains to dimensions corresponding to the principal communities. It is evident that: Prob(Y = y|ZD) = Prob(Y = y|Z) = Prob(Y = y|A) Hence, the principal graph encoder embedding satisfies Y |A dist = Y |ZD. Regarding the two trivial cases: when d = K, implying that all communities are principal communities, the theorem trivially holds since no additional dimension reduction occurs. When d = 0, there is no principal community and D is empty. In this scenario, we have Prob(Y = y|A) = Prob(Y = y|Z) = πy = Prob(Y = y), indicating that A and Y are independent, and Z and Y are independent as well. In other words, the graph provides no information for predicting Y , so the graph data itself is redundant. (iii) Given two random variables (X, Y ) where Y is categorical, the Bayes optimal classifier for using X to predict Y is g(X) = arg max k=1,...,K Prob(Y = k | X). 4 By the conditional density equivalence in parts (i) and (ii), it is immediate",
+          "page_span": [
+            14,
+            14
+          ]
+        },
+        {
+          "id": "appendix-p012",
+          "text": "that the Bayes optimal classifier for using A to",
+          "page_span": [
+            14,
+            14
+          ]
+        },
+        {
+          "id": "appendix-p013",
+          "text": "predict Y satisfies g(A) = arg max Prob(Y = k | A) = arg max Prob(Y = k | Z) = g(Z) = arg max Prob(Y = k | ZD) = g(ZD). Therefore, the Bayes optimal classifier for predicting Y is the same, regardless of whether the underlying random variable is A, Z, or ZD. Since the optimal classifier is always the same, the resulting optimal error is also the same. Theorem 2. Assume A ∼RBG(X, ⃗V), and δ(X, U k)|Y is independent of X|Y , which is satisfied under the stochastic block model. Then the population community score λ(k) = 0 if and only if community k is a redundant community. Proof. (i) We first prove that the required condition, δ(X, U k)|Y being independent of X|Y , can be satisfied under the stochastic block model (SBM). Recall that the standard stochastic block model satisfies: A(i, j) ∼Bernoulli(B(Y(i), Y(j))), which, when cast into the framework of a random Bernoulli graph, is equivalent to: δ(X, U k)|(Y = y) = B(y, k), where B(y, k) is a constant and, therefore, always independent of X|(Y = y). This condition can also hold under the more general degree-corrected stochastic block model (DC-SBM), with an additional assumption regarding how the degree parameters are generated. Under",
+          "page_span": [
+            15,
+            15
+          ]
+        },
+        {
+          "id": "appendix-p014",
+          "text": "DC-SBM, we have:",
+          "page_span": [
+            15,
+            15
+          ]
+        },
+        {
+          "id": "appendix-p015",
+          "text": "δ(X, U k)|(Y = y) = θθ′B(y, k), where θ and θ′ are the degrees for X and U k, respectively. Clearly, θ′B(y, k) is independent of X|(Y = y). By further assuming that the degree variable θ is generated independently of X|(Y = y), δ(X, U k)|(Y = y) becomes independent of X|(Y = y) under DC-SBM. (ii) Next, we prove that under the condition that δ(X, U k)|Y is independent of X|Y , the population community score λ(k) equals 0 if and only if community k is a redundant community. From the definition of principal community and the population community score, we need to prove two things. First, we shall prove that V ar \u0000 E(δ(X, U k) | X) \u0001 = 0 if and only if V ar(E(Zk|Y = l)) = 0. This is because when the above conditional variance equals 0, E(Zk|Y = l) is a constant across different l, which makes the numerator of the population community score always 0. From the proof of Theorem 1, we have: mkZk|(Y = l, X = x) ∼Binomial(mk, E(δ(x, U k))). From this, we can derive the conditional expectations as follows: E(Zk|(Y, X = x)) = E(δ(x, U k)), E(Zk|Y = l) = E(δ(X, U k)|Y = l). When community k is redundant such that V ar(E(δ(X, U k)|X)) = 0, we immediately have V ar(E(Zk|Y = l)) = V ar(E(δ(X, U",
+          "page_span": [
+            15,
+            15
+          ]
+        },
+        {
+          "id": "appendix-p016",
+          "text": "k)|Y = l)) = 0.",
+          "page_span": [
+            15,
+            15
+          ]
+        },
+        {
+          "id": "appendix-p017",
+          "text": "This is because when the conditional variance equals 0 for all possible X, it must also be 0 when conditioning on Y = l, which restricts to part of the support of X. This proves the only if direction. To prove the if direction, we need the additional assumption that δ(X, U k)|Y is independent of X|Y . Given such conditional independence, and the fact that Zk|Y is a random variable with parameter mk and E(δ(X, U k)), we immediately have that Zk|Y 5 is independent of X|Y , which implies E(Zk|Y = l) = E(Zk|(Y = l, X)). Therefore, when V ar(E(Zk|Y = l)) = 0, we also have V ar(E(Zk|(Y = l, X))) = 0. Since E(Zk|(Y = l, X = x)) = E(δ(x, U k)) = E(δ(X, U k)|X = x), which intuitively means that conditioning on Y is redundant once X is known, this leads to V ar(E(Zk|X)) = V ar(E(δ(X, U k)|X)) = 0. (iii) Part (ii) proved that the numerator of the population community score equals 0 if and only if community k is a redundant community. To complete the proof, it remains to show that the denominator of the population community score is greater than 0; otherwise, a 0/0 problem could arise when community k is redundant. Based on the binomial distribution of Zk, we have: V ar(Zk|(Y, X)) = E(δ(x, U",
+          "page_span": [
+            15,
+            15
+          ]
+        },
+        {
+          "id": "appendix-p018",
+          "text": "k))(1 −E(δ(x, U k)))",
+          "page_span": [
+            15,
+            15
+          ]
+        },
+        {
+          "id": "appendix-p019",
+          "text": "mk > 0, which always holds, regardless of whether k is redundant or not, except in the trivial case where δ(x, U k) = 0 or 1 almost surely. This corresponds to the scenario where the graph adjacency matrix is entirely 0s or 1s, making all communities redundant and reducing vertex classification to random guessing. Excluding such trivial cases, we have: V ar(Zk|Y = l) = EX(V ar(Zk|(Y, X))) + V arX(E(Zk|(Y, X))) > 0, where the first term is positive, and the second term is non-negative. Thus, excluding trivial graphs, the denominator of the principal community score is always positive, regardless of whether community k is redundant or principal.",
+          "page_span": [
+            16,
+            16
+          ]
+        }
+      ]
+    }
+  ]
+}

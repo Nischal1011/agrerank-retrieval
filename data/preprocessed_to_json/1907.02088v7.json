@@ -1,0 +1,295 @@
+{
+  "id": "1907.02088v7",
+  "title": "Multivariate Hypothesis Testing Python Package",
+  "metadata": {
+    "source_path": "data/pdf_files/1907.02088v7.pdf",
+    "page_count": 7,
+    "hash": "6f29bd4f58786c32d327deaab851c16b5131bb68f5a426343859749b6b3a0c09"
+  },
+  "sections": [
+    {
+      "id": "front-matter",
+      "title": "Front Matter",
+      "paras": [
+        {
+          "id": "front-matter-p001",
+          "text": "hyppo: A Multivariate Hypothesis Testing Python Package Sambit Panda1, Satish Palaniappan1, Junhao Xiong1, Eric W. Bridgeford2, Ronak Mehta1, Cencheng Shen3, and Joshua T. Vogelstein1,4 ∗ Abstract. We introduce hyppo, a unified library for performing multivariate hypothesis testing, including independence, twosample, and k-sample testing. While many multivariate independence tests have R packages available, the interfaces are inconsistent and most are not available in Python. hyppo includes many state of the art multivariate testing procedures. The package is easy-to-use and is flexible enough to enable future extensions. The documentation and all releases are available at https://hyppo.neurodata.io. Key words. Python, multivariate, independence, k-sample, hypothesis 1 Introduction Examining and identifying relationships between sets of high-dimensional variables is critical to advance understanding and planning of future numerical and physical experiments. Hypothesis testing enables formally testing models to identify such discrepancies. Many correlation measures have been proposed to solve the problem of independence testing, such as Pearson’s correlation [1], but many are",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "front-matter-p002",
+          "text": "unsuited to detect nonlinear and high-dimensional",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "front-matter-p003",
+          "text": "dependence structures within data. Recently, several statistics have been proposed that operate well on high-dimensional (potentially non-Euclidean) data, such as distance correlation [2–5] and Hilbert- Schmidt independence criterion [6–8], which are actually exactly equivalent in Sejdinovic et al. [9], Shen and Vogelstein [10]. Heller, Heller and Gofrine proposed another nonparametric independence test with particularly high power in certain nonlinear relationships [11]. Multiscale Graph Correlation is a test that has demonstrated higher statistical power on many multivariate, nonlinear, and structured data when compared to other independence tests [12–14], which combines and extends the nearest neighbors and energy statistics to detect underlying relationships. For each of these tests, p-values can be calculated using a random permutation test [15–17]. These tests can be modified and extended to such applications as time-series testing [18]. To approach the problem of two-sample testing, Student’s t-test [19] is traditionally used, while a few nonparametric alternatives have been proposed that operate well on multivariate, nonlinear data such as Energy [20], and maxmimal mean",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "front-matter-p004",
+          "text": "discrepency [21], and Heller Heller and Gorfine’s test [11].",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "front-matter-p005",
+          "text": "The two-sample testing problem can be generalized to the k-sample testing problem and here analysis of variance (ANOVA) [22] or its multivariate analogue multivariate ANOVA (MANOVA) [23] can be used, but these statistics either fail to, or operate poorly upon, non-Gaussian data [24, 25]. There are a few nonparametric alternatives to ANOVA and MANOVA, such as multivariate k-sample Heller Heller Gorfine [26], and distance components (DISCO) [27]. Recently, Panda et al. [28] has shown that nonparametric distance and kernel k-sample tests can be formulated by reducing the k-sample testing problem to the independence testing problem. This manuscript introduces hyppo, a hypothesis package that provides various tests with high finite-sample statistical power on multivariate and nonlinear relationships. hyppo is a well-tested, multiplatform, Python 3 compatible library that allows users to conduct hypothesis tests on their data, and is also extensible enough to allow developers to easily add in their own tests. hyppo also provides benchmarks for each of these tests by comparing statistical power over many statistical models. The contribution of this manuscript is therefore to provide: (1)",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "front-matter-p006",
+          "text": "an overview of the library and examples of",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "front-matter-p007",
+          "text": "how to use some of the tests in the package, and (2) comparisons of the test statistics and wall times with similar R packages. arXiv:1907.02088v7 [stat.CO] 13 Sep 2024 ∗Corresponding author: jovo@jhu.edu 1 Johns Hopkins University, Baltimore, MD 2 Johns Hopkins School of Public Health, Baltimore, MD 3 University of Delaware, Newark, DE 4 Progressive Learning 1 2 Library Overview Inspired by the desire to allow for convenient use of these independence tests, hyppo has been developed as a hypothesis testing package. The package structure is modeled on the scikit-learn and energy R packages’ API. Links to source code, documentation, and tutorials can be found here: https://hyppo.neurodata.io. Included Tests We have included a host of notable and novel hypothesis tests that we determined to be useful for the end user. Shen and Vogelstein [10] has shown that distance and kernel methods are equivalent and thus, we have one implementation that is able to perform both with a proper bijective transformation. We have implemented k-sample tests as specified in Panda et al. [28] and every algorithm in the following list can be used as a two-sample or k-sample test this way. The included",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "front-matter-p008",
+          "text": "algorithms are:",
+          "page_span": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "front-matter-p009",
+          "text": "• Multivariate generalizations of Pearson’s product moment correlation: RV [29, 30] and Cannonical correlation analysis (Cca) [31]. • Heller-Heller-Gorfine (Hhg) [11]: Multivariate distance-based test. • Distance correlation (Dcorr): Both biased [4] and unbiased [32] and a fast O(n log n) variant that runs on Euclidean one-dimensional data [33]. • Hilbert-Schmidt independence criterion (Hsic): Both biased and unbiased [34] kernel-based statistics. A chi-square fast statistic is also implemented [35]. • Multiscale graph correlation (Mgc) [14]: An independence tests that combines k-nearest neighbors and energy statistics. Recently, Mgc has been accepted into scipy.stats and this implementation wraps the scipy implementation. • Friedman Rafsky [36]: A tree-based two sample test. • dHsic [37]: A d-variate independence test based on Hsic • Multivariate analysis of variance (Manova) [24, 38] and Hotelling T 2 (Hotelling) [39]. • Maximum mean discrepancy (Mmd) [21]: A kernel two-sample test. • Energy [20]: A distance two-sample test. • Distance components (Disco) [27]: A distance-based k-sample test. • Smooth CF Test [40]: A test using analytic analogues of characteristic functions. •",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "front-matter-p010",
+          "text": "Mean Embedding Test [40]: A test based on the analytical mean embeddings between two",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "front-matter-p011",
+          "text": "distributions. • KSample Hhg [41]: A k-sample test for Hhg. • Fast Conditional Independence Test [42]: A fast, nonparametric conditional independence test. • Kernel Conditional Independence Test [43]: An efficient, kernel conditional independence test. • Finite Set Stein Discrepancy [44]: A linear time kernel goodness of fit test. • Discriminability test [45]: A highly accurate and powerful discriminability test. • Partial Dcorr [46]: A method to perform conditional independence testing using distance correlation. • Conditional Dcorr [47]: Conditional independence testing using Dcorr with strong theoretical properties. • LjungBox [48]: Tests if groups of autocorrelations of time series are different from 0. A number of algorithms have been implemented that lack an open source implementation elsewhere. These include: • Kernel mean embedding random forest (Kmerf) [49]: A kernel test that leverages random forest kernel induced similarity matrix to generate a test statistic. • Fast Implementations of Dcorr (Fast Dcorr) [50]: An approximation to Dcorr when calculating the p-value. • Universally consistent k-sample tests via independence testing [28]: Transforms the k-sample testing",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "front-matter-p012",
+          "text": "problem into the independence testing problem and then uses non-parametric indepen-",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "front-matter-p013",
+          "text": "dence tests from hyppo. • Time-series Mgc and Dcorr: Applying Mgc and Dcorr to time-series data. • Maximal Margin Correlation (MaxMargin) [50]: A highly accurate formulation of independence 2 5e-4 4 10 Execution Time 2 10 (Seconds) Test Statistic Difference 0 10 0 2 10 4 10 4 2 10 3 10 10 Number of Samples MGC (hyppo) HHG (hyppo) Dcorr (hyppo) MMD (hyppo) Fast Dcorr (hyppo) Fast 1D Dcorr (hyppo) HHG (HHG) Dcorr (energy) MMD (kernlab) Dcorr MMD HHG -5e-4 Figure 1: Benchmarks of hyppo implementations against corresponding R implementations for tests in the independence testing module. Average wall times (over 3 repetitions) (left) are shown for Dcorr in energy, Mmd in kernlab, and Hhg in Hhg as compared against hyppo implementations of Mgc, Hhg, Dcorr, Mmd, and Fast Dcorr. Test statistic comparisons (right) between Dcorr, Mmd, and Hhg in hyppo are compared against their respective reference R implementations. Test statistics are nearly identical for each implementation. tests in high dimensions with minimal added computational complexity. Structure of hyppo The modules of hyppo are as follows: independence, d_variate, ksample, discrim, kgof time_series, and tools. Each test within",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "front-matter-p014",
+          "text": "hyppo contains a .test method which",
+          "page_span": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "front-matter-p015",
+          "text": "the user runs that returns at least a statistic and p-value in all cases, and parallelization of the permutation tests are performed using joblib. Test statistic code is compiled and cached with numba, which is a just-in-time (JIT) compiler. tools contains common helper functions, simulations, and finite-sample statistical power functions to test differences between each test in hyppo. 3 Benchmarks Wall Time Comparisons Figure 1a shows the computational efficiency of hyppo’s implementations against existing implementations in commonly used R packages—specifically energy [51], kernlab [52], and HHG [53]. When comparing performance, wall times are averages of p-value computations (1000 replications when permutation tests are used) 3 trials calculated on a univariate noisy linear simulation with number of samples increasing from 50 to 10,000. All computations were performed on an Ubuntu 18.04.3 LTS system with access to 96 cores. When sample sizes are above a few hundred, all algorithms achieve approximately quadratic times, with different slopes. Hhg was the slowest as expected, though had comparable speeds to the other algorithms at low sample sizes. Mgc and Dcorr are next, and",
+          "page_span": [
+            3,
+            3
+          ]
+        },
+        {
+          "id": "front-matter-p016",
+          "text": "still only requires tens of minutes to run when sample sizes are around",
+          "page_span": [
+            3,
+            3
+          ]
+        },
+        {
+          "id": "front-matter-p017",
+          "text": "10,000. At low sample sizes, the energy package’s Dcorr is faster than kernlab’s implementation of Mmd (Dcorr is equivalent to Mmd for all finite sample sizes [10]) even at a sample size of 10,000. hyppo’s Fast Dcorr, which uses a fast statistic [33] and p-value approximation [35] is the fastest, even though both energy and kernlab both use highly optimized C++ versions. Implementation Validation Next, we verify that hyppo’s test statistics are equivalent to existing R implementations of the tests. Specifically, hyppo’s implementations were compared to: Dcorr from the energy package [51]. Mmd from the kernlab package [52], and Hhg from the HHG package [53]. The evaluation uses a spiral simulation with 1000 samples and 2 dimensions for each test and compares test statistics over 20 repetitions. Figure 1b shows the difference between the hyppo implementation 3 of the independence test and the respective R package implementation of the independence test. Test statistics are nearly equivalent for each implementation. 4 Conclusion hyppo is an extensive and extensible open-source Python package for multivariate hypothesis testing. As hyppo continues to grow and add functionality, it will",
+          "page_span": [
+            3,
+            3
+          ]
+        },
+        {
+          "id": "front-matter-p018",
+          "text": "enhance tools scientists",
+          "page_span": [
+            3,
+            3
+          ]
+        },
+        {
+          "id": "front-matter-p019",
+          "text": "use when determining relationships within their investigations. Acknowledgements This work is graciously supported by the Defense Advanced Research Projects Agency (DARPA) Lifelong Learning Machines program through contract FA8650-18-2-7834, the National Institute of Health awards RO1MH120482 amd T32GM119998, and the National Science Foundation award DMS-1921310. The authors would like to acknowledge the NeuroData Design class and the NeuroData lab at Johns Hopkins University for helpful feedback. 4",
+          "page_span": [
+            4,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "id": "references",
+      "title": "References",
+      "paras": [
+        {
+          "id": "references-p001",
+          "text": "[1] Karl Pearson. Note on regression and inheritance in the case of two parents. Proceedings of the Royal Society of London, 58(347-352):240–242, 1895. [2] Gábor J Székely and Maria L Rizzo. Brownian distance covariance. The Annals of Applied Statis- [3] Gábor J Székely and Maria L Rizzo. The distance correlation t-test of independence in high dimension. Journal of Multivariate Analysis, 117:193–213, 2013. [4] Gábor J Székely, Maria L Rizzo, and Nail K Bakirov. Measuring and testing dependence by correlation of distances. The Annals of Statistics, 35(6):2769–2794, 2007. [5] Russell Lyons. Distance covariance in metric spaces. The Annals of Probability, 41(5):3284–3305, 2013. [6] Arthur Gretton and Györfi László. Consistent nonparametric tests of independence. Journal of Machine Learning Research, 11(Apr):1391–1423, 2010. [7] Arthur Gretton, Ralf Herbrich, Alexander Smola, Olivier Bousquet, and Bernhard Schölkopf. Kernel methods for measuring independence. Journal of Machine Learning Research, 6(Dec):2075– 2129, 2005. [8] Krikamol Muandet, Kenji Fukumizu, Bharath Sriperumbudur, and Bernhard Schölkopf. Kernel mean embedding of distributions: A review and beyond. Foundations and",
+          "page_span": [
+            5,
+            5
+          ]
+        },
+        {
+          "id": "references-p002",
+          "text": "Trends® in Machine",
+          "page_span": [
+            5,
+            5
+          ]
+        },
+        {
+          "id": "references-p003",
+          "text": "[9] Dino Sejdinovic, Bharath Sriperumbudur, Arthur Gretton, and Kenji Fukumizu. Equivalence of distance-based and rkhs-based statistics in hypothesis testing. The Annals of Statistics, 41(5): 2263–2291, 2013. [10] Cencheng Shen and Joshua T. Vogelstein. The exact equivalence of distance and kernel methods in hypothesis testing. AStA Advances in Statistical Analysis, 105(3):385–403, 2021. [11] Ruth Heller, Yair Heller, and Malka Gorfine. A consistent multivariate test of association based on ranks of distances. Biometrika, 100(2):503–510, 2012. [12] Cencheng Shen, Carey E Priebe, and Joshua T Vogelstein. From distance correlation to multiscale graph correlation. Journal of the American Statistical Association, 115(529):280–291, 2020. [13] Youjin Lee, Cencheng Shen, Carey E Priebe, and Joshua T Vogelstein. Network dependence testing via diffusion maps and distance-based correlations. Biometrika, 106(4):857–873, 2019. [14] Joshua T Vogelstein, Eric W Bridgeford, Qing Wang, Carey E Priebe, Mauro Maggioni, and Cencheng Shen. Discovering and deciphering relationships across disparate data modalities. eLife, 8:e41690, 2019. [15] Dave S Collingridge. A primer on quantitized data analysis",
+          "page_span": [
+            5,
+            5
+          ]
+        },
+        {
+          "id": "references-p004",
+          "text": "and permutation testing. Journal of",
+          "page_span": [
+            5,
+            5
+          ]
+        },
+        {
+          "id": "references-p005",
+          "text": "Mixed Methods Research, 7(1):81–97, 2013. [16] Meyer Dwass. Modified randomization tests for nonparametric hypotheses. The Annals of Mathematical Statistics, pages 181–187, 1957. [17] Phillip I Good. Permutation, parametric, and bootstrap tests of hypotheses. Springer Science & Business Media, 2006. [18] Cencheng Shen, Jaewon Chung, Ronak Mehta, Ting Xu, and Joshua T Vogelstein. Independence testing for temporal data. Transactions on Machine Learning Research, 2024. ISSN 2835-8856. URL https://openreview.net/forum?id=jv1aPQINc4. [19] Student. The probable error of a mean. Biometrika, pages 1–25, 1908. [20] Gábor J Székely and Maria L Rizzo. Energy statistics: A class of statistics based on distances. Journal of statistical planning and inference, 143(8):1249–1272, 2013. [21] Arthur Gretton, Karsten M Borgwardt, Malte J Rasch, Bernhard Schölkopf, and Alexander Smola. A kernel two-sample test. Journal of Machine Learning Research, 13(Mar):723–773, 2012. [22] Ronald A Fisher. Xv.—the correlation between relatives on the supposition of mendelian inheritance. Earth and Environmental Science Transactions of the Royal Society of Edinburgh, 52(2): 399–433, 1919. 5 [23] Maurice S Bartlett.",
+          "page_span": [
+            5,
+            5
+          ]
+        },
+        {
+          "id": "references-p006",
+          "text": "Multivariate analysis. Supplement to the journal of the royal statistical society,",
+          "page_span": [
+            5,
+            5
+          ]
+        },
+        {
+          "id": "references-p007",
+          "text": "9(2):176–197, 1947. [24] Russell Warne. A primer on multivariate analysis of variance (manova) for behavioral scientists. Practical Assessment, Research, and Evaluation, 19(1):17, 2014. [25] JP Stevens. Applied multivariate statistics for the social sciences. lawrence erlbaum. Mahwah, NJ, pages 510–1, 2002. [26] Ruth Heller, Yair Heller, Shachar Kaufman, Barak Brill, and Malka Gorfine. Consistent distributionfree k-sample and independence tests for univariate random variables. The Journal of Machine Learning Research, 17(1):978–1031, 2016. [27] Maria L Rizzo, Gábor J Székely, et al. Disco analysis: A nonparametric extension of analysis of variance. The Annals of Applied Statistics, 4(2):1034–1055, 2010. [28] Sambit Panda, Cencheng Shen, Ronan Perry, Jelle Zorn, Antoine Lutz, Carey E. Priebe, and Joshua T. Vogelstein. High-dimensional and universally consistent k-sample tests. arXiv preprint arXiv:1910.08883, 2024. [29] Yves Escoufier. Le traitement des variables vectorielles. Biometrics, pages 751–760, 1973. [30] Paul Robert and Yves Escoufier. A unifying tool for linear multivariate statistical methods: the rvcoefficient. Journal of the Royal Statistical Society: Series C (Applied",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "references-p008",
+          "text": "Statistics), 25(3):257–265,",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "references-p009",
+          "text": "1976. [31] David R Hardoon, Sandor Szedmak, and John Shawe-Taylor. Canonical correlation analysis: An overview with application to learning methods. Neural computation, 16(12):2639–2664, 2004. [32] Gábor J Székely, Maria L Rizzo, et al. Partial distance correlation with methods for dissimilarities. The Annals of Statistics, 42(6):2382–2412, 2014. [33] Arin Chaudhuri and Wenhao Hu. A fast algorithm for computing distance correlation. Computational Statistics & Data Analysis, 135:15 – 24, 2019. ISSN 0167-9473. doi: https://doi.org/10.1016/j.csda.2019.01.016. URL http://www.sciencedirect.com/science/article/ [34] Arthur Gretton, Kenji Fukumizu, Choon H Teo, Le Song, Bernhard Schölkopf, and Alex J Smola. A kernel statistical test of independence. In Advances in neural information processing systems, pages 585–592, 2008. [35] Cencheng Shen, Sambit Panda, and Joshua T. Vogelstein. The chi-square test of distance correlation. Journal of Computational and Graphical Statistics, 31(1):254–262, 2022. [36] Jerome H Friedman and Lawrence C Rafsky. Multivariate generalizations of the wald-wolfowitz and smirnov two-sample tests. The Annals of Statistics, pages 697–717, 1979. [37] Niklas Pfister,",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "references-p010",
+          "text": "Peter Bühlmann, Bernhard Schölkopf, and Jonas Peters. Kernel-based tests for",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "references-p011",
+          "text": "joint independence. Journal of the Royal Statistical Society Series B: Statistical Methodology, 80 (1):5–31, 2018. [38] Gregory Carey. Multivariate analysis of variance (manova): I. theory. Retrieved May, 14:2011, 1998. [39] Harold Hotelling. The generalization of student’s ratio. In Breakthroughs in statistics, pages 54–65. Springer, 1992. [40] Kacper P Chwialkowski, Aaditya Ramdas, Dino Sejdinovic, and Arthur Gretton. Fast two-sample testing with analytic representations of probability measures. Advances in Neural Information Processing Systems, 28, 2015. [41] Ruth Heller and Yair Heller. Multivariate tests of association based on univariate tests. Advances in Neural Information Processing Systems, 29, 2016. [42] Krzysztof Chalupka, Pietro Perona, and Frederick Eberhardt. Fast conditional independence test for vector variables with large sample sizes. arXiv preprint arXiv:1804.02747, 2018. [43] Kun Zhang, Jonas Peters, Dominik Janzing, and Bernhard Schölkopf. Kernel-based conditional independence test and application in causal discovery. arXiv preprint arXiv:1202.3775, 2012. [44] Wittawat Jitkrittum, Wenkai Xu, Zoltán Szabó, Kenji Fukumizu, and Arthur Gretton. A linear-time 6",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "references-p012",
+          "text": "kernel goodness-of-fit test. Advances in neural information processing systems, 30, 2017.",
+          "page_span": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "references-p013",
+          "text": "[45] Zeyi Wang, Eric Bridgeford, Shangsi Wang, Joshua T. Vogelstein, and Brian Caffo. Statistical analysis of data repeatability measures, 2020. [46] Gábor J. Székely and Maria L. Rizzo. Partial distance correlation with methods for dissimilarities. The Annals of Statistics, 42(6):2382–2412, December 2014. ISSN 0090-5364, 2168-8966. doi: 10.1214/14-AOS1255. [47] Xueqin Wang, Wenliang Pan, Wenhao Hu, Yuan Tian, and Heping Zhang. Conditional distance correlation. Journal of the American Statistical Association, 110(512):1726–1734, 2015. [48] Greta M Ljung and George EP Box. On a measure of lack of fit in time series models. Biometrika, 65(2):297–303, 1978. [49] Cencheng Shen, Sambit Panda, and Joshua T. Vogelstein. Learning interpretable characteristic kernels via decision forests. arXiv preprint arXiv:1812.00029, 2024. [50] Cencheng Shen and Yuexiao Dong. High-dimensional independence testing via maximum and average distance correlations. arXiv preprint arXiv:2001.01095, 2024. [51] Maria Rizzo and Gabor Szekely. energy: E-Statistics: Multivariate Inference via the Energy of Data, 2018. URL https://CRAN.R-project.org/package=energy. R package version 1.7-5. [52] Alexandros",
+          "page_span": [
+            7,
+            7
+          ]
+        },
+        {
+          "id": "references-p014",
+          "text": "Karatzoglou, Alex Smola, Kurt Hornik, and Achim Zeileis. kernlab – an S4 package for",
+          "page_span": [
+            7,
+            7
+          ]
+        },
+        {
+          "id": "references-p015",
+          "text": "kernel methods in R. Journal of Statistical Software, 11(9):1–20, 2004. URL http://www.jstatsoft. org/v11/i09/. [53] Barak Brill and Shachar Kaufman. HHG: Heller-Heller-Gorfine Tests of Independence and Equality of Distributions, 2019. URL https://CRAN.R-project.org/package=HHG. R package version 2.3.2. 7",
+          "page_span": [
+            7,
+            7
+          ]
+        }
+      ]
+    }
+  ]
+}
