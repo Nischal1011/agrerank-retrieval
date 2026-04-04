@@ -107,31 +107,54 @@ The `data/` directory contains the diagnostic corpus used in the controlled eval
 
 ---
 
-## Pipeline
+## Pipeline (Diagnostic Corpus — Study 1)
 
-### 1. Ingest and Chunk Corpus
+This pipeline builds and runs AgreRank over the controlled diagnostic corpus of statistical machine learning papers (1,249 passages, 100 queries). The preprocessed JSON files in `data/preprocessed_to_json/` mean you can skip Step 1 and start directly from chunking.
+
+### 1. Ingest: PDF → JSON
 ```bash
-python src/pdf_to_json_with_metadata.py   # Convert PDFs to JSON
-python src/chunk_json.py                  # Chunk JSON into retrieval units
+# Skip this if using data/preprocessed_to_json/ directly
+python src/pdf_to_json_with_metadata.py
+# Input:  data/pdf_files/*.pdf
+# Output: data/preprocessed_to_json/*.json (one file per paper, named by arXiv ID)
 ```
 
-### 2. Generate Embeddings
+### 2. Chunk JSON into Retrieval Units
 ```bash
-python src/embed_chunks.py                # Embed corpus chunks
-python src/create_qset_embeddings.py      # Embed query set
+python src/chunk_json.py
+# Input:  data/preprocessed_to_json/*.json
+# Output: chunked passage units ready for embedding
 ```
 
-### 3. Build FAISS Index
+### 3. Generate Embeddings
 ```bash
-python src/build_faiss_index.py           # Build HNSW index (M=64, efConstruction=200)
+python src/embed_chunks.py               # Embed corpus chunks (text-embedding-3-large)
+python src/create_qset_embeddings.py     # Embed query set (text-embedding-3-large)
 ```
 
-### 4. Run Retrieval
+### 4. Build FAISS Index
 ```bash
-python src/retrieve.py                    # Run full AgreRank pipeline
+python src/build_faiss_index.py
+# Builds HNSW index: M=64, efConstruction=200
+# Output: FAISS index file for ANN search
+```
+
+### 5. Run AgreRank Retrieval
+```bash
+python src/retrieve.py                   # Full AgreRank pipeline (consensus seed → expand → gate → rerank)
 # or, for RAG downstream handoff:
-python src/retrieve_and_pass_to_llm.py
+python src/retrieve_and_pass_to_llm.py  # Retrieval + LLM response generation
 ```
+
+### Noise Resilience Experiments
+To reproduce the 9× corpus expansion results from Table 4 (Section 5.4):
+```bash
+python src/noisy_corpus.py
+# Injects 10,000 distractor passages from orthogonal domains (sports, finance, weather, entertainment)
+# Expands corpus: 1,249 → 11,249 passages
+```
+
+> For TREC DL 2021/2022 large-scale experiments (MS MARCO v2, 138M passages), see the [Reproducing Paper Experiments](#reproducing-paper-experiments) section below.
 
 ---
 
