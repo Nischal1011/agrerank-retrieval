@@ -1,0 +1,12 @@
+# Tested with Python 3.12 on macOS (Apple M1 Pro, MPS) and Java 21 (required by Pyserini).
+numpy==1.26.4
+scipy==1.12.0
+pyserini==1.2.0
+ir_datasets
+pytrec_eval
+rank_bm25==0.2.2
+sentence-transformers==5.1.1
+transformers==4.56.0
+torch==2.8.0
+openai==1.102.0
+pytest

@@ -1,0 +1,896 @@
+[
+  {
+    "query_id": "p1_q1_sc",
+    "paper_id": "1806.05514v5",
+    "query_type": "single_chunk",
+    "query_text": "What is the primary contribution of the paper 'The Exact Equivalence of Distance and Kernel Methods in Hypothesis Testing'?",
+    "answer_text": ["The paper proposes a simple and elegant bijection between metric and kernel that allows distance correlation and Hilbert-Schmidt independence criterion to always be the same for hypothesis testing."],
+    "relevant_chunks": ["1806.05514v5::abstract::fixed_0001"]
+  },
+  {
+    "query_id": "p1_q2_sc",
+    "paper_id": "1806.05514v5",
+    "query_type": "single_chunk",
+    "query_text": "In the paper on the equivalence of distance and kernel methods, what is the 'bijective induced kernel' for a given metric d(·, ·)?",
+    "answer_text": ["For a given metric d(·, ·) and sample data, the bijective induced kernel is defined as k_hat_d(xi, xj) = max_{s,t}[d(xs, xt)] - d(xi, xj)."],
+    "relevant_chunks": ["1806.05514v5::background::fixed_0013"]
+  },
+  {
+    "query_id": "p1_q3_sc",
+    "paper_id": "1806.05514v5",
+    "query_type": "single_chunk",
+    "query_text": "What does Theorem 5 in 'The Exact Equivalence...' state about the relationship between a strong negative type metric and its bijective induced kernel?",
+    "answer_text": ["Theorem 5 states that when a given metric d(·, ·) is of strong negative type, its bijective induced kernel k_hat_d(·, ·) is asymptotically a characteristic kernel."],
+    "relevant_chunks": ["1806.05514v5::7-translation-invariant-when-d-is-translation-invariant-kd-is-also-translation::fixed_0024"]
+  },
+  {
+    "query_id": "p1_q4_sc",
+    "paper_id": "1806.05514v5",
+    "query_type": "single_chunk",
+    "query_text": "What is the formula for the biased sample distance covariance, DCOVb_n(X, Y)?",
+    "answer_text": ["The biased sample distance covariance is given by the formula DCOVb_n(X, Y) = (1/n^2) * trace(HDXH * HDYH), where DX and DY are distance matrices and H is the centering matrix."],
+    "relevant_chunks": ["1806.05514v5::background::fixed_0005"]
+  },
+  {
+    "query_id": "p2_q1_sc",
+    "paper_id": "1710.09768v3",
+    "query_type": "single_chunk",
+    "query_text": "What does MGC stand for and what method does it generalize?",
+    "answer_text": ["MGC stands for Multiscale Graph Correlation, and it generalizes distance correlation."],
+    "relevant_chunks": ["1710.09768v3::abstract::fixed_0001"]
+  },
+  {
+    "query_id": "p2_q2_sc",
+    "paper_id": "1710.09768v3",
+    "query_type": "single_chunk",
+    "query_text": "According to the paper, what is the 'optimal scale' in the context of Multiscale Graph Correlation?",
+    "answer_text": ["The optimal scale is the scale (ρk, ρl) that maximizes the population local correlation, dCorr_ρk,ρl(X, Y), within the valid domain."],
+    "relevant_chunks": ["1710.09768v3::introduction::fixed_0016"]
+  },
+  {
+    "query_id": "p2_q3_sc",
+    "paper_id": "1710.09768v3",
+    "query_type": "single_chunk",
+    "query_text": "What is the purpose of the permutation test in the context of the MGC paper?",
+    "answer_text": ["The permutation test is the standard procedure used to approximate the null distribution of the test statistic (like MGC) to compute a p-value for testing independence."],
+    "relevant_chunks": ["1710.09768v3::introduction::fixed_0036"]
+  },
+  {
+    "query_id": "p2_q4_sc",
+    "paper_id": "1710.09768v3",
+    "query_type": "single_chunk",
+    "query_text": "What is the running time complexity for computing the Sample MGC statistic?",
+    "answer_text": ["The overall time complexity for computing the Sample MGC is O(n^2 * max{log n, p})."],
+    "relevant_chunks": ["1710.09768v3::20-independence::fixed_0057"]
+  },
+  {
+    "query_id": "p3_q1_sc",
+    "paper_id": "1907.02088v7",
+    "query_type": "single_chunk",
+    "query_text": "What is the name of the Python package for multivariate hypothesis testing introduced in the paper?",
+    "answer_text": ["The paper introduces hyppo, a unified library for performing multivariate hypothesis testing in Python."],
+    "relevant_chunks": ["1907.02088v7::front-matter::fixed_0000"]
+  },
+  {
+    "query_id": "p3_q2_sc",
+    "paper_id": "1907.02088v7",
+    "query_type": "single_chunk",
+    "query_text": "Which fast variant of the Dcorr test is implemented in `hyppo`?",
+    "answer_text": ["The `hyppo` package includes a fast O(n log n) variant of Dcorr that runs on Euclidean one-dimensional data."],
+    "relevant_chunks": ["1907.02088v7::front-matter::fixed_0004"]
+  },
+  {
+    "query_id": "p3_q3_sc",
+    "paper_id": "1907.02088v7",
+    "query_type": "single_chunk",
+    "query_text": "What is the purpose of the Kmerf test included in the hyppo package?",
+    "answer_text": ["Kmerf (Kernel mean embedding random forest) is a kernel test that leverages a random forest kernel-induced similarity matrix to generate a test statistic."],
+    "relevant_chunks": ["1907.02088v7::front-matter::fixed_0006"]
+  },
+  {
+    "query_id": "p4_q1_sc",
+    "paper_id": "1910.08883v5",
+    "query_type": "single_chunk",
+    "query_text": "What is the main finding presented in 'Universally Consistent K-Sample Tests via Dependence Measures'?",
+    "answer_text": ["The paper demonstrates a transformation that allows the K-sample testing problem to be solved using any universally consistent dependence measure."],
+    "relevant_chunks": ["1910.08883v5::abstract::fixed_0001"]
+  },
+  {
+    "query_id": "p4_q2_sc",
+    "paper_id": "1910.08883v5",
+    "query_type": "single_chunk",
+    "query_text": "How does the paper propose to handle the K-sample testing problem using a dependence measure?",
+    "answer_text": ["It proposes a transformation where the K-sample data is concatenated into a single data matrix U, and a corresponding one-hot encoding matrix V is created to represent the data source label. A dependence measure is then computed between U and V."],
+    "relevant_chunks": ["1910.08883v5::2-3-sample-method::fixed_0012"]
+  },
+  {
+    "query_id": "p4_q3_sc",
+    "paper_id": "1910.08883v5",
+    "query_type": "single_chunk",
+    "query_text": "What does Corollary 1 state about using a universally consistent dependence measure for K-sample testing?",
+    "answer_text": ["Corollary 1 states that if a dependence measure is universally consistent, then after the proposed transformation, it will be universally consistent for the K-sample test, meaning it will be zero if and only if all K distributions are the same."],
+    "relevant_chunks": ["1910.08883v5::2-2-population-transformation::fixed_0010"]
+  },
+  {
+    "query_id": "p5_q1_sc",
+    "paper_id": "2001.01095v4",
+    "query_type": "single_chunk",
+    "query_text": "What is the formula for the average distance correlation, ADcorn(X, Y)?",
+    "answer_text": ["The average distance correlation is the sum of all marginal distance correlations between each dimension of X and each dimension of Y, divided by the total number of pairs (pq)."],
+    "relevant_chunks": ["2001.01095v4::abstract::fixed_0011"]
+  },
+  {
+    "query_id": "p5_q2_sc",
+    "paper_id": "2001.01095v4",
+    "query_type": "single_chunk",
+    "query_text": "What is the main advantage of the maximum distance correlation (MDcorr)?",
+    "answer_text": ["The maximum distance correlation is advantageous when the dependence signal is sparse, meaning it is concentrated in only a few marginal pairs."],
+    "relevant_chunks": ["2001.01095v4::abstract::fixed_0014"]
+  },
+  {
+    "query_id": "p5_q3_sc",
+    "paper_id": "2001.01095v4",
+    "query_type": "single_chunk",
+    "query_text": "What is the limiting null distribution of the average distance correlation statistic according to Theorem 4?",
+    "answer_text": ["Theorem 4 states that as both n and pq go to infinity, the statistic n*sqrt(pq)*ADcorn(X, Y) converges to a Normal distribution with mean 0 and variance 2."],
+    "relevant_chunks": ["2001.01095v4::abstract::fixed_0015"]
+  },
+  {
+    "query_id": "p6_q1_sc",
+    "paper_id": "2305.02381v2",
+    "query_type": "single_chunk",
+    "query_text": "What is the 'vertex dynamic statistic' and what does it measure?",
+    "answer_text": ["The vertex dynamic statistic for a vertex i at time t is calculated as 1 minus the inner product of its normalized embedding at time t and its embedding at a reference time. It measures the deviation in a vertex's communication pattern from the reference time point."],
+    "relevant_chunks": ["2305.02381v2::front-matter::fixed_0007"]
+  },
+  {
+    "query_id": "p6_q2_sc",
+    "paper_id": "2305.02381v2",
+    "query_type": "single_chunk",
+    "query_text": "According to Theorem 1, what does the temporal encoder embedding converge to?",
+    "answer_text": ["Theorem 1 states that the temporal encoder embedding converges to a conditional expectation, which represents the normalized average connectivity of a vertex to each community."],
+    "relevant_chunks": ["2305.02381v2::front-matter::fixed_0019"]
+  },
+  {
+    "query_id": "p6_q3_sc",
+    "paper_id": "2305.02381v2",
+    "query_type": "single_chunk",
+    "query_text": "How was the Covid-19 pandemic's effect on a communication network analyzed in the paper?",
+    "answer_text": ["The paper applied temporal encoder embedding to a large-scale monthly communication network from 2019-2020 and used the resulting temporal dynamic statistics to detect and visualize communication pattern shifts at all levels of the network."],
+    "relevant_chunks": ["2305.02381v2::front-matter::fixed_0028"]
+  },
+  {
+    "query_id": "p7_q1_sc",
+    "paper_id": "2307.13868v2",
+    "query_type": "single_chunk",
+    "query_text": "What is the definition of a 'K-sample conditional discrepancy'?",
+    "answer_text": ["A K-sample conditional discrepancy exists if for some groups k and l, and some covariate value x, the conditional distribution of the outcome y differs between the groups, i.e., Fyi|k,x ≠ Fyi|l,x."],
+    "relevant_chunks": ["2307.13868v2::front-matter::fixed_0007"]
+  },
+  {
+    "query_id": "p7_q2_sc",
+    "paper_id": "2307.13868v2",
+    "query_type": "single_chunk",
+    "query_text": "What is the purpose of the Vector Matching (VM) technique?",
+    "answer_text": ["Vector Matching (VM) is used to preprocess observational data to better satisfy the positivity assumption by trimming subjects whose treatment assignment is nearly deterministic based on their covariates, thus ensuring common covariate support across groups."],
+    "relevant_chunks": ["2307.13868v2::2-the-treatment-assignments-are-positive-for-all-levels-of-the-covariates-p::fixed_0031"]
+  },
+  {
+    "query_id": "p7_q3_sc",
+    "paper_id": "2307.13868v2",
+    "query_type": "single_chunk",
+    "query_text": "What is the 'fundamental problem of causal inference'?",
+    "answer_text": ["The 'fundamental problem of causal inference' is that we only observe the outcome for the treatment an individual actually received, and cannot observe the counterfactual outcomes for the treatments they did not receive."],
+    "relevant_chunks": ["2307.13868v2::front-matter::fixed_0014"]
+  },
+  {
+    "query_id": "p8_q1_sc",
+    "paper_id": "2402.04403v1",
+    "query_type": "single_chunk",
+    "query_text": "What is the primary contribution of the paper 'Edge-Parallel Graph Encoder Embedding'?",
+    "answer_text": ["The paper contributes a parallel implementation of the Graph Encoder Embedding (GEE) algorithm in the Ligra graph engine, which significantly speeds up the process using edge maps and lock-free atomic instructions."],
+    "relevant_chunks": ["2402.04403v1::front-matter::fixed_0001"]
+  },
+  {
+    "query_id": "p8_q2_sc",
+    "paper_id": "2402.04403v1",
+    "query_type": "single_chunk",
+    "query_text": "What speedup did the GEE-Ligra implementation achieve on the soc-orkut graph?",
+    "answer_text": ["The GEE-Ligra implementation achieved a speedup of 1897 times over the original GEE-Python implementation on the soc-orkut graph."],
+    "relevant_chunks": ["2402.04403v1::front-matter::fixed_0009"]
+  },
+  {
+    "query_id": "p8_q3_sc",
+    "paper_id": "2402.04403v1",
+    "query_type": "single_chunk",
+    "query_text": "How does the GEE algorithm handle undirected graphs?",
+    "answer_text": ["Undirected graphs are treated as two symmetric directed graphs."],
+    "relevant_chunks": ["2402.04403v1::front-matter::fixed_0005"]
+  },
+  {
+    "query_id": "p9_q1_sc",
+    "paper_id": "2406.02189v2",
+    "query_type": "single_chunk",
+    "query_text": "What is the key optimization in the 'Fast Multi-Kernel Encoder Classifier'?",
+    "answer_text": ["It uses a proxy matrix U (class-wise conditional expectation of the data) and only calculates pairwise kernels between the data X and U, which reduces kernel computation complexity from O(n^2) to O(nK)."],
+    "relevant_chunks": ["2406.02189v2::introduction::fixed_0009"]
+  },
+  {
+    "query_id": "p9_q2_sc",
+    "paper_id": "2406.02189v2",
+    "query_type": "single_chunk",
+    "query_text": "Under what condition is linear discriminant analysis the Bayes optimal classifier for the embedding variable Z?",
+    "answer_text": ["If the input data X is a mixture of normal distributions where each component has the same variance matrix, then the resulting embedding Z is also a mixture of normal distributions with a shared variance, making LDA the Bayes optimal classifier."],
+    "relevant_chunks": ["2406.02189v2::introduction::fixed_0013"]
+  },
+  {
+    "query_id": "p9_q3_sc",
+    "paper_id": "2406.02189v2",
+    "query_type": "single_chunk",
+    "query_text": "What is the time complexity of the fast multi-kernel encoder classifier?",
+    "answer_text": ["The optimized method has a time complexity of O(MKnp), where M is the number of kernels, K is the number of classes, n is the number of samples, and p is the number of features."],
+    "relevant_chunks": ["2406.02189v2::introduction::fixed_0009"]
+  },
+  {
+    "query_id": "p10_q1_sc",
+    "paper_id": "2406.03726v1",
+    "query_type": "single_chunk",
+    "query_text": "What specific data structure does 'sparse GEE' use to improve efficiency?",
+    "answer_text": ["The 'sparse GEE' method uses the Compressed Sparse Row (CSR) data structure to calculate the embedding matrix and the Dictionary of Keys (DOK) data structure for intermediate results."],
+    "relevant_chunks": ["2406.03726v1::3-method::fixed_0009"]
+  },
+  {
+    "query_id": "p10_q2_sc",
+    "paper_id": "2406.03726v1",
+    "query_type": "single_chunk",
+    "query_text": "How is the weight matrix W generated in the GEE algorithm?",
+    "answer_text": ["The weight matrix W is a normalized one-hot encoding. For any node j belonging to class k, its weight vector Wj is [0 ... 1/nk ... 0], where nk is the total node count of class k."],
+    "relevant_chunks": ["2406.03726v1::2-previous-work::fixed_0005"]
+  },
+  {
+    "query_id": "p10_q3_sc",
+    "paper_id": "2406.03726v1",
+    "query_type": "single_chunk",
+    "query_text": "What is 'Edge Density' and how is it calculated?",
+    "answer_text": ["Edge Density is a measure of a graph's sparsity, calculated as d = 2|E| / (|V| * (|V| - 1)), where |E| is the number of edges and |V| is the number of nodes."],
+    "relevant_chunks": ["2406.03726v1::4-evaluations::fixed_0014"]
+  },
+  {
+    "query_id": "p11_q1_sc",
+    "paper_id": "2501.14932v1",
+    "query_type": "single_chunk",
+    "query_text": "What does the graph covariance Σt(u, v) quantify?",
+    "answer_text": ["The graph covariance Σt(u, v) quantifies the dependence between binary features u and v at a specific timestamp t. It is calculated as At(u, v) - At(u, u) * At(v, v), where At is the normalized co-occurrence frequency graph."],
+    "relevant_chunks": ["2501.14932v1::2-main-method::fixed_0010"]
+  },
+  {
+    "query_id": "p11_q2_sc",
+    "paper_id": "2501.14932v1",
+    "query_type": "single_chunk",
+    "query_text": "What theoretical property of the graph covariance is established in Theorem 1?",
+    "answer_text": ["Theorem 1 establishes that the graph covariance is a consistent dependence measure for Bernoulli random variables, converging to zero if and only if the two binary features are independent."],
+    "relevant_chunks": ["2501.14932v1::3-mathematical-theory::fixed_0018"]
+  },
+  {
+    "query_id": "p11_q3_sc",
+    "paper_id": "2501.14932v1",
+    "query_type": "single_chunk",
+    "query_text": "What is the computational complexity of the proposed graph covariance algorithm?",
+    "answer_text": ["The algorithm has a computational complexity of O(np1), which scales linearly with the total number of samples (n) and the number of binary features (p1)."],
+    "relevant_chunks": ["2501.14932v1::2-main-method::fixed_0015"]
+  },
+  {
+    "query_id": "p12_q1_sc",
+    "paper_id": "2501.14939v2",
+    "query_type": "single_chunk",
+    "query_text": "What is the role of the sample community score in the P-GEE algorithm?",
+    "answer_text": ["The sample community score ranks the importance of each community, helping to estimate a set of 'principal communities' whose dimensions are retained in the final embedding for dimension reduction."],
+    "relevant_chunks": ["2501.14939v2::front-matter::fixed_0001"]
+  },
+  {
+    "query_id": "p12_q2_sc",
+    "paper_id": "2501.14939v2",
+    "query_type": "single_chunk",
+    "query_text": "How does the P-GEE algorithm handle vertices with unknown labels?",
+    "answer_text": ["Vertices with unknown labels are assigned a dummy category of 0, resulting in their corresponding rows in the weight matrix W being zero vectors, meaning they are still embedded but do not contribute to the initial construction of the embedding space."],
+    "relevant_chunks": ["2501.14939v2::front-matter::fixed_0007"]
+  },
+  {
+    "query_id": "p12_q3_sc",
+    "paper_id": "2501.14939v2",
+    "query_type": "single_chunk",
+    "query_text": "What is a 'redundant community' according to Definition 3?",
+    "answer_text": ["A community k is a redundant community if the variance of the expected connectivity to it is zero, specifically when Var(E(δ(X, Uk) | X)) = 0."],
+    "relevant_chunks": ["2501.14939v2::front-matter::fixed_0018"]
+  },
+  {
+    "query_id": "p13_q1_sc",
+    "paper_id": "2506.06845v1",
+    "query_type": "single_chunk",
+    "query_text": "What are the two primary limitations of classical Linear Discriminant Analysis (LDA)?",
+    "answer_text": ["The two limitations are its reliance on Gaussian assumptions and the instability of covariance matrix estimation in high-dimensional settings."],
+    "relevant_chunks": ["2506.06845v1::1-introduction::fixed_0003"]
+  },
+  {
+    "query_id": "p13_q2_sc",
+    "paper_id": "2506.06845v1",
+    "query_type": "single_chunk",
+    "query_text": "How does LDA-GO ensure the learned inverse covariance matrix remains symmetric and positive semi-definite?",
+    "answer_text": ["It parametrizes the inverse covariance matrix as Σ⁻¹ = LLᵀ, using a Cholesky-like factorization, which guarantees the resulting matrix is always symmetric and positive semi-definite."],
+    "relevant_chunks": ["2506.06845v1::1-introduction::fixed_0004"]
+  },
+  {
+    "query_id": "p13_q3_sc",
+    "paper_id": "2506.06845v1",
+    "query_type": "single_chunk",
+    "query_text": "What is the formula for the gradient of the loss L with respect to the inverse covariance matrix Σ⁻¹?",
+    "answer_text": ["The gradient is ∂L/∂Σ⁻¹ = -1/n * Σ_{i=1 to n} Σ_{k=1 to K} (Yik - Pik) * [xiμkᵀ + μkxiᵀ - μkμkᵀ]."],
+    "relevant_chunks": ["2506.06845v1::3-2-gradient-with-respect-to-covariance-inverse::fixed_0011"]
+  },
+  {
+    "query_id": "p14_q1_sc",
+    "paper_id": "2507.10215v2",
+    "query_type": "single_chunk",
+    "query_text": "What is a 'region-separated random variable'?",
+    "answer_text": ["A random variable X is region-separated if its support can be partitioned into a finite number of regions, and within each region, the conditional distribution of the target variable Y given X is constant."],
+    "relevant_chunks": ["2507.10215v2::preliminaries::fixed_0033"]
+  },
+  {
+    "query_id": "p14_q2_sc",
+    "paper_id": "2507.10215v2",
+    "query_type": "single_chunk",
+    "query_text": "How does the paper interpret a fully connected layer from a graph-theoretic perspective?",
+    "answer_text": ["It interprets the output as a generalized similarity graph, where each neuron computes a pairwise function between the input variable X and a set of learned 'anchor points' (the weight vectors)."],
+    "relevant_chunks": ["2507.10215v2::preliminaries::fixed_0016"]
+  },
+  {
+    "query_id": "p14_q3_sc",
+    "paper_id": "2507.10215v2",
+    "query_type": "single_chunk",
+    "query_text": "What does Theorem 8.3 state about the optimal classification error for a ReLU network on an ε-region-separated variable?",
+    "answer_text": ["Theorem 8.3 states that the difference in Bayes-optimal classification error between using the network's representation and the original data is bounded by ε, i.e., |Err*(Z) - Err*(X)| ≤ ε."],
+    "relevant_chunks": ["2507.10215v2::preliminaries::fixed_0042"]
+  },
+  {
+    "query_id": "p15_q1_sc",
+    "paper_id": "2507.11732v1",
+    "query_type": "single_chunk",
+    "query_text": "What is the GEE-powered GNN (GG) method?",
+    "answer_text": ["The GG method uses embeddings from the one-hot graph encoder embedding (GEE) as initial node features for a standard Graph Convolutional Network (GCN) to improve performance."],
+    "relevant_chunks": ["2507.11732v1::front-matter::fixed_0001"]
+  },
+  {
+    "query_id": "p15_q2_sc",
+    "paper_id": "2507.11732v1",
+    "query_type": "single_chunk",
+    "query_text": "What is the architecture of the GG-C variant for node classification?",
+    "answer_text": ["The GG-C variant concatenates the final GNN-refined embeddings from the GG model with the initial supervised GEE embeddings, and passes this combined representation to a Linear Discriminant Analysis (LDA) classifier."],
+    "relevant_chunks": ["2507.11732v1::front-matter::fixed_0026"]
+  },
+  {
+    "query_id": "p15_q3_sc",
+    "paper_id": "2507.11732v1",
+    "query_type": "single_chunk",
+    "query_text": "What is the DMoN loss function used for in the GNN architecture?",
+    "answer_text": ["The DMoN loss function combines spectral modularity maximization to encourage dense within-class connections with a regularization term to prevent trivial solutions like cluster collapse."],
+    "relevant_chunks": ["2507.11732v1::front-matter::fixed_0009"]
+  },
+  {
+    "query_id": "p16_q1_sc",
+    "paper_id": "3625403.3625407",
+    "query_type": "single_chunk",
+    "query_text": "What is the Minimal Rank Index (MRI) and how is it calculated?",
+    "answer_text": ["The Minimal Rank Index (MRI) is a rank-based measure of clustering quality, calculated as the proportion of vertices that are not closest to their own cluster's mean in the embedding space."],
+    "relevant_chunks": ["3625403.3625407::introduction::fixed_0012"]
+  },
+  {
+    "query_id": "p16_q2_sc",
+    "paper_id": "3625403.3625407",
+    "query_type": "single_chunk",
+    "query_text": "What is the time complexity of the Graph Encoder Ensemble algorithm?",
+    "answer_text": ["The algorithm has a linear time complexity of O(rm(n*max(R) + s)), where n is vertices, s is edges, r is replicates, m is iterations, and R is the cluster size range."],
+    "relevant_chunks": ["3625403.3625407::introduction::fixed_0013"]
+  },
+  {
+    "query_id": "p16_q3_sc",
+    "paper_id": "3625403.3625407",
+    "query_type": "single_chunk",
+    "query_text": "Why is L2 normalization important for the graph encoder embedding?",
+    "answer_text": ["L2 normalization scales each vertex embedding to a unit norm, which mitigates the influence of varying vertex degrees, leading to better separation of communities in sparse or heterogeneous graphs."],
+    "relevant_chunks": ["3625403.3625407::introduction::fixed_0009"]
+  },
+  {
+    "query_id": "p1_q19_mc",
+    "paper_id": "1806.05514v5",
+    "query_type": "multi_chunk",
+    "query_text": "How does the paper's spectral clustering experiment demonstrate the superiority of the bijective transformation over the fixed-point transformation?",
+    "answer_text": ["The experiment shows that the bijective induced kernel produces a clear block structure in the kernel matrix, leading to a perfect clustering result. In contrast, the fixed-point induced kernel creates a distorted, non-rank-preserving, and non-translation-invariant matrix, which causes many observations to be grouped incorrectly by the spectral clustering algorithm."],
+    "relevant_chunks": ["1806.05514v5::experiments::fixed_0027", "1806.05514v5::experiments::fixed_0028"]
+  },
+  {
+    "query_id": "p2_q19_mc",
+    "paper_id": "1710.09768v3",
+    "query_type": "multi_chunk",
+    "query_text": "How does the Sample MGC algorithm's thresholding step work, and what is the theoretical motivation for the improved threshold choice?",
+    "answer_text": ["The thresholding step identifies the largest connected component (R) of local correlations that exceed a threshold τn. The improved threshold choice is motivated by the limiting null distribution of DCORR, which approximates a Beta distribution. This provides a reliable, data-adaptive bound to eliminate local correlations that are large purely by chance, ensuring τn converges to 0 as n increases."],
+    "relevant_chunks": ["1710.09768v3::introduction::fixed_0030", "1710.09768v3::introduction::fixed_0035"]
+  },
+  {
+    "query_id": "p3_q19_mc",
+    "paper_id": "1907.02088v7",
+    "query_type": "multi_chunk",
+    "query_text": "What are two nonparametric alternatives for two-sample and K-sample testing mentioned in the `hyppo` paper?",
+    "answer_text": ["For two-sample testing, the paper mentions Energy and maximal mean discrepancy (MMD) as nonparametric alternatives. For K-sample testing, it mentions multivariate k-sample Heller Heller Gorfine and Distance Components (DISCO)."],
+    "relevant_chunks": ["1907.02088v7::front-matter::fixed_0001", "1907.02088v7::front-matter::fixed_0002"]
+  },
+  {
+    "query_id": "p4_q19_mc",
+    "paper_id": "1910.08883v5",
+    "query_type": "multi_chunk",
+    "query_text": "Explain the sample transformation for the K-sample problem and why the probabilities {πk} can be chosen based on sample size.",
+    "answer_text": ["The sample transformation involves concatenating all K sample data matrices to form a single matrix U and creating a one-hot encoding matrix V to label the source of each sample. The probabilities {πk} in the population transformation correspond to the mixture probabilities. At the sample level, these are naturally chosen based on the proportion of samples from each group, i.e., πk = nk/n, where nk is the size of sample k and n is the total sample size."],
+    "relevant_chunks": ["1910.08883v5::2-3-sample-method::fixed_0012", "1910.08883v5::2-3-sample-method::fixed_0013"]
+  },
+  {
+    "query_id": "p5_q19_mc",
+    "paper_id": "2001.01095v4",
+    "query_type": "multi_chunk",
+    "query_text": "Compare the computational complexity of the proposed chi-square test for marginal-based methods with the original (non-marginal) distance correlation.",
+    "answer_text": ["The proposed chi-square test for marginal-based methods has a computational complexity of O(pq * n log n). In contrast, the original (non-marginal) distance correlation has a complexity of O((p + q) * n^2), which is practically treated as O(n^2) because the distance matrix is computed only twice. Therefore, the marginal-based methods can be computationally slower, trading speed for potential gains in statistical power in high dimensions."],
+    "relevant_chunks": ["2001.01095v4::abstract::fixed_0018", "2001.01095v4::abstract::fixed_0019"]
+  },
+  {
+    "query_id": "p6_q19_mc",
+    "paper_id": "2305.02381v2",
+    "query_type": "multi_chunk",
+    "query_text": "How does the temporal encoder embedding method handle situations where vertex labels are either unavailable or change over time?",
+    "answer_text": ["If labels change over time, the paper recommends using the label vector from a single reference time point consistently across all graphs to isolate changes in edge connectivity. If partial or no labels are known, unknown labels can be assigned a value of 0 (unused), or a label vector can be estimated at the reference time using a method like the iterative ensemble version of encoder embedding or algorithms like Leiden or Louvain."],
+    "relevant_chunks": ["2305.02381v2::front-matter::fixed_0010", "2305.02381v2::front-matter::fixed_0011"]
+  },
+  {
+    "query_id": "p7_q19_mc",
+    "paper_id": "2307.13868v2",
+    "query_type": "multi_chunk",
+    "query_text": "What are the 'ignorability' and 'positivity' assumptions in causal inference, and how are they handled in observational studies according to the paper?",
+    "answer_text": ["Ignorability assumes that treatment assignment is independent of potential outcomes, conditional on observed covariates (no unmeasured confounding). Positivity assumes that for any covariate level, there is a non-zero probability of receiving any treatment. In observational studies, ignorability is an untestable assumption, while positivity is addressed practically through matching techniques like Vector Matching (VM) to create a subsample where covariate distributions overlap across treatment groups."],
+    "relevant_chunks": ["2307.13868v2::front-matter::fixed_0014", "2307.13868v2::2-the-treatment-assignments-are-positive-for-all-levels-of-the-covariates-p::fixed_0030"]
+  },
+  {
+    "query_id": "p8_q19_mc",
+    "paper_id": "2402.04403v1",
+    "query_type": "multi_chunk",
+    "query_text": "Explain the role of the Ligra framework's `edgeMap` and `writeAdd` functions in parallelizing the GEE algorithm.",
+    "answer_text": ["The `edgeMap` function in Ligra is used to apply a user-defined function (in this case, `updateEmb`) in parallel to every outbound edge from a given set of vertices (the frontier). The `writeAdd` function performs a lock-free atomic increment, which is crucial for preventing data races when multiple parallel threads attempt to update the same entry in the embedding matrix Z simultaneously."],
+    "relevant_chunks": ["2402.04403v1::front-matter::fixed_0006", "2402.04403v1::front-matter::fixed_0007"]
+  },
+  {
+    "query_id": "p9_q19_mc",
+    "paper_id": "2406.02189v2",
+    "query_type": "multi_chunk",
+    "query_text": "What is the theoretical interpretation of the matrix U in the fast algorithm, and what does the embedding variable Z represent in the population setting?",
+    "answer_text": ["The matrix U used in the fast algorithm is the sample estimate of a population matrix U, where each row U(k, :) is the conditional expectation of the data X given the class label Y=k. The resulting embedding variable Z is a K-dimensional random variable where each component Zj is the kernel function applied to the input variable X and the j-th row of the population matrix U: Zj = δ(X, U(j, :))."],
+    "relevant_chunks": ["2406.02189v2::introduction::fixed_0011"]
+  },
+  {
+    "query_id": "p10_q19_mc",
+    "paper_id": "2406.03726v1",
+    "query_type": "multi_chunk",
+    "query_text": "What are the three additional options offered by GEE, and which one is the most computationally expensive?",
+    "answer_text": ["The three options are diagonal augmentation, Laplacian normalization, and correlation. Laplacian normalization is the most computationally expensive because it requires more operations than the other options, including constructing the degree matrix, powering it, and performing additional dot products to calculate the final embedding."],
+    "relevant_chunks": ["2406.03726v1::2-previous-work::fixed_0006", "2406.03726v1::4-2-real-datasets::fixed_0016"]
+  },
+  {
+    "query_id": "p11_q19_mc",
+    "paper_id": "2501.14932v1",
+    "query_type": "multi_chunk",
+    "query_text": "Describe the two schemes (δ1 and δ2) for identifying significant feature pairs and explain the difference in their calculation.",
+    "answer_text": ["The two schemes are for detecting common interactions (δ1) and spiked interactions (δ2). The key difference is the denominator in their calculation. δ1 averages the significant graph covariance values over all timestamps (T), making it sensitive to persistent trends. δ2 averages over only the number of timestamps where the interaction was significant, making it more sensitive to strong, sudden spikes of dependence."],
+    "relevant_chunks": ["2501.14932v1::2-main-method::fixed_0010", "2501.14932v1::2-main-method::fixed_0011"]
+  },
+  {
+    "query_id": "p12_q19_mc",
+    "paper_id": "2501.14939v2",
+    "query_type": "multi_chunk",
+    "query_text": "Explain the role of normalization in the P-GEE algorithm and its connection to spectral embedding.",
+    "answer_text": ["Normalization projects each vertex embedding onto a unit sphere. This eliminates degree differences, which often leads to better separation between communities, especially in heterogeneous graphs. This effect is analogous to the relationship between Adjacency Spectral Embedding (ASE) and Laplacian Spectral Embedding (LSE), where the normalization in LSE often improves performance on sparse graphs."],
+    "relevant_chunks": ["2501.14939v2::front-matter::fixed_0006"]
+  },
+  {
+    "query_id": "p13_q19_mc",
+    "paper_id": "2506.06845v1",
+    "query_type": "multi_chunk",
+    "query_text": "Explain the setup of Simulation 10 (Sparse Signal Separation with Heterogeneous Dimension Blocks) and why it challenges the assumptions of classical LDA.",
+    "answer_text": ["Simulation 10 creates a 500-dimensional dataset with three blocks: an informative block (dims 1-20) with a mean shift between classes, a correlated noise block (dims 21-40) with a Toeplitz covariance structure shared by both classes, and a heteroskedastic noise block (dims 41-500) where classes have zero mean but differing diagonal covariances. This setup challenges classical LDA's assumption of a single, shared covariance matrix across all dimensions and classes."],
+    "relevant_chunks": ["2506.06845v1::5-simulations::fixed_0024", "2506.06845v1::5-simulations::fixed_0025", "2506.06845v1::5-simulations::fixed_0026"]
+  },
+{
+    "query_id": "p14_q19_mc",
+    "paper_id": "2507.10215v2",
+    "query_type": "multi_chunk",
+    "query_text": "What is a 'region-separating transformation' and why is it a weaker condition than injectivity?",
+    "answer_text": [
+      "A region-separating transformation T maps inputs from different predefined regions (where the conditional outcome distribution P(Y|X) is constant) to distinct outputs. It is a weaker condition than injectivity because it only requires that T(x) ≠ T(x') when x and x' are in different regions; it allows the transformation to collapse all points within the same region to a single output value, whereas injectivity requires T(x) ≠ T(x') for all distinct x and x'."
+    ],
+    "relevant_chunks": [
+      "2507.10215v2::preliminaries::fixed_0033",
+      "2507.10215v2::preliminaries::fixed_0034"
+    ]
+  },
+  {
+    "query_id": "p15_q19_mc",
+    "paper_id": "2507.11732v1",
+    "query_type": "multi_chunk",
+    "query_text": "What is the theoretical motivation behind using GEE as an initialization for GNNs, as explained in the paper?",
+    "answer_text": ["Directly optimizing modularity for clustering is NP-hard due to a 'rugged' optimization landscape with many local optima. A GNN reframes this as a continuous optimization problem. The theoretical motivation is that GEE, being statistically consistent and converging to latent positions, provides a high-quality, structurally-informed initialization that places the GNN in a promising region of this smoother landscape, allowing it to avoid poor local optima and fine-tune its way to a superior solution."],
+    "relevant_chunks": ["2507.11732v1::front-matter::fixed_0010", "2507.11732v1::front-matter::fixed_0011"]
+  },
+  {
+    "query_id": "p16_q19_mc",
+    "paper_id": "3625403.3625407",
+    "query_type": "multi_chunk",
+    "query_text": "Explain the Minimal Rank Index (MRI) and why it is preferred over distance-based measures like the Silhouette Score in this algorithm.",
+    "answer_text": ["The Minimal Rank Index (MRI) is a rank-based measure that counts the proportion of vertices not closest to their assigned cluster's mean. It is preferred over distance-based measures like the Silhouette Score because the graph encoder embedding's dimension is equal to the number of communities (k). This causes within-cluster distances to become smaller for smaller k, which would bias distance-based measures to always select the smallest possible cluster size."],
+    "relevant_chunks": ["3625403.3625407::introduction::fixed_0012", "3625403.3625407::introduction::fixed_0013"]
+  },
+  {
+    "query_id": "p1_q20_mc",
+    "paper_id": "1806.05514v5",
+    "query_type": "multi_chunk",
+    "query_text": "What is the key difference between the testing equivalence provided by the fixed-point transformation and the bijective transformation for unbiased statistics?",
+    "answer_text": ["The testing equivalence for the biased statistics holds under both transformations. However, for the unbiased statistics, the equivalence (yielding the same p-value) does not hold for the fixed-point transformation because the remainder term is dependent on the choice of the fixed point and is not invariant to permutation. In contrast, the bijective transformation provides testing equivalence for the unbiased methods, with a remainder term that is invariant to permutation."],
+    "relevant_chunks": ["1806.05514v5::7-translation-invariant-when-d-is-translation-invariant-kd-is-also-translation::fixed_0021", "1806.05514v5::7-translation-invariant-when-d-is-translation-invariant-kd-is-also-translation::fixed_0022"]
+  },
+  {
+    "query_id": "p2_q20_mc",
+    "paper_id": "1710.09768v3",
+    "query_type": "multi_chunk",
+    "query_text": "Why is the domain of the population local correlation limited to S_ε, and what does Theorem 3 state about this set?",
+    "answer_text": ["The domain needs to be limited to S_ε, where the local variances are above a small positive ε, to ensure the population local correlation is well-behaved and avoid division by zero (e.g., when a random variable is constant or the scale ρk is 0). Theorem 3 states that this set S_ε is always non-empty (unless a variable is constant) and compact, which guarantees the existence of the population MGC."],
+    "relevant_chunks": ["1710.09768v3::introduction::fixed_0013", "1710.09768v3::introduction::fixed_0016"]
+  },
+  {
+    "query_id": "p3_q20_mc",
+    "paper_id": "1907.02088v7",
+    "query_type": "multi_chunk",
+    "query_text": "Explain what the dHsic test and the KSample Hhg test are designed for.",
+    "answer_text": ["The dHsic test is a d-variate independence test based on the Hilbert-Schmidt Independence Criterion (Hsic). The KSample Hhg test is a k-sample test for the Heller-Heller-Gorfine (Hhg) method."],
+    "relevant_chunks": ["1907.02088v7::front-matter::fixed_0005"]
+  },
+  {
+    "query_id": "p4_q20_mc",
+    "paper_id": "1910.08883v5",
+    "query_type": "multi_chunk",
+    "query_text": "How does the paper's framework connect Dcov to the K-sample Disco statistic, and under what condition are they equivalent?",
+    "answer_text": ["The framework shows that the sample Dcov applied to the transformed data is a weighted sum of pairwise two-sample energy statistics between all pairs of the K groups. The Disco statistic is also a weighted sum of these statistics. They become equivalent (up to a scaling factor) under the condition that all sample sizes are equal (n1 = n2 = ... = nK)."],
+    "relevant_chunks": ["1910.08883v5::2-4-sample-properties::fixed_0017", "1910.08883v5::2-4-sample-properties::fixed_0018"]
+  },
+  {
+    "query_id": "p5_q20_mc",
+    "paper_id": "2001.01095v4",
+    "query_type": "multi_chunk",
+    "query_text": "What is the fundamental difference between testing for mutual independence within a vector Z = [X, Y] and testing for independence between vectors X and Y?",
+    "answer_text": ["Testing for mutual independence within Z requires that all components of Z are mutually independent (FX = Π FXj). Testing for independence between X and Y only requires that the joint distribution factorizes as FXY = FX * FY, and does not impose any constraints on the dependence structure within X or within Y. Therefore, applying a mutual independence test to Z is not a valid method for testing whether X is independent of Y."],
+    "relevant_chunks": ["2001.01095v4::abstract::fixed_0008", "2001.01095v4::abstract::fixed_0009"]
+  },
+  {
+    "query_id": "p6_q20_mc",
+    "paper_id": "2305.02381v2",
+    "query_type": "multi_chunk",
+    "query_text": "Explain why the temporal encoder embedding is computationally stable and does not require graph alignment.",
+    "answer_text": ["The method is computationally stable because it does not require complex parameter tuning, random-walk schemes, or graph alignment. The embedding is deterministic; the same graph will always produce the same embedding because the method directly estimates the average connectivity based on the provided labels, rather than relying on a stochastic process."],
+    "relevant_chunks": ["2305.02381v2::front-matter::fixed_0005", "2305.02381v2::front-matter::fixed_0006"]
+  },
+  {
+    "query_id": "p7_q20_mc",
+    "paper_id": "2307.13868v2",
+    "query_type": "multi_chunk",
+    "query_text": "What is 'effect aliasing' as described in the simulation results, and which tests were particularly susceptible to it?",
+    "answer_text": ["'Effect aliasing' occurs when a test incorrectly detects an effect due to confounding from disparate covariate distributions, rather than a true treatment effect. In the simulations, unconditional tests like Dcorr and cDcorr (without causal preprocessing) were particularly susceptible. For example, in the sigmoidal simulation with an effect size of 0, they showed high power (high Type I error rate) simply because the covariate distributions differed between groups, aliasing the outcome/covariate effect with an outcome/group effect."],
+    "relevant_chunks": ["2307.13868v2::4-2-the-effects-of-this-pre-processing-step-are-indicated-in-figure-1-b-note-that-vm-pre-processes::fixed_0042", "2307.13868v2::4-2-the-effects-of-this-pre-processing-step-are-indicated-in-figure-1-b-note-that-vm-pre-processes::fixed_0043"]
+  },
+  {
+    "query_id": "p8_q20_mc",
+    "paper_id": "2402.04403v1",
+    "query_type": "multi_chunk",
+    "query_text": "What does the strong-scaling performance analysis on the Friendster graph reveal about the GEE-Ligra algorithm?",
+    "answer_text": ["The strong-scaling analysis shows that the GEE-Ligra algorithm exhibits good scalability, achieving an 11 times speedup on 24 cores. The performance is likely memory-bound rather than compute-bound, as there is little computation per edge, which is consistent with the scaling results of other memory-bound graph algorithms."],
+    "relevant_chunks": ["2402.04403v1::front-matter::fixed_0010", "2402.04403v1::front-matter::fixed_0011"]
+  },
+  {
+    "query_id": "p9_q20_mc",
+    "paper_id": "2406.02189v2",
+    "query_type": "multi_chunk",
+    "query_text": "What does the 'Uniform Transformed' simulation entail, and how did the two-layer neural network perform on it compared to other methods?",
+    "answer_text": ["The 'Uniform Transformed' simulation starts with a high-dimensional uniform distribution where the signal is in specific dimensions, and then applies a random transformation matrix Q to the data (X = X*Q). The two-layer neural network performed significantly worse on this simulation compared to the linear encoder, multi-kernel encoder, and SVM, which all converged to zero error."],
+    "relevant_chunks": ["2406.02189v2::experiments::fixed_0017", "2406.02189v2::experiments::fixed_0018"]
+  },
+  {
+    "query_id": "p10_q20_mc",
+    "paper_id": "2406.03726v1",
+    "query_type": "multi_chunk",
+    "query_text": "What is the core calculation of the GEE algorithm and how does the sparse GEE implementation optimize it?",
+    "answer_text": ["The core calculation is the matrix multiplication Z = AW, where A is the adjacency matrix and W is a normalized one-hot encoding matrix. The sparse GEE implementation optimizes this by representing both A and W (and other intermediate matrices like the degree and identity matrices) using efficient sparse data structures (primarily Compressed Sparse Row), which saves space and avoids unnecessary computations involving zero entries."],
+    "relevant_chunks": ["2406.03726v1::2-previous-work::fixed_0005", "2406.03726v1::3-method::fixed_0009"]
+  },
+  {
+    "query_id": "p11_q20_mc",
+    "paper_id": "2501.14932v1",
+    "query_type": "multi_chunk",
+    "query_text": "Explain how the proposed method can be adapted for datasets without timestamps or with continuous features.",
+    "answer_text": ["For datasets without timestamps, all records can be treated as occurring at a single time point. For continuous features, they can be accommodated by discretizing their range into categories, effectively transforming them into categorical features before applying the one-hot encoding step."],
+    "relevant_chunks": ["2501.14932v1::2-main-method::fixed_0016"]
+  },
+  {
+    "query_id": "p12_q20_mc",
+    "paper_id": "2501.14939v2",
+    "query_type": "multi_chunk",
+    "query_text": "How did the P-GEE method perform on real-world data with noisy labels compared to the original GEE and ASE?",
+    "answer_text": ["In the noisy data experiment, where 10% of labels were randomized into noise classes, P-GEE consistently outperformed both GEE and ASE. It was nearly insusceptible to the label noise, achieving error rates close to the ideal error (best error on original data + 10%). For example, on the IMDB data, P-GEE's error was 10.2% compared to 28.3% for GEE."],
+    "relevant_chunks": ["2501.14939v2::front-matter::fixed_0034", "2501.14939v2::front-matter::fixed_0035"]
+  },
+  {
+    "query_id": "p13_q20_mc",
+    "paper_id": "2506.06845v1",
+    "query_type": "multi_chunk",
+    "query_text": "What is the gradient update rule for the matrix L in the LDA-GO algorithm?",
+    "answer_text": ["The gradient of the loss L with respect to the full inverse covariance matrix Σ⁻¹ is first calculated. Then, using the chain rule and the parametrization Σ⁻¹ = LLᵀ, the gradient with respect to L is computed as ∂L/∂L = 2 * (∂L/∂Σ⁻¹) * L. The update rule for L at each iteration is then L(t+1) ← L(t) - η * (∂L/∂L), where η is the learning rate."],
+    "relevant_chunks": ["2506.06845v1::3-3-backpropagation-through-cholesky-factorization::fixed_0012", "2506.06845v1::3-4-low-rank-extension::fixed_0013", "2506.06845v1::3-6-parameter-update::fixed_0017"]
+  },
+  {
+    "query_id": "p14_q20_mc",
+    "paper_id": "2507.10215v2",
+    "query_type": "multi_chunk",
+    "query_text": "What is the 'patch condition' required for a convolutional layer to be a region-separating transformation, and why is it essential?",
+    "answer_text": ["The patch condition requires that for any two distinct regions Ri and Rj, their corresponding fixed reference patches xi and xj must disagree on their shared support (the intersection of their receptive fields Qi and Qj). This is essential because if two regions had identical values on the overlapping coordinates, a filter focused on that region might produce the same output for both, failing to separate them. The condition ensures that there is a distinctive local signal for the filter to detect."],
+    "relevant_chunks": ["2507.10215v2::preliminaries::fixed_0046", "2507.10215v2::preliminaries::fixed_0049"]
+  },
+  {
+    "query_id": "p15_q20_mc",
+    "paper_id": "2507.11732v1",
+    "query_type": "multi_chunk",
+    "query_text": "What were the comparative results for clustering accuracy (ARI) on the LastFM and PolBlogs datasets?",
+    "answer_text": ["On the LastFM dataset, GG achieved the highest ARI of 0.409, followed by GEE at 0.341 and GNN at 0.274. On the PolBlogs dataset, GG also achieved the highest ARI of 0.821, outperforming GEE (0.812) and GNN (0.745)."],
+    "relevant_chunks": ["2507.11732v1::front-matter::fixed_0023"]
+  },
+  {
+    "query_id": "p16_q20_mc",
+    "paper_id": "3625403.3625407",
+    "query_type": "multi_chunk",
+    "query_text": "In the simulation comparing the ensemble vs. no-ensemble versions, what was the key finding regarding performance?",
+    "answer_text": ["The key finding was that the ensemble algorithm (using r=10 replicates) consistently achieved a higher mean Adjusted Rand Index (ARI) and, importantly, had a significantly lower standard deviation compared to the no-ensemble version (r=1). This demonstrates that the ensemble approach improves both accuracy and stability."],
+    "relevant_chunks": ["3625403.3625407::results::fixed_0016", "3625403.3625407::results::fixed_0018"]
+  }
+,
+{
+    "query_id": "p1_q21_mc",
+    "paper_id": "1806.05514v5",
+    "query_type": "multi_chunk",
+    "query_text": "Explain the concepts of 'distance correlation' and 'Hilbert-Schmidt independence criterion' and what common goal they share in hypothesis testing.",
+    "answer_text": [
+      "Distance correlation is a distance-based method for testing independence between two random variables, computed via their pairwise Euclidean distance matrices. The Hilbert-Schmidt independence criterion is a kernel-based method that serves the same purpose, typically computed using a Gaussian kernel. Both are universally consistent for testing independence, meaning they are asymptotically zero if and only if the variables are independent."
+    ],
+    "relevant_chunks": [
+      "1806.05514v5::introduction::fixed_0002",
+      "1806.05514v5::introduction::fixed_0003"
+    ]
+  },
+  {
+    "query_id": "p2_q21_mc",
+    "paper_id": "1710.09768v3",
+    "query_type": "multi_chunk",
+    "query_text": "What is the key idea behind the Sample MGC algorithm's thresholding process, and what is it trying to mitigate?",
+    "answer_text": [
+      "The Sample MGC algorithm uses a smoothed maximum within the largest connected region of thresholded local correlations. The purpose is to mitigate the bias of taking a direct maximum of all sample local correlations, which would be positively biased under independence and could hurt testing power. The idea is that true dependence will show large correlations in a connected region of scales, while spurious correlations under independence will be isolated."
+    ],
+    "relevant_chunks": [
+      "1710.09768v3::introduction::fixed_0028",
+      "1710.09768v3::introduction::fixed_0029"
+    ]
+  },
+  {
+    "query_id": "p3_q21_mc",
+    "paper_id": "1907.02088v7",
+    "query_type": "multi_chunk",
+    "query_text": "What are two methods for conditional independence testing included in the `hyppo` package?",
+    "answer_text": [
+      "The `hyppo` package includes the Fast Conditional Independence Test and the Kernel Conditional Independence Test for performing conditional independence testing."
+    ],
+    "relevant_chunks": [
+      "1907.02088v7::front-matter::fixed_0005"
+    ]
+  },
+  {
+    "query_id": "p4_q21_mc",
+    "paper_id": "1910.08883v5",
+    "query_type": "multi_chunk",
+    "query_text": "Explain the population transformation proposed in Theorem 1 for converting a K-sample problem into an independence testing problem.",
+    "answer_text": [
+      "Theorem 1 proposes creating a mixture distribution U from the K random variables (U1, ..., UK) based on a multinomial random variable V. U takes the value of Uk if the kth outcome of V occurs. The theorem proves that the joint distribution F_UV factorizes into F_U * F_V (i.e., U and V are independent) if and only if all the original K distributions are identical (FU1 = FU2 = ... = FUK)."
+    ],
+    "relevant_chunks": [
+      "1910.08883v5::2-2-population-transformation::fixed_0010"
+    ]
+  },
+  {
+    "query_id": "p5_q21_mc",
+    "paper_id": "2001.01095v4",
+    "query_type": "multi_chunk",
+    "query_text": "Explain the difference in asymptotic consistency between the maximum and average distance correlation statistics in high-dimensional settings.",
+    "answer_text": [
+      "The maximum distance correlation (MDcorr) is asymptotically consistent as long as the number of dimension pairs (pq) grows slower than a specific exponential function of the sample size n (pq = o(sqrt(n)e^n)). The average distance correlation (ADcorr) is only consistent if the number of truly dependent dimensions (δ(X,Y)) grows proportionally to the total number of dimensions (δ(X,Y) = O(pq)). This makes MDcorr suitable for sparse signals and ADcorr suitable for dense signals."
+    ],
+    "relevant_chunks": [
+      "2001.01095v4::abstract::fixed_0013",
+      "2001.01095v4::abstract::fixed_0014"
+    ]
+  },
+  {
+    "query_id": "p6_q21_mc",
+    "paper_id": "2305.02381v2",
+    "query_type": "multi_chunk",
+    "query_text": "How is the 'community dynamic statistic' calculated, and what does it represent?",
+    "answer_text": [
+      "The community dynamic statistic for a community k is the average of the vertex dynamic statistics of all vertices within that community. It represents the overall change in communication patterns for that entire community relative to the reference time point."
+    ],
+    "relevant_chunks": [
+      "2305.02381v2::front-matter::fixed_0008"
+    ]
+  },
+  {
+    "query_id": "p7_q21_mc",
+    "paper_id": "2307.13868v2",
+    "query_type": "multi_chunk",
+    "query_text": "What is the relationship between a K-sample conditional discrepancy test and a K-sample causal conditional discrepancy test, and what assumptions are required to equate them?",
+    "answer_text": [
+      "Under the causal assumptions of ignorability and positivity, a consistent test for a K-sample conditional discrepancy (differences in observed outcomes conditional on treatment and covariates) is equivalent to a K-sample causal conditional discrepancy test (differences in potential outcomes conditional on covariates)."
+    ],
+    "relevant_chunks": [
+      "2307.13868v2::4-for-each-individual-the-treatment-assignment-mechanism-is-consistent-where-the-coun::fixed_0021",
+      "2307.13868v2::4-for-each-individual-the-treatment-assignment-mechanism-is-consistent-where-the-coun::fixed_0022"
+    ]
+  },
+  {
+    "query_id": "p8_q21_mc",
+    "paper_id": "2402.04403v1",
+    "query_type": "multi_chunk",
+    "query_text": "How does the GEE-Ligra implementation's runtime scale with the number of edges, and how does this compare to spectral embedding?",
+    "answer_text": [
+      "The GEE-Ligra implementation's runtime increases linearly with the number of edges. This is a significant performance improvement over spectral embedding, which has a computational complexity of O(n^3) or O(n^2 log n) and is limited by the efficiency of Singular Value Decomposition (SVD)."
+    ],
+    "relevant_chunks": [
+      "2402.04403v1::front-matter::fixed_0011",
+      "2402.04403v1::front-matter::fixed_0002"
+    ]
+  },
+  {
+    "query_id": "p9_q21_mc",
+    "paper_id": "2406.02189v2",
+    "query_type": "multi_chunk",
+    "query_text": "In the 'Fast Multi-Kernel Encoder Classifier', what is the purpose of the matrix U, and how is it computed?",
+    "answer_text": [
+      "The matrix U serves as a proxy for the entire dataset, representing the centroid (conditional expectation) for each class. It is computed by multiplying the transpose of the normalized one-hot encoding matrix W with the data matrix X (U = W^T * X). This allows the algorithm to compute kernels against this small K x p matrix instead of the full n x n data matrix, drastically reducing computation."
+    ],
+    "relevant_chunks": [
+      "2406.02189v2::introduction::fixed_0008",
+      "2406.02189v2::introduction::fixed_0009"
+    ]
+  },
+  {
+    "query_id": "p10_q21_mc",
+    "paper_id": "2406.03726v1",
+    "query_type": "multi_chunk",
+    "query_text": "What is the difference between the original GEE and the sparse GEE when handling intermediate matrices like the degree and identity matrices?",
+    "answer_text": [
+      "The original GEE uses an edge list to avoid storing the full adjacency matrix but may still instantiate dense intermediate matrices. Sparse GEE improves on this by using specialized sparse data structures, such as the Dictionary of Keys (DOK) and Compressed Sparse Row (CSR) formats, for these intermediate matrices, which saves significant space and avoids unnecessary operations on zero entries."
+    ],
+    "relevant_chunks": [
+      "2406.03726v1::3-method::fixed_0008",
+      "2406.03726v1::3-method::fixed_0009"
+    ]
+  },
+  {
+    "query_id": "p11_q21_mc",
+    "paper_id": "2501.14932v1",
+    "query_type": "multi_chunk",
+    "query_text": "How does the proposed method use one-hot encoding and matrix multiplication to efficiently compute the temporal graph At?",
+    "answer_text": [
+      "The method first transforms all categorical features into a p1-dimensional binary format using one-hot encoding. For each timestamp t, it extracts the corresponding n_t samples into a matrix X(t). The temporal graph At, which represents the normalized co-occurrence frequency of binary features, can then be computed efficiently via matrix multiplication as At = X(t)^T * X(t)."
+    ],
+    "relevant_chunks": [
+      "2501.14932v1::2-main-method::fixed_0008",
+      "2501.14932v1::2-main-method::fixed_0009"
+    ]
+  },
+  {
+    "query_id": "p12_q21_mc",
+    "paper_id": "2501.14939v2",
+    "query_type": "multi_chunk",
+    "query_text": "What is the difference between a Stochastic Block Model (SBM) and a Degree-Corrected Stochastic Block Model (DC-SBM)?",
+    "answer_text": [
+      "A standard SBM assumes all vertices within the same community have the same expected degree, often resulting in dense graphs. The DC-SBM is a generalization that accounts for the sparsity and degree heterogeneity of real graphs by assigning an additional degree parameter θi to each vertex, making the edge probability dependent on the degrees of both nodes."
+    ],
+    "relevant_chunks": [
+      "2501.14939v2::front-matter::fixed_0011",
+      "2501.14939v2::front-matter::fixed_0015"
+    ]
+  },
+  {
+    "query_id": "p13_q21_mc",
+    "paper_id": "2506.06845v1",
+    "query_type": "multi_chunk",
+    "query_text": "Explain the low-rank extension of LDA-GO and its dual role as a performance optimization and a form of regularization.",
+    "answer_text": [
+      "The low-rank extension parametrizes the inverse covariance matrix as Σ⁻¹ = LLᵀ, where L is a p x d matrix with d < p. This reduces the number of free parameters from O(p²) to p*d, providing a performance optimization. It also acts as an implicit regularization by constraining the discriminant projection to a d-dimensional subspace, which can reduce overfitting and improve performance when the true class separation exists in a low-dimensional structure."
+    ],
+    "relevant_chunks": [
+      "2506.06845v1::3-4-low-rank-extension::fixed_0013",
+      "2506.06845v1::3-4-low-rank-extension::fixed_0014"
+    ]
+  },
+  {
+    "query_id": "p14_q21_mc",
+    "paper_id": "2507.10215v2",
+    "query_type": "multi_chunk",
+    "query_text": "What is the difference between the two paths to sufficiency—injectivity and region separation—in terms of neuron width and layer depth requirements?",
+    "answer_text": [
+      "The injectivity-based path requires the number of neurons (width) in a layer to be infinite to guarantee asymptotic sufficiency, but it holds for any finite number of layers. The region separation path can achieve exact sufficiency with a finite number of neurons (equal to the number of regions), and this sufficiency is preserved for an infinite number of subsequent layers."
+    ],
+    "relevant_chunks": [
+      "2507.10215v2::conclusion::fixed_0055",
+      "2507.10215v2::preliminaries::fixed_0041"
+    ]
+  },
+  {
+    "query_id": "p15_q21_mc",
+    "paper_id": "2507.11732v1",
+    "query_type": "multi_chunk",
+    "query_text": "Explain the difference between the GEE-powered GNN (GG) and the concatenated variant (GG-C) for node classification.",
+    "answer_text": [
+      "The GG method uses the supervised GEE embedding as the initial input features for a GNN, and the final prediction is made by the GNN. The GG-C method takes this a step further by concatenating the final GNN-refined embeddings from the GG model with the initial supervised GEE embeddings. This combined, richer representation is then passed to a Linear Discriminant Analysis (LDA) classifier for the final label prediction."
+    ],
+    "relevant_chunks": [
+      "2507.11732v1::front-matter::fixed_0042",
+      "2507.11732v1::front-matter::fixed_0026"
+    ]
+  },
+  {
+    "query_id": "p16_q21_mc",
+    "paper_id": "3625403.3625407",
+    "query_type": "multi_chunk",
+    "query_text": "How does the Graph Encoder Ensemble algorithm handle the determination of the number of clusters, K?",
+    "answer_text": [
+      "The algorithm iterates through a range of potential cluster sizes (e.g., from 2 to 10). For each potential size 'k', it runs the embedding and clustering process multiple times. It then uses the Minimal Rank Index (MRI) to evaluate the quality of the clustering for each 'k'. The final estimated cluster size, K̂, is the one that yields the smallest MRI value, with ties being broken by choosing the larger k."
+    ],
+    "relevant_chunks": [
+      "3625403.3625407::introduction::fixed_0011",
+      "3625403.3625407::results::fixed_0021"
+    ]
+  },
+  {
+    "query_id": "p1_q22_mc",
+    "paper_id": "1806.05514v5",
+    "query_type": "multi_chunk",
+    "query_text": "Explain the concept of a 'negative type metric' and its relationship to a 'positive definite kernel' as described in the paper.",
+    "answer_text": [
+      "A metric d(·, ·) is of negative type if for any set of points {x_i} and real numbers {a_i} with Σa_i = 0, the sum Σ(a_i * a_j * d(x_i, x_j)) is less than or equal to 0. A kernel k(·, ·) is positive definite if for any set of points {x_i} and real numbers {a_i}, the sum Σ(a_i * a_j * k(x_i, x_j)) is greater than or equal to 0. The paper's bijective transformation establishes a direct relationship: the bijective induced kernel is positive definite if and only if the original metric is of negative type."
+    ],
+    "relevant_chunks": [
+      "1806.05514v5::background::fixed_0009",
+      "1806.05514v5::background::fixed_0010",
+      "1806.05514v5::4-negative-type-metric-to-positive-de-nite-kernel-the-bijective-induced-kernel-kd::fixed_0017"
+    ]
+  },
+  {
+    "query_id": "p2_q22_mc",
+    "paper_id": "1710.09768v3",
+    "query_type": "multi_chunk",
+    "query_text": "What is the alternative definition of population local covariance from Theorem 1 and why is it useful?",
+    "answer_text": [
+      "Theorem 1 provides an alternative definition based on the expectation of products of truncated distance differences: dCov_ρk,ρl(X, Y) = E(d_ρk_X * d_ρl_Y') - E(d_ρk_X)E(d_ρl_Y'). This definition is useful because it better motivates the sample version, is often easier for understanding and proving theoretical properties, and makes it obvious that the local covariance is always a real number."
+    ],
+    "relevant_chunks": [
+      "1710.09768v3::introduction::fixed_0014",
+      "1710.09768v3::introduction::fixed_0015"
+    ]
+  }
+]

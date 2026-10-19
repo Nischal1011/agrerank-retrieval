@@ -1,0 +1,20 @@
+{
+ "dl2021": {
+  "queries": 53,
+  "pool_mismatch": 0,
+  "query_text_mismatch": 0,
+  "passage_text_mismatch": 0,
+  "bad_vectors": 0,
+  "imported_passages": 45176,
+  "unique_passages_in_pool": 52865
+ },
+ "dl2022": {
+  "queries": 76,
+  "pool_mismatch": 0,
+  "query_text_mismatch": 0,
+  "passage_text_mismatch": 0,
+  "bad_vectors": 0,
+  "imported_passages": 65584,
+  "unique_passages_in_pool": 75175
+ }
+}

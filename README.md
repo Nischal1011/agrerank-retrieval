@@ -102,6 +102,8 @@ The `data/` directory contains the diagnostic corpus used in the controlled eval
   git clone https://github.com/Nischal1011/agrerank-retrieval.git
   ```
 - **`data/preprocessed_to_json/`** — JSON files preprocessed from the PDFs (one file per paper, named by arXiv ID). These are the inputs to `chunk_json.py` and are ready to use without re-running `pdf_to_json_with_metadata.py`.
+- **`data/diagnostic/chunks.jsonl`** — the 1,249-passage diagnostic corpus (250-token chunks of the papers above).
+- **`data/diagnostic/queries.json`** — the 100 diagnostic queries (50 single-chunk, 50 multi-chunk; 145 relevant chunks) used in the paper. `data/qset.json` is an earlier 41-query version.
 
 > Note: The large-scale TREC DL experiments use MS MARCO v2 (138M passages), which is not included in this repo. Follow the [MS MARCO v2 instructions](https://microsoft.github.io/msmarco/) to obtain it, then index with Pyserini.
 
@@ -159,6 +161,10 @@ python src/noisy_corpus.py
 ---
 
 ## Reproducing Paper Experiments
+
+**From scratch (recommended).** [`reproduce/`](reproduce/) rebuilds every table from public inputs with one
+implementation and a single command (`reproduce/run_all.sh`); [`REPRODUCTION.md`](REPRODUCTION.md) lists each
+paper number next to the reproduced one. The scripts below are the originals used for the paper.
 
 All TREC DL experiments can be reproduced via the ablation shell script. Set your OpenAI API key first:
 

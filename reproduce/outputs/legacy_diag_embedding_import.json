@@ -1,0 +1,7 @@
+{
+ "chunk_ids_match": true,
+ "noisy_corpus_ids_match": true,
+ "noisy_corpus_texts_match": true,
+ "bad_vectors": 0,
+ "query_ids_match": true
+}
